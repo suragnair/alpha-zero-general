@@ -8,7 +8,7 @@ class OthelloGame():
 
     def getInitBoard(self):
         # return initial board (numpy board)
-        b = Board(self.n)    
+        b = Board(self.n)
         return np.array(b.pieces)
 
     def getBoardSize(self):
@@ -25,7 +25,7 @@ class OthelloGame():
         if action == self.n*self.n:
         	return (board, -player)
         b = Board(self.n)
-        b.pieces = board
+        b.pieces = np.copy(board)
         move = (action/self.n, action%self.n)
         b.execute_move(move, player)
         return (b.pieces, -player)
@@ -34,7 +34,7 @@ class OthelloGame():
         # return a fixed size binary vector
         valids = [0]*self.getActionSize()
         b = Board(self.n)
-        b.pieces = board
+        b.pieces = np.copy(board)
         legalMoves =  b.get_legal_moves(player)
         if len(legalMoves)==0:
         	valids[-1]=1
@@ -47,7 +47,7 @@ class OthelloGame():
         # return 0 if not ended, 1 if player 1 won, -1 if player 1 lost
         # player = 1
         b = Board(self.n)
-        b.pieces = board
+        b.pieces = np.copy(board)
         legalMoves1 =  b.get_legal_moves(player)
         legalMoves2 =  b.get_legal_moves(-player)
         if len(legalMoves1)>0 or len(legalMoves2)>0:
@@ -60,7 +60,7 @@ class OthelloGame():
         # return state if player==0, else return -state ?
         return player*board
 
-    def gameSymmetries(self, board):
+    def getSymmetries(self, board):
         # mirror, rotational
         l = []
         for i in range(1, 5):
@@ -77,10 +77,10 @@ class OthelloGame():
     def stringRepresentation(self, board):#, player):
     	# 64 + 1 digits; 0 for player2, 1 for empty, 2 for player1
     	# followed by 2 or 1 for whose turn it is
-    	l = [x+1 for x in np.ravel(board).to_list()]# + [player+1]
-    	return l
+    	l = [x+1 for x in np.ravel(board)]# + [player+1]
+    	return ''.join([str(x) for x in l])
 
     def getScore(self, board, player):
         b = Board(self.n)
-        b.pieces = board
+        b.pieces = np.copy(board)
         return b.count(player)-b.count(-player)

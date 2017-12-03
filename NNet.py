@@ -23,9 +23,8 @@ args = dotdict({
     'dropout': 0.3,
     'epochs': 10,
     'batch_size': 256,
-    'cuda': True,
+    'cuda': False,
     'num_channels': 512,
-    'checkpoint': '/mnt/models/basset+/',
 })
 
 class NNetWrapper():
@@ -121,8 +120,8 @@ class NNetWrapper():
         self.nnet.eval()
         pi, v = self.nnet(board)
 
-        print('PREDICTION TIME TAKEN : {0:03f}'.format(time.time()-start))
-        return pi.data.cpu()[0], v.data.cpu()[0]
+        #print('PREDICTION TIME TAKEN : {0:03f}'.format(time.time()-start))
+        return pi.data.cpu().numpy()[0], v.data.cpu().numpy()[0]
 
     def loss_pi(self, targets, outputs):
         return -torch.sum(targets*torch.log(outputs))/targets.size()[0]
@@ -138,7 +137,7 @@ class NNetWrapper():
         else:
             print("Checkpoint Directory exists! ")
         torch.save({
-            'state_dict' : self.nnet.state_dict(),            
+            'state_dict' : self.nnet.state_dict(),
         }, filepath)
 
     def load_checkpoint(self, folder='checkpoint', filename='checkpoint.pth.tar'):
