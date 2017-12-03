@@ -9,7 +9,7 @@ class Coach():
         self.curPlayer = 1
         self.numIters = 1000
         self.numEps = 100
-        self.mcts = mcts
+        self.mcts = mcts(self.game, self.nnet)
         self.maxlenOfQueue = 5000
         # other hyperparams (numIters, numEps, MCTSParams etc)
 
@@ -34,6 +34,7 @@ class Coach():
                     e[3] = r if self.curPlayer == e[1] else -r
                     trainExamples[i] = (e[0],e[2],e[3])
                 break
+
         return train_examples    
 
 
@@ -44,6 +45,7 @@ class Coach():
         for Iter in xrange(numIters):
             for eps in xrange(numEps):
                 trainExamples.append(executeEpisode())
+            
             self.nnet.trainNNet(trainExamples)
         
 
