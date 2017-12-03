@@ -12,7 +12,6 @@ class Coach():
         self.mcts = mcts
         self.maxlenOfQueue = 5000
         # other hyperparams (numIters, numEps, MCTSParams etc)
-        pass
 
     def executeEpisode(self):
         # performs one full game
@@ -23,17 +22,20 @@ class Coach():
         while True:
             pi = self.mcts.getActionProb(self.board, self.player)
             canonicalBoard = self.game.getCanonicalForm(self.board,self.curPlayer)
-            trainExamples.append((self.board, self.curPlayer, actionProb, 0))
+            trainExamples.append((self.canonicalBoard, self.curPlayer, actionProb, 0))
 
             action = np.argmax(pi)
             (self.board, self.curPlayer) = self.game.getNextState(self.board, self.curPlayer, action)
+            
             r = getGameEnded(self.board, self.curPlayer)
-
             if r!=0:
                 for i in xrange(len(trainExamples)):
-                    trainExamples[i][3] = r if self.curPlayer == trainExamples[i][1] else -r 
+                    e = trainExamples[i]
+                    e[3] = r if self.curPlayer == e[1] else -r
+                    trainExamples[i] = (e[0],e[2],e[3])
                 break
         return train_examples    
+
 
     def learn(self):
         # performs numIters x numEps games
