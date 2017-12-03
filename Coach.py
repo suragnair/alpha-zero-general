@@ -48,14 +48,14 @@ class Coach():
         # performs numIters x numEps games
         # after every Iter, retrains nnet and only updates if it wins > cutoff% games
         trainExamples = deque([], maxlen=self.args.maxlenOfQueue)
-        for i in range(self.args.numIters): 
+        for i in range(self.args.numIters):
             for eps in range(self.args.numEps):
                 print('EPISODE # ' + str(eps+1))
                 trainExamples += self.executeEpisode()
 
-            self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='checkpoint_' + str(i+1) +  '.pth.tar')
+            self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='checkpoint_temp.pth.tar')
             pnet = NNet(self.game)
-            pnet.load_checkpoint(folder=self.args.checkpoint, filename='checkpoint_' + str(i+1) + '.pth.tar')
+            pnet.load_checkpoint(folder=self.args.checkpoint, filename='checkpoint_temp.pth.tar')
             pmcts = MCTS(self.game, pnet, self.args)
             self.nnet.train(trainExamples)
             nmcts = MCTS(self.game, self.nnet, self.args)
@@ -71,4 +71,5 @@ class Coach():
 
             else:
                 print('NEW MODEL AWESOME')
+                self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')
                 self.mcts = MCTS(self.game, self.nnet, self.args)
