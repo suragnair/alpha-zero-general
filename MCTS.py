@@ -14,7 +14,7 @@ Class MCTS():
 
 	def getActionProb(self, canonicalBoard, temp=1):
 		# return pi
-		for i in range(len(self.numSimulations)):
+		for i in range(len(args.numMCTSSims)):
 			self.search(canonicalBoard)
 
 		s = self.game.stringRepresentation(canonicalBoard)
@@ -47,7 +47,7 @@ Class MCTS():
 
 		cur_best = -float('inf')
 		best_act = -1
-		for a in range(len(game.getActionSize)):
+		for a in range(len(game.getActionSize())):
 			if valids[a]:
 				if (s,a) in self.Qsa:
 					u = self.Qsa[(s,a)] + self.cpuct*self.Ps[s][a]*math.sqrt(self.Ns[s])/(1+self.Nsa[(s,a)])
@@ -62,8 +62,8 @@ Class MCTS():
 		next_s = self.game.getCanonicalForm(next_s, next_player)
 
 		v = self.search(next_s)
-		a = best_act
 
+		a = best_act
 		if (s,a) in self.Qsa:
 			self.Qsa[(s,a)] = (self.Nsa[(s,a)]*self.Qsa[(s,a)] + v)/(self.Nsa[(s,a)]+1)
 			self.Nsa[(s,a)] += 1
