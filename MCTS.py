@@ -12,13 +12,23 @@ Class MCTS():
 		self.Ns = {}
 		self.Ps = {}
 
-	def GetActionCounts(self, canonicalBoard):
+	def getActionProb(self, canonicalBoard, temp=1):
 		# return pi
 		for i in range(len(self.numSimulations)):
 			self.search(canonicalBoard)
 
 		s = self.game.stringRepresentation(canonicalBoard)
-		return [self.Nsa[(s,a)] if (s,a) in self.Nsa else 0 for a in range(len(actions))]
+		counts = [self.Nsa[(s,a)] if (s,a) in self.Nsa else 0 for a in range(len(actions))]
+
+		if temp==0:
+			bestA = np.argmax(counts)
+			probs = [0]*len(counts)
+			probs[bestA]=1probs
+			return probs
+
+		counts = [x**(1./temp) for x in counts]
+		probs = [x/sum(counts) for x in counts]
+		return probs
 
 
 	def search(self, canonicalBoard):
@@ -53,7 +63,7 @@ Class MCTS():
 
 		v = self.search(next_s)
 		a = best_act
-		
+
 		if (s,a) in self.Qsa:
 			self.Qsa[(s,a)] = (self.Nsa[(s,a)]*self.Qsa[(s,a)] + v)/(self.Nsa[(s,a)]+1)
 			self.Nsa[(s,a)] += 1
@@ -64,13 +74,3 @@ Class MCTS():
 
 		self.Ns[s] += 1
 		return -v
-
-	def GetBestAction(self, canonicalBoard, temp=0):
-		counts = self.GetActionCounts(canonicalBoard)
-
-		if temp==0:
-			return np.argmax(counts)
-
-		counts = [x**(1./temp) for x in counts]
-		counts = [x/sum(counts) for x in counts]
-		return np.random.choice(list(range(self.game.getActionSize)), p=counts)
