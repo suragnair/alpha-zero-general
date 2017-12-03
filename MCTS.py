@@ -13,6 +13,8 @@ class MCTS():
 		self.Nsa = {}
 		self.Ns = {}
 		self.Ps = {}
+
+		self.Es = {}		# stores if game ended
 		self.Vs = {}		# stores valid actions
 
 	def getActionProb(self, canonicalBoard, temp=1):
@@ -39,8 +41,9 @@ class MCTS():
 
 		s = self.game.stringRepresentation(canonicalBoard)
 
-		if self.game.getGameEnded(canonicalBoard, 1)!=0:
-			return -self.game.getGameEnded(canonicalBoard, 1)
+		if s not in self.Es:
+			self.Es[s] = self.game.getGameEnded(canonicalBoard, 1)!=0:
+		if self.Es[s]!=0: return -self.Es[s]
 
 		if s not in self.Ps:
 			self.Ps[s], v = self.nnet.predict(canonicalBoard)
