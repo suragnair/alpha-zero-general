@@ -62,7 +62,8 @@ class OthelloGame():
 
     def getSymmetries(self, board, pi):
         # mirror, rotational
-        pi_board = np.reshape(pi, (self.n, self.n))
+        assert(len(pi) == self.n**2+1)  # 1 for pass
+        pi_board = np.reshape(pi[:-1], (self.n, self.n))
         l = []
 
         for i in range(1, 5):
@@ -72,7 +73,7 @@ class OthelloGame():
                 if j:
                     newB = np.fliplr(newB)
                     newPi = np.fliplr(newPi)
-                l += [newB, newPi.ravel()]
+                l += [newB, list(newPi.ravel()) + [pi[-1]]]
         return l
 
     def stringRepresentation(self, board):#, player):
