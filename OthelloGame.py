@@ -74,10 +74,10 @@ class OthelloGame():
 					l += [newB]
         return l
 
-    def stringRepresentation(self, board, player):
+    def stringRepresentation(self, board):#, player):
     	# 64 + 1 digits; 0 for player2, 1 for empty, 2 for player1
     	# followed by 2 or 1 for whose turn it is
-    	l = [x+1 for x in np.ravel(board).to_list()] + [player+1]
+    	l = [x+1 for x in np.ravel(board).to_list()]# + [player+1]
     	return l
 
     def getScore(self, board, player):
