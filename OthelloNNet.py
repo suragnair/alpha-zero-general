@@ -53,23 +53,4 @@ class OthelloNNet(nn.Module):
 
         return F.softmax(pi), F.sigmoid(v)
 
-    def save_checkpoint(self, folder='checkpoint', filename='checkpoint.pth.tar'):
-        filepath = os.path.join(folder, filename)
-        if not os.path.exists(folder):
-            print("Checkpoint Directory does not exist! Making directory {}".format(folder))
-            os.mkdir(folder)
-        else:
-            print("Checkpoint Directory exists! ")
-        torch.save({
-            'state_dict' : self.nnet.state_dict(),
-            'optimizer' : self.optimizer.state_dict(),
-        }, filepath)
-
-    def load_checkpoint(self, folder='checkpoint', filename='checkpoint.pth.tar'):
-        # https://github.com/pytorch/examples/blob/master/imagenet/main.py#L98
-        filepath = os.path.join(folder, filename)
-        if not os.path.exists(filepath):
-            raise("No model in path {}".format(checkpoint))
-        checkpoint = torch.load(filepath)
-        self.nnet.load_state_dict(checkpoint['state_dict'])
-        
+    
