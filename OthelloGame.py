@@ -78,3 +78,8 @@ class OthelloGame(Game):
     	# followed by 2 or 1 for whose turn it is
     	l = [x+1 for x in np.ravel(board).to_list()] + [player+1]
     	return l
+
+    def getScore(self, board, player):
+        b = Board(self.n)
+        b.__pieces = board
+        return b.count(player)-b.count(-player)
