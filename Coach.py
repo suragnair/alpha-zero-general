@@ -11,6 +11,7 @@ class Coach():
         self.board = game.getInitBoard()
         self.nnet = nnet
         self.args = args
+        self.mcts = MCTS(self.game, self.nnet, self.args)
         # other hyperparams (numIters, numEps, MCTSParams etc)
 
     def executeEpisode(self):
@@ -47,8 +48,7 @@ class Coach():
         # performs numIters x numEps games
         # after every Iter, retrains nnet and only updates if it wins > cutoff% games
         trainExamples = deque([], maxlen=self.args.maxlenOfQueue)
-        for i in range(self.args.numIters):
-            self.mcts = MCTS(self.game, self.nnet, self.args)
+        for i in range(self.args.numIters): 
             for eps in range(self.args.numEps):
                 print('EPISODE # ' + str(eps+1))
                 trainExamples += self.executeEpisode()
@@ -64,9 +64,11 @@ class Coach():
             pwins, nwins = arena.playGames(self.args.arenaCompare)
 
             print('ENDING ITER ' + str(i+1))
+            print('NEW/PREV WINS : ' + str(nwins) + '/' + str(pwins))
             if float(nwins)/(pwins+nwins) < self.args.updateThreshold:
                 print('NEW MODEL SUCKS')
                 self.nnet = pnet
 
             else:
                 print('NEW MODEL AWESOME')
+                self.mcts = MCTS(self.game, self.nnet, self.args)

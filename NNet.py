@@ -22,8 +22,8 @@ import pdb
 args = dotdict({
     'lr': 0.001,
     'dropout': 0.3,
-    'epochs': 2,
-    'batch_size': 256,
+    'epochs': 5,
+    'batch_size': 64,
     'cuda': True,
     'num_channels': 512,
 })
@@ -128,7 +128,7 @@ class NNetWrapper():
         return -torch.sum(targets*torch.log(outputs))/targets.size()[0]
 
     def loss_v(self, targets, outputs):
-        return torch.sum((targets-outputs)**2)/targets.size()[0]
+        return torch.sum((targets-outputs.view(-1))**2)/targets.size()[0]
 
     def save_checkpoint(self, folder='checkpoint', filename='checkpoint.pth.tar'):
         filepath = os.path.join(folder, filename)
