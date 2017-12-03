@@ -1,4 +1,6 @@
 from collections import deque
+from NNet import NNetWrapper as NNet
+from Arena import Arena
 
 class Coach():
     def __init__(self, game, nnet, mcts):
@@ -20,9 +22,10 @@ class Coach():
         self.board = game.getInitBoard()
 
         while True:
-            pi = self.mcts.getActionProb(self.board, self.player)
+            
             canonicalBoard = self.game.getCanonicalForm(self.board,self.curPlayer)
-            trainExamples.append((self.canonicalBoard, self.curPlayer, actionProb, 0))
+            pi = self.mcts.getActionProb(canonicalBoard)
+            trainExamples.append((canonicalBoard, self.curPlayer, actionProb, 0))
 
             action = np.argmax(pi)
             (self.board, self.curPlayer) = self.game.getNextState(self.board, self.curPlayer, action)
@@ -37,15 +40,24 @@ class Coach():
 
         return train_examples    
 
-
     def learn(self):
         # performs numIters x numEps games
         # after every Iter, retrains nnet and only updates if it wins > cutoff% games
         trainExamples = deque([], maxlen=self.maxlenOfQueue)
         for Iter in xrange(numIters):
+            self.
             for eps in xrange(numEps):
                 trainExamples.append(executeEpisode())
-            
+
+            self.nnet.save_checkpoint(folder='checkpoint', filename='checkpoint.pth.tar')
+            pnet = NNet(self.game)
+            pnet.load_checkpoint(folder='checkpoint', filename='checkpoint.pth.tar')
+            pmcts = MCTS(self.game, pnet)
             self.nnet.trainNNet(trainExamples)
+            nmcts = MCTS(self.game, self.nnet) 
+            arena = Arena(pmcts.GetBestAction,  nmcts.GetBestAction)
+
+
+
         
 
