@@ -71,6 +71,19 @@ class RandomPlayer():
 			a = np.random.randint(self.game.getActionSize())
 		return a
 
+class HumanOthelloPlayer():
+	def __init__(self, game):
+		self.game = game
+
+	def play(self, board):
+		display(board)
+		a = raw_input().strip().split(',')
+		x,y = int(a[0]),int(a[1])
+		a = self.game.n * x + y if x!= -1 else self.game.n ** 2
+		assert self.game.getValidMoves(board, 1)[a]==1
+		return a
+
+
 class GreedyOthelloPlayer():
 	def __init__(self, game):
 		self.game = game
@@ -87,21 +100,23 @@ class GreedyOthelloPlayer():
 		candidates.sort()
 		return candidates[0][1]
 
-from OthelloGame import OthelloGame
-curGame = OthelloGame(6)
-p1 = RandomPlayer(curGame)
-p2 = GreedyOthelloPlayer(curGame)
+if __name__ == "__main__":
+	from OthelloGame import OthelloGame
+	curGame = OthelloGame(6)
+	p1 = RandomPlayer(curGame)
+	p2 = GreedyOthelloPlayer(curGame)
 
-p1,p2 = p1, p2
+	p1,p2 = p1, p2
 
-arena = Arena(p1.play, p2.play, curGame)
-l = []
-for _ in range(100):
-	score, length =  arena.playGame(verbose=True)
-	print score, length
-	raw_input()
-	l += [score]
+	arena = Arena(p1.play, p2.play, curGame)
+	l = []
+	for _ in range(100):
+		score, length =  arena.playGame(verbose=True)
+		print score, length
+		raw_input()
+		l += [score]
 
-print len([x for x in l if x>0])
-print len([x for x in l if x==0])
-print len([x for x in l if x<0])
+	print len([x for x in l if x>0])
+	print len([x for x in l if x==0])
+	print len([x for x in l if x<0])
+
