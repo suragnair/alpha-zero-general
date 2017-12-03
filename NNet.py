@@ -19,13 +19,12 @@ from torch.autograd import Variable
 from OthelloNNet import OthelloNNet as onnet
 
 args = dotdict({
-    'lr': 0.002,
-    'momentum': 0.98,
+    'lr': 0.001,
     'dropout': 0.3,
     'epochs': 10,
     'batch_size': 256,
     'cuda': True,
-    'num_channels': 512
+    'num_channels': 512,
     'checkpoint': '/mnt/models/basset+/',
 })
 
@@ -42,6 +41,8 @@ class NNetWrapper():
         """
         examples: list of examples, each example is of form (board, pi, v)
         """
+        optimizer = optim.Adam(self.nnet.parameters())
+
         for epoch in range(args.epochs):
             print('EPOCH ::: ' + str(epoch+1))
             self.nnet.train()
@@ -51,15 +52,15 @@ class NNetWrapper():
             v_losses = AverageMeter()
             end = time.time()
 
-            bar = Bar('Processing', max=args.batches_per_epoch)
+            bar = Bar('Processing', max=len(examples)/args.batch_size)
             batch_idx = 0
 
             while batch_idx < len(examples)/args.batch_size:
                 sample_ids = np.random.randint(len(examples), size=args.batch_size)
                 boards, pis, vs = zip(*[examples[i] for i in sample_ids])
-                boards = torch.from_numpy(boards)
-                target_pis = torch.from_numpy(pis)
-                target_vs = torch.from_numpy(vs)
+                boards = torch.FloatTensor(np.array(boards))
+                target_pis = torch.FloatTensor(np.array(pis))
+                target_vs = torch.FloatTensor(np.array(vs))
 
                 # predict
                 if args.cuda:
@@ -71,7 +72,7 @@ class NNetWrapper():
 
                 # compute output
                 out_pi, out_v = self.nnet(boards)
-                l_pi = self.loss_pi(target_pis, pi_out)
+                l_pi = self.loss_pi(target_pis, out_pi)
                 l_v = self.loss_v(target_vs, out_v)
                 total_loss = l_pi + l_v
 
@@ -112,7 +113,7 @@ class NNetWrapper():
         start = time.time()
 
         # preparing input
-        board = torch.from_numpy(board)
+        board = torch.FloatTensor(board)
         if args.cuda: board = board.contiguous().cuda()
         board = Variable(board, volatile=True)
         board = board.view(1, self.board_x, self.board_y)
@@ -137,8 +138,7 @@ class NNetWrapper():
         else:
             print("Checkpoint Directory exists! ")
         torch.save({
-            'state_dict' : self.nnet.state_dict(),
-            'optimizer' : self.optimizer.state_dict(),
+            'state_dict' : self.nnet.state_dict(),            
         }, filepath)
 
     def load_checkpoint(self, folder='checkpoint', filename='checkpoint.pth.tar'):
