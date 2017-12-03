@@ -33,3 +33,4 @@ class Game():
     def gameSymmetries(self):
         # mirror, rotational
         pass
+
