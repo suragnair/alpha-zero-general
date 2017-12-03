@@ -3,10 +3,10 @@ import numpy as np
 import NNet
 
 Class MCTS():
-	def __init__(self, game, nnet, cpuct):
+	def __init__(self, game, nnet, args):
 		self.game = game
 		self.nnet = nnet
-		self.cpuct = cpuct
+		self.cpuct = args.cpuct
 		self.Qsa = {}
 		self.Nsa = {}
 		self.Ns = {}
