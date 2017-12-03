@@ -20,19 +20,19 @@ class Board():
 
         self.n = n
         # Create the empty board array.
-        self.__pieces = [None]*self.n
+        self.pieces = [None]*self.n
         for i in range(8):
-            self.__pieces[i] = [0]*self.n
+            self.pieces[i] = [0]*self.n
 
         # Set up the initial 4 pieces.
-        self.__pieces[self.n/2-1][self.n/2] = 1
-        self.__pieces[self.n/2][self.n/2-1] = 1
-        self.__pieces[self.n/2-1][self.n/2-1] = -1;
-        self.__pieces[self.n/2][self.n/2] = -1;
+        self.pieces[self.n/2-1][self.n/2] = 1
+        self.pieces[self.n/2][self.n/2-1] = 1
+        self.pieces[self.n/2-1][self.n/2-1] = -1;
+        self.pieces[self.n/2][self.n/2] = -1;
 
     # add [][] indexer syntax to the Board
     def __getitem__(self, index):
-        return self.__pieces[index]
+        return self.pieces[index]
 
     def count(self, color):
         """Counts the # pieces of the given color

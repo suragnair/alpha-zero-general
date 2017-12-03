@@ -1,3 +1,4 @@
+import numpy as np
 class Arena():
     def __init__(self, player1, player2, game):
     	# player1 and player2 are functions which take in board, return action
@@ -9,8 +10,8 @@ class Arena():
         # execute one game and return winner
         players = [self.player1, None, self.player2]
         curPlayer = 1
-        board = game.getInitBoard()
-        while self.game.getGameEnded()!=0:
+        board = self.game.getInitBoard()
+        while self.game.getGameEnded(board, curPlayer)==0:
         	action = players[curPlayer+1](self.game.getCanonicalForm(board, curPlayer))
         	board, curPlayer = self.game.getNextState(board, curPlayer, action)
         return self.game.getGameEnded(board, curPlayer)
@@ -41,3 +42,12 @@ class GreedyOthelloPlayer():
 			candidates += [(-score, a)]
 		candidates.sort()
 		return candidates[0][1]
+
+from OthelloGame import OthelloGame
+curGame = OthelloGame(8)
+p1 = RandomPlayer(curGame)
+p2 = GreedyOthelloPlayer(curGame)
+
+arena = Arena(p1.play, p2.play, curGame)
+for _ in range(10):
+	print arena.playGame()
