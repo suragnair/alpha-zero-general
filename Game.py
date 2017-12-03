@@ -10,6 +10,10 @@ class Game():
         # (a,b) tuple
         pass
 
+    def getActionSize(self):
+        # return number of actions
+        pass
+
     def getNextState(self, board, player, action):
         # if player takes action on board, return next (board,player)
         pass
