@@ -1,4 +1,12 @@
+import argparse
+import os
+import shutil
+import time
+import random
+import numpy as np
+import math
 from utils import *
+from pytorch_classification.utils import Bar, Logger, AverageMeter, accuracy, mkdir_p, savefig
 
 import argparse
 import torch
@@ -8,7 +16,6 @@ import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.autograd import Variable
 
-from pytorch_classification.utils import Bar, Logger, AverageMeter, accuracy, mkdir_p, savefig
 from OthelloNNet import OthelloNNet as onnet
 
 args = dotdict({
@@ -25,18 +32,99 @@ args = dotdict({
 class NNetWrapper():
     def __init__(self, game):
         self.nnet = onnet(game, args)
+        self.board_x, self.board_y = game.getBoardSize()
+        self.action_size = game.getActionSize()
 
+        if args.cuda:
+            self.nnet.cuda()
 
-    def trainNNet(self, examples):
+    def train(self, examples):
         """
         examples: list of examples, each example is of form (board, pi, v)
         """
-        for epoch in args.epochs:
-            for batch in
+        for epoch in range(args.epochs):
+            print('EPOCH ::: ' + str(epoch+1))
+            self.nnet.train()
+            data_time = AverageMeter()
+            batch_time = AverageMeter()
+            pi_losses = AverageMeter()
+            v_losses = AverageMeter()
+            end = time.time()
+
+            bar = Bar('Processing', max=args.batches_per_epoch)
+            batch_idx = 0
+
+            while batch_idx < len(examples)/args.batch_size:
+                sample_ids = np.random.randint(len(examples), size=args.batch_size)
+                boards, pis, vs = zip(*[examples[i] for i in sample_ids])
+                boards = torch.from_numpy(boards)
+                target_pis = torch.from_numpy(pis)
+                target_vs = torch.from_numpy(vs)
+
+                # predict
+                if args.cuda:
+                    boards, target_pis, target_vs = boards.contiguous().cuda(), target_pis.contiguous().cuda(), target_vs.contiguous().cuda()
+                boards, target_pis, target_vs = Variable(boards), Variable(target_pis), Variable(target_vs)
+
+                # measure data loading time
+                data_time.update(time.time() - end)
+
+                # compute output
+                out_pi, out_v = self.nnet(boards)
+                l_pi = self.loss_pi(target_pis, pi_out)
+                l_v = self.loss_v(target_vs, out_v)
+                total_loss = l_pi + l_v
+
+                # record loss
+                pi_losses.update(l_pi.data[0], boards.size(0))
+                v_losses.update(l_v.data[0], boards.size(0))
+
+                # compute gradient and do SGD step
+                optimizer.zero_grad()
+                total_loss.backward()
+                optimizer.step()
+
+                # measure elapsed time
+                batch_time.update(time.time() - end)
+                end = time.time()
+                batch_idx += 1
+
+                # plot progress
+                bar.suffix  = '({batch}/{size}) Data: {data:.3f}s | Batch: {bt:.3f}s | Total: {total:} | ETA: {eta:} | Loss_pi: {lpi:.4f} | Loss_v: {lv:.3f}'.format(
+                            batch=batch_idx,
+                            size=len(examples)/args.batch_size,
+                            data=data_time.avg,
+                            bt=batch_time.avg,
+                            total=bar.elapsed_td,
+                            eta=bar.eta_td,
+                            lpi=pi_losses.avg,
+                            lv=v_losses.avg,                            
+                            )
+                bar.next()
+            bar.finish()
+
 
     def predict(self, board):
         """
         board: np array with board
         """
+        # timing
+        start = time.time()
 
-        pi, v = onnet(board)
+        # preparing input
+        board = torch.from_numpy(board)
+        if args.cuda: board = board.contiguous().cuda()
+        board = Variable(board, volatile=True)
+        board = board.view(1, self.board_x, self.board_y)
+
+        self.nnet.eval()
+        pi, v = self.nnet(board)
+
+        print('PREDICTION TIME TAKEN : {0:03f}'.format(time.time()-start))
+        return pi.data.cpu()[0], v.data.cpu()[0]
+
+    def loss_pi(self, targets, outputs):
+        return -torch.sum(targets*torch.log(outputs))/targets.size()[0]
+
+    def loss_v(self, targets, outputs):
+        return torch.sum((targets-outputs)**2)/targets.size()[0]
