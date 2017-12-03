@@ -4,23 +4,23 @@ def display(board):
     n = board.shape[0]
     
     for y in range(n):
-    	print y,"|",
-    print ""
-    print " -----------------------"
+    	print (y,"|",)
+    print("")
+    print(" -----------------------")
     for y in range(n-1,-1,-1):
-        print y, "|",    # print the row #
+        print(y, "|",)    # print the row #
         for x in range(n):
             piece = board[x][y]    # get the piece to print
-            if piece == -1: print "b ",
-            elif piece == 1: print "W ",
+            if piece == -1: print("b "),
+            elif piece == 1: print("W "),
             else:
                 if x==n:
-                    print "-",
+                    print("-"),
                 else:
-                    print "- ",
-        print "|"
+                    print("- "),
+        print("|")
 
-    print "   -----------------------"
+    print("   -----------------------")
     
 class Arena():
     def __init__(self, player1, player2, game):
@@ -38,12 +38,12 @@ class Arena():
         while self.game.getGameEnded(board, curPlayer)==0:
         	it+=1
         	if verbose:
-        		print "Turn ", str(it), "Player ", str(curPlayer)
+        		print("Turn ", str(it), "Player ", str(curPlayer))
         		display(board)
         	action = players[curPlayer+1](self.game.getCanonicalForm(board, curPlayer))
         	board, curPlayer = self.game.getNextState(board, curPlayer, action)
         if verbose:
-        	print "Turn ", str(it), "Player ", str(curPlayer)
+        	print("Turn ", str(it), "Player ", str(curPlayer))
         	display(board)
         return self.game.getGameEnded(board, 1)
 
@@ -84,7 +84,7 @@ class HumanOthelloPlayer():
 		valid = self.game.getValidMoves(board, 1)
 		for i in range(len(valid)):
 			if valid[i]:
-				print i%self.game.n, i/self.game.n
+				print(i%self.game.n, i/self.game.n)
 		a = raw_input().strip().split(',')
 		x,y = int(a[0]),int(a[1])
 		a = self.game.n * y + x if x!= -1 else self.game.n ** 2
@@ -121,11 +121,11 @@ if __name__ == "__main__":
 	l = []
 	for _ in range(1):
 		score, length =  arena.playGame(verbose=False)
-		print score, length
+		print(score, length)
 		raw_input()
 		l += [score]
 
-	print len([x for x in l if x>0])
-	print len([x for x in l if x==0])
-	print len([x for x in l if x<0])
+	print(len([x for x in l if x>0]))
+	print(len([x for x in l if x==0]))
+	print(len([x for x in l if x<0]))
 

@@ -64,14 +64,14 @@ class OthelloGame():
         # mirror, rotational
         l = []
         for i in range(1, 5):
-			for j in [True, False]:
-				for k in [True, False]:
-					newB = np.rot90(board, i)
-					if j:
-						newB = np.fliplr(newB)
-					if k:
-						newB = np.flipud(newB)
-					l += [newB]
+            for j in [True, False]:
+	        for k in [True, False]:
+                    newB = np.rot90(board, i)
+                    if j:
+                        newB = np.fliplr(newB)
+                    if k:
+                        newB = np.flipud(newB)
+                    l += [newB]
         return l
 
     def stringRepresentation(self, board):#, player):
