@@ -22,14 +22,15 @@ class Coach():
         self.board = game.getInitBoard()
 
         while True:
-            
+
             canonicalBoard = self.game.getCanonicalForm(self.board,self.curPlayer)
             pi = self.mcts.getActionProb(canonicalBoard)
-            trainExamples.append((canonicalBoard, self.curPlayer, actionProb, 0))
-
+            sym = self.game.getSymmetries(canonicalBoard)
+            for b in sym:
+                trainExamples.append((b, self.curPlayer, pi, 0))
             action = np.argmax(pi)
             (self.board, self.curPlayer) = self.game.getNextState(self.board, self.curPlayer, action)
-            
+
             r = getGameEnded(self.board, self.curPlayer)
             if r!=0:
                 for i in xrange(len(trainExamples)):
@@ -38,7 +39,7 @@ class Coach():
                     trainExamples[i] = (e[0],e[2],e[3])
                 break
 
-        return train_examples    
+        return train_examples
 
     def learn(self):
         # performs numIters x numEps games
@@ -49,15 +50,11 @@ class Coach():
             for eps in xrange(numEps):
                 trainExamples.append(executeEpisode())
 
+
             self.nnet.save_checkpoint(folder='checkpoint', filename='checkpoint.pth.tar')
             pnet = NNet(self.game)
             pnet.load_checkpoint(folder='checkpoint', filename='checkpoint.pth.tar')
             pmcts = MCTS(self.game, pnet)
             self.nnet.trainNNet(trainExamples)
-            nmcts = MCTS(self.game, self.nnet) 
+            nmcts = MCTS(self.game, self.nnet)
             arena = Arena(pmcts.GetBestAction,  nmcts.GetBestAction)
-
-
-
-        
-
