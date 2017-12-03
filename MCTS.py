@@ -12,7 +12,8 @@ class MCTS():
 		self.Qsa = {}
 		self.Nsa = {}
 		self.Ns = {}
-		self.Ps = {}
+                self.Ps = {}
+		self.Vs = {}     # valid moves from s
 
 	def getActionProb(self, canonicalBoard, temp=1):
 		# return pi
@@ -21,7 +22,7 @@ class MCTS():
 
 		s = self.game.stringRepresentation(canonicalBoard)
 		counts = [self.Nsa[(s,a)] if (s,a) in self.Nsa else 0 for a in range(self.game.getActionSize())]
-		print(counts, sum(counts))
+
 		if temp==0:
 			bestA = np.argmax(counts)
 			probs = [0]*len(counts)
@@ -37,19 +38,21 @@ class MCTS():
 		# v' for the newest leaf node
 
 		s = self.game.stringRepresentation(canonicalBoard)
-		valids = self.game.getValidMoves(canonicalBoard, 1)
 
 		if self.game.getGameEnded(canonicalBoard, 1)!=0:
 			return -self.game.getGameEnded(canonicalBoard, 1)
 
 		if s not in self.Ps:
 			self.Ps[s], v = self.nnet.predict(canonicalBoard)
+                        valids = self.game.getValidMoves(canonicalBoard, 1)
 			self.Ps[s] = self.Ps[s]*valids
 			self.Ps[s] /= np.sum(self.Ps[s])	# renormalize
-
+                        
+			self.Vs[s] = valids
 			self.Ns[s] = 0
 			return -v
-
+                
+		valids = self.Vs[s]
 		cur_best = -float('inf')
 		best_act = -1
 		for a in range(self.game.getActionSize()):
