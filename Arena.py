@@ -71,7 +71,7 @@ class GreedyOthelloPlayer():
 		return candidates[0][1]
 
 from OthelloGame import OthelloGame
-curGame = OthelloGame(8)
+curGame = OthelloGame(6)
 p1 = RandomPlayer(curGame)
 p2 = GreedyOthelloPlayer(curGame)
 
@@ -80,7 +80,7 @@ p1,p2 = p1, p2
 arena = Arena(p1.play, p2.play, curGame)
 l = []
 for _ in range(100):
-	score, length =  arena.playGame(verbose=False)
+	score, length =  arena.playGame(verbose=True)
 	print score, length
 	raw_input()
 	l += [score]
