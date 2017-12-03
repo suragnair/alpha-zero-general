@@ -27,22 +27,17 @@ class Coach():
             temp = int(episodeStep < self.args.tempThreshold)
 
             pi = self.mcts.getActionProb(canonicalBoard, temp=temp)
-            sym = self.game.getSymmetries(canonicalBoard)
-            for b in sym:
-                trainExamples.append([b, self.curPlayer, pi, None])
+            sym = self.game.getSymmetries(canonicalBoard, pi)
+            for b,p in sym:
+                trainExamples.append([b, self.curPlayer, p, None])
 
             action = np.argmax(pi)
             self.board, self.curPlayer = self.game.getNextState(self.board, self.curPlayer, action)
 
             r = self.game.getGameEnded(self.board, self.curPlayer)
-            if r!=0:
-                for i in range(len(trainExamples)):
-                    e = trainExamples[i]
-                    e[3] = r if self.curPlayer == e[1] else -r
-                    trainExamples[i] = (e[0],e[2],e[3])
-                break
 
-        return trainExamples
+            if r!=0:
+                return [(x[0],x[2],r*((-1)**(x[1]!=self.curPlayer))) for x in train_examples]
 
     def learn(self):
         # performs numIters x numEps games
@@ -72,4 +67,4 @@ class Coach():
             else:
                 print('NEW MODEL AWESOME')
                 self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')
-                self.mcts = MCTS(self.game, self.nnet, self.args)
+                self.mcts = MCTS(self.game, self.nnet, self.args)   # reset search tree

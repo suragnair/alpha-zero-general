@@ -57,21 +57,26 @@ class OthelloGame():
         return -1
 
     def getCanonicalForm(self, board, player):
-        # return state if player==0, else return -state ?
+        # return state if player==1, else return -state if player==-1
         return player*board
 
-    def getSymmetries(self, board):
+    def getSymmetries(self, board, pi):
         # mirror, rotational
+        pi_board = np.reshape(pi, (self.n, self.n))
         l = []
+
         for i in range(1, 5):
             for j in [True, False]:
                 for k in [True, False]:
                     newB = np.rot90(board, i)
+                    newPi = np.rot90(pi_board, i)
                     if j:
                         newB = np.fliplr(newB)
+                        newPi = np.fliplr(newPi)
                     if k:
                         newB = np.flipud(newB)
-                    l += [newB]
+                        newPi = np.flipud(newPi)
+                    l += [newB, newPi.ravel()]
         return l
 
     def stringRepresentation(self, board):#, player):
