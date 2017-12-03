@@ -41,7 +41,24 @@ class Arena():
         if verbose:
         	print "Turn ", str(it), "Player ", str(curPlayer)
         	display(board)
-        return self.game.getScore(board, 1), it
+        return self.game.getGameEnded(board, 1)
+
+    def playGames(self, num):
+    	num/=2
+    	oneWon = 0
+    	twoWon = 0
+    	for _ in range(num):
+    		if self.playGame()==1:
+    			oneWon+=1
+    		else:
+    			twoWon+=1
+    	self.player1, self.player2 = self.player2, self.player1
+    	for _ in range(num):
+    		if self.playGame()==-1:
+    			oneWon+=1
+    		else:
+    			twoWon+=1
+    	return oneWon, twoWon
 
 class RandomPlayer():
 	def __init__(self, game):
