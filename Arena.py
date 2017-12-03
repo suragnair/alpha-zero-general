@@ -2,9 +2,13 @@ import numpy as np
 
 def display(board):
     n = board.shape[0]
-    print "   -----------------------"
+    
+    for y in range(n):
+    	print y,"|",
+    print ""
+    print " -----------------------"
     for y in range(n-1,-1,-1):
-        print y+1, "|",    # print the row #
+        print y, "|",    # print the row #
         for x in range(n):
             piece = board[x][y]    # get the piece to print
             if piece == -1: print "b ",
@@ -27,7 +31,7 @@ class Arena():
 
     def playGame(self, verbose=False):
         # execute one game and return winner
-        players = [self.player1, None, self.player2]
+        players = [self.player2, None, self.player1]
         curPlayer = 1
         board = self.game.getInitBoard()
         it = 0
@@ -77,10 +81,14 @@ class HumanOthelloPlayer():
 
 	def play(self, board):
 		display(board)
+		valid = self.game.getValidMoves(board, 1)
+		for i in range(len(valid)):
+			if valid[i]:
+				print i%self.game.n, i/self.game.n
 		a = raw_input().strip().split(',')
 		x,y = int(a[0]),int(a[1])
-		a = self.game.n * x + y if x!= -1 else self.game.n ** 2
-		assert self.game.getValidMoves(board, 1)[a]==1
+		a = self.game.n * y + x if x!= -1 else self.game.n ** 2
+
 		return a
 
 
@@ -104,14 +112,15 @@ if __name__ == "__main__":
 	from OthelloGame import OthelloGame
 	curGame = OthelloGame(6)
 	p1 = RandomPlayer(curGame)
-	p2 = GreedyOthelloPlayer(curGame)
+	# p2 = GreedyOthelloPlayer(curGame)
+	p2 = HumanOthelloPlayer(curGame)
 
 	p1,p2 = p1, p2
 
 	arena = Arena(p1.play, p2.play, curGame)
 	l = []
-	for _ in range(100):
-		score, length =  arena.playGame(verbose=True)
+	for _ in range(1):
+		score, length =  arena.playGame(verbose=False)
 		print score, length
 		raw_input()
 		l += [score]
