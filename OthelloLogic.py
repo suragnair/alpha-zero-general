@@ -31,7 +31,7 @@ class Board():
         self.pieces[int(self.n/2)][int(self.n/2)] = -1;
 
     # add [][] indexer syntax to the Board
-    def __getitem__(self, index):
+    def __getitem__(self, index): 
         return self.pieces[index]
 
     def count(self, color):
@@ -145,7 +145,7 @@ class Board():
     @staticmethod
     def _increment_move(move, direction, n):
         """ Generator expression for incrementing moves """
-        move = map(sum, zip(move, direction))
-        while all(map(lambda x: 0 <= x < n, move)):
+        move = list(map(sum, zip(move, direction)))
+        while all(map(lambda x: 0 <= x < n, move)): 
             yield move
-            move = map(sum, zip(move, direction))
+            move =list(map(sum, zip(move, direction)))

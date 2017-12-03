@@ -25,7 +25,7 @@ class MCTS():
 		if temp==0:
 			bestA = np.argmax(counts)
 			probs = [0]*len(counts)
-			probs[bestA]=probs
+			probs[bestA]=1
 			return probs
 
 		counts = [x**(1./temp) for x in counts]

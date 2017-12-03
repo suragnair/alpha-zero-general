@@ -48,7 +48,7 @@ class Arena():
         return self.game.getGameEnded(board, 1)
 
     def playGames(self, num):
-    	num/=2
+    	num = int(num/2)
     	oneWon = 0
     	twoWon = 0
     	for _ in range(num):

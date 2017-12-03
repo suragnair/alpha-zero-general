@@ -17,13 +17,14 @@ from torchvision import datasets, transforms
 from torch.autograd import Variable
 
 from OthelloNNet import OthelloNNet as onnet
+import pdb
 
 args = dotdict({
     'lr': 0.001,
     'dropout': 0.3,
-    'epochs': 10,
+    'epochs': 2,
     'batch_size': 256,
-    'cuda': False,
+    'cuda': True,
     'num_channels': 512,
 })
 
@@ -55,11 +56,11 @@ class NNetWrapper():
             batch_idx = 0
 
             while batch_idx < len(examples)/args.batch_size:
-                sample_ids = np.random.randint(len(examples), size=args.batch_size)
-                boards, pis, vs = zip(*[examples[i] for i in sample_ids])
-                boards = torch.FloatTensor(np.array(boards))
+                sample_ids = np.random.randint(len(examples), size=args.batch_size)                
+                boards, pis, vs = list(zip(*[examples[i] for i in sample_ids]))
+                boards = torch.FloatTensor(np.array(boards).astype(np.float64))
                 target_pis = torch.FloatTensor(np.array(pis))
-                target_vs = torch.FloatTensor(np.array(vs))
+                target_vs = torch.FloatTensor(np.array(vs).astype(np.float64))
 
                 # predict
                 if args.cuda:
@@ -112,7 +113,7 @@ class NNetWrapper():
         start = time.time()
 
         # preparing input
-        board = torch.FloatTensor(board)
+        board = torch.FloatTensor(board.astype(np.float64))
         if args.cuda: board = board.contiguous().cuda()
         board = Variable(board, volatile=True)
         board = board.view(1, self.board_x, self.board_y)

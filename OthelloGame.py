@@ -26,7 +26,7 @@ class OthelloGame():
         	return (board, -player)
         b = Board(self.n)
         b.pieces = np.copy(board)
-        move = (action/self.n, action%self.n)
+        move = (int(action/self.n), action%self.n)
         b.execute_move(move, player)
         return (b.pieces, -player)
 
