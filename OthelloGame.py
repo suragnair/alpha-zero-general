@@ -67,16 +67,12 @@ class OthelloGame():
 
         for i in range(1, 5):
             for j in [True, False]:
-                for k in [True, False]:
-                    newB = np.rot90(board, i)
-                    newPi = np.rot90(pi_board, i)
-                    if j:
-                        newB = np.fliplr(newB)
-                        newPi = np.fliplr(newPi)
-                    if k:
-                        newB = np.flipud(newB)
-                        newPi = np.flipud(newPi)
-                    l += [newB, newPi.ravel()]
+                newB = np.rot90(board, i)
+                newPi = np.rot90(pi_board, i)
+                if j:
+                    newB = np.fliplr(newB)
+                    newPi = np.fliplr(newPi)
+                l += [newB, newPi.ravel()]
         return l
 
     def stringRepresentation(self, board):#, player):
