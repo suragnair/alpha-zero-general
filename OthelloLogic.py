@@ -7,7 +7,7 @@ Board data:
   first dim is column , 2nd is row:
      pieces[1][7] is the square in column 2,
      at the opposite end of the board in row 8.
-Squares are stored and manipulated as (x,y) tuples. 
+Squares are stored and manipulated as (x,y) tuples.
 x is the column, y is the row.
 '''
 class Board():
@@ -25,10 +25,10 @@ class Board():
             self.pieces[i] = [0]*self.n
 
         # Set up the initial 4 pieces.
-        self.pieces[self.n/2-1][self.n/2] = 1
-        self.pieces[self.n/2][self.n/2-1] = 1
-        self.pieces[self.n/2-1][self.n/2-1] = -1;
-        self.pieces[self.n/2][self.n/2] = -1;
+        self.pieces[int(self.n/2)-1][int(self.n/2)] = 1
+        self.pieces[int(self.n/2)][int(self.n/2)-1] = 1
+        self.pieces[int(self.n/2)-1][int(self.n/2)-1] = -1;
+        self.pieces[int(self.n/2)][int(self.n/2)] = -1;
 
     # add [][] indexer syntax to the Board
     def __getitem__(self, index):
@@ -55,7 +55,7 @@ class Board():
                     squares.append( (x,y) )
         return squares
 
-        
+
     def get_legal_moves(self, color):
         """Returns all the legal moves for the given color.
         (1 for white, -1 for black
@@ -85,7 +85,7 @@ class Board():
         color = self[x][y]
 
         # skip empty source squares.
-        if color==0: 
+        if color==0:
             return None
 
         # search all possible directions.
@@ -124,10 +124,10 @@ class Board():
             if self[x][y] == 0 and flips:
                 return (x, y)
             elif self[x][y] == color:
-                return None 
+                return None
             elif self[x][y] == -color:
                 flips.append((x, y))
-    
+
     def _get_flips(self, origin, direction, color):
         """ Gets the list of flips for a vertex and direction to use with the
         execute_move function """

@@ -65,7 +65,7 @@ class OthelloGame():
         l = []
         for i in range(1, 5):
             for j in [True, False]:
-            for k in [True, False]:
+                for k in [True, False]:
                     newB = np.rot90(board, i)
                     if j:
                         newB = np.fliplr(newB)
