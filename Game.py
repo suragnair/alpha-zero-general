@@ -10,8 +10,8 @@ class Game():
         # (a,b) tuple
         pass
 
-    def getNextBoard(self, board, player, action):
-        # if player takes action on board, return next board
+    def getNextState(self, board, player, action):
+        # if player takes action on board, return next (board,player)
         pass
 
     def getValidMoves(self, board, player):
