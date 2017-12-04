@@ -64,9 +64,9 @@ class Coach():
             bar.finish()
 
 
-            self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='checkpoint_temp.pth.tar')
+            self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='checkpoint_' + str(i) + '.pth.tar')
             pnet = NNet(self.game)
-            pnet.load_checkpoint(folder=self.args.checkpoint, filename='checkpoint_temp.pth.tar')
+            pnet.load_checkpoint(folder=self.args.checkpoint, filename='checkpoint_' + str(i) + '.pth.tar')
             pmcts = MCTS(self.game, pnet, self.args)
             self.nnet.train(trainExamples)
             nmcts = MCTS(self.game, self.nnet, self.args)

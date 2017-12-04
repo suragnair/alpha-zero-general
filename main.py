@@ -5,10 +5,10 @@ from utils import *
 
 args = dotdict({
     'numIters': 1000,
-    'numEps': 20,
+    'numEps': 50,
     'tempThreshold': 15,
     'updateThreshold': 0.55,
-    'maxlenOfQueue': 5000,
+    'maxlenOfQueue': 25000,
     'numMCTSSims': 20,
     'arenaCompare': 20,
     'cpuct': 1,
