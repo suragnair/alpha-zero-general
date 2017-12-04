@@ -4,20 +4,20 @@ def display(board):
     n = board.shape[0]
     
     for y in range(n):
-    	print (y,"|",)
+    	print (y,"|",end="")
     print("")
     print(" -----------------------")
     for y in range(n-1,-1,-1):
-        print(y, "|",)    # print the row #
+        print(y, "|",end="")    # print the row #
         for x in range(n):
             piece = board[x][y]    # get the piece to print
-            if piece == -1: print("b "),
-            elif piece == 1: print("W "),
+            if piece == -1: print("b ",end="")
+            elif piece == 1: print("W ",end="")
             else:
                 if x==n:
-                    print("-"),
+                    print("-",end="")
                 else:
-                    print("- "),
+                    print("- ",end="")
         print("|")
 
     print("   -----------------------")
@@ -84,8 +84,8 @@ class HumanOthelloPlayer():
 		valid = self.game.getValidMoves(board, 1)
 		for i in range(len(valid)):
 			if valid[i]:
-				print(i%self.game.n, i/self.game.n)
-		a = raw_input().strip().split(',')
+				print(i%self.game.n, int(i/self.game.n))
+		a = input().strip().split(',')
 		x,y = int(a[0]),int(a[1])
 		a = self.game.n * y + x if x!= -1 else self.game.n ** 2
 
@@ -122,7 +122,6 @@ if __name__ == "__main__":
 	for _ in range(1):
 		score, length =  arena.playGame(verbose=False)
 		print(score, length)
-		raw_input()
 		l += [score]
 
 	print(len([x for x in l if x>0]))

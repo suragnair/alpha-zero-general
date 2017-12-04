@@ -49,10 +49,12 @@ class OthelloGame():
         b = Board(self.n)
         b.pieces = np.copy(board)
         legalMoves1 =  b.get_legal_moves(player)
+        if len(legalMoves1)>0:
+            return 0
         legalMoves2 =  b.get_legal_moves(-player)
-        if len(legalMoves1)>0 or len(legalMoves2)>0:
+        if len(legalMoves2)>0:
         	return 0
-        if b.count(player) > b.count(-player):
+        if b.countDiff(player) > 0:
         	return 1
         return -1
 
@@ -85,4 +87,4 @@ class OthelloGame():
     def getScore(self, board, player):
         b = Board(self.n)
         b.pieces = np.copy(board)
-        return b.count(player)-b.count(-player)
+        return b.countDiff(player)
