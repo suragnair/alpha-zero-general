@@ -60,6 +60,14 @@ class Board():
                     moves.update(newmoves)
         return list(moves)
 
+    def has_legal_moves(self, color):
+        for y in range(self.n):
+            for x in range(self.n):
+                if self[x][y]==color:
+                    newmoves = self.get_moves_for_square((x,y))
+                    if len(newmoves)>0:
+                        return True
+        return False
 
     def get_moves_for_square(self, square):
         """Returns all the legal moves that use the given square as a base.

@@ -112,19 +112,14 @@ if __name__ == "__main__":
 	from OthelloGame import OthelloGame
 	curGame = OthelloGame(6)
 	p1 = RandomPlayer(curGame)
-	# p2 = GreedyOthelloPlayer(curGame)
-	p2 = HumanOthelloPlayer(curGame)
+	p2 = GreedyOthelloPlayer(curGame)
+	# p2 = HumanOthelloPlayer(curGame)
 
 	p1,p2 = p1, p2
 
 	arena = Arena(p1.play, p2.play, curGame)
-	l = []
-	for _ in range(1):
-		score, length =  arena.playGame(verbose=False)
-		print(score, length)
-		l += [score]
-
-	print(len([x for x in l if x>0]))
-	print(len([x for x in l if x==0]))
-	print(len([x for x in l if x<0]))
-
+	for _ in range(20):
+		winner =  arena.playGame(verbose=False)
+		print(winner)
+		
+	

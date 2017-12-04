@@ -48,11 +48,9 @@ class OthelloGame():
         # player = 1
         b = Board(self.n)
         b.pieces = np.copy(board)
-        legalMoves1 =  b.get_legal_moves(player)
-        if len(legalMoves1)>0:
+        if b.has_legal_moves(player):
             return 0
-        legalMoves2 =  b.get_legal_moves(-player)
-        if len(legalMoves2)>0:
+        if b.has_legal_moves(-player):
         	return 0
         if b.countDiff(player) > 0:
         	return 1
