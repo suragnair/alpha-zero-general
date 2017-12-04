@@ -3,6 +3,8 @@ from NNet import NNetWrapper as NNet
 from Arena import Arena
 from MCTS import MCTS
 import numpy as np
+from pytorch_classification.utils import Bar, Logger, AverageMeter
+import time
 
 class Coach():
     def __init__(self, game, nnet, args):
@@ -37,16 +39,30 @@ class Coach():
             r = self.game.getGameEnded(self.board, self.curPlayer)
 
             if r!=0:
-                return [(x[0],x[2],r*((-1)**(x[1]!=self.curPlayer))) for x in train_examples]
+                return [(x[0],x[2],r*((-1)**(x[1]!=self.curPlayer))) for x in trainExamples]
 
     def learn(self):
         # performs numIters x numEps games
         # after every Iter, retrains nnet and only updates if it wins > cutoff% games
         trainExamples = deque([], maxlen=self.args.maxlenOfQueue)
         for i in range(self.args.numIters):
+            # bookkeeping
+            print('------ITER ' + str(i+1) + '------')
+            eps_time = AverageMeter()
+            bar = Bar('Self Play', max=self.args.numEps)
+            end = time.time()
+
             for eps in range(self.args.numEps):
-                print('EPISODE # ' + str(eps+1))
                 trainExamples += self.executeEpisode()
+
+                eps_time.update(time.time() - end)
+                end = time.time()
+                # plot progress
+                bar.suffix  = '({eps}/{maxeps}) Eps Time: {et:.3f}s | Total: {total:} | ETA: {eta:}'.format(eps=eps, maxeps=self.args.numEps, et=eps_time.avg,
+                                                                                                           total=bar.elapsed_td, eta=bar.eta_td)
+                bar.next()
+            bar.finish()
+
 
             self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='checkpoint_temp.pth.tar')
             pnet = NNet(self.game)
