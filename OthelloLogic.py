@@ -34,7 +34,7 @@ class Board():
     def __getitem__(self, index): 
         return self.pieces[index]
 
-    def count(self, color):
+    def countDiff(self, color):
         """Counts the # pieces of the given color
         (1 for white, -1 for black, 0 for empty spaces)"""
         count = 0
@@ -42,19 +42,9 @@ class Board():
             for x in range(self.n):
                 if self[x][y]==color:
                     count += 1
+                if self[x][y]==-color:
+                    count -= 1
         return count
-
-    def get_squares(self, color):
-        """Gets coordinates (x,y pairs) for all pieces on the board of the given color.
-        (1 for white, -1 for black, 0 for empty spaces)"""
-
-        squares=[]
-        for y in range(self.n):
-            for x in range(self.n):
-                if self[x][y]==color:
-                    squares.append( (x,y) )
-        return squares
-
 
     def get_legal_moves(self, color):
         """Returns all the legal moves for the given color.
@@ -63,12 +53,11 @@ class Board():
         moves = set()  # stores the legal moves.
 
         # Get all the squares with pieces of the given color.
-        for square in self.get_squares(color):
-            # Find all moves using these pieces as base squares.
-            newmoves = self.get_moves_for_square(square)
-            # Store these in the moves set.
-            moves.update(newmoves)
-
+        for y in range(self.n):
+            for x in range(self.n):
+                if self[x][y]==color:
+                    newmoves = self.get_moves_for_square((x,y))
+                    moves.update(newmoves)
         return list(moves)
 
 
