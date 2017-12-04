@@ -52,7 +52,7 @@ class NNetWrapper():
             v_losses = AverageMeter()
             end = time.time()
 
-            bar = Bar('Processing', max=int(len(examples)/args.batch_size))
+            bar = Bar('Training Net', max=int(len(examples)/args.batch_size))
             batch_idx = 0
 
             while batch_idx < int(len(examples)/args.batch_size):
@@ -93,7 +93,7 @@ class NNetWrapper():
                 # plot progress
                 bar.suffix  = '({batch}/{size}) Data: {data:.3f}s | Batch: {bt:.3f}s | Total: {total:} | ETA: {eta:} | Loss_pi: {lpi:.4f} | Loss_v: {lv:.3f}'.format(
                             batch=batch_idx,
-                            size=len(examples)/args.batch_size,
+                            size=int(len(examples)/args.batch_size),
                             data=data_time.avg,
                             bt=batch_time.avg,
                             total=bar.elapsed_td,
