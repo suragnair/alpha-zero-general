@@ -24,7 +24,7 @@ args = dotdict({
     'dropout': 0.3,
     'epochs': 5,
     'batch_size': 64,
-    'cuda': True,
+    'cuda': False,
     'num_channels': 512,
 })
 
@@ -122,10 +122,10 @@ class NNetWrapper():
         pi, v = self.nnet(board)
 
         #print('PREDICTION TIME TAKEN : {0:03f}'.format(time.time()-start))
-        return pi.data.cpu().numpy()[0], v.data.cpu().numpy()[0]
+        return torch.exp(pi).data.cpu().numpy()[0], v.data.cpu().numpy()[0]
 
     def loss_pi(self, targets, outputs):
-        return -torch.sum(targets*torch.log(outputs))/targets.size()[0]
+        return -torch.sum(targets*outputs)/targets.size()[0]
 
     def loss_v(self, targets, outputs):
         return torch.sum((targets-outputs.view(-1))**2)/targets.size()[0]
