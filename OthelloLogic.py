@@ -105,10 +105,12 @@ class Board():
         #follow it on all 8 directions to look for a piece allowing flipping.
 
         # Add the piece to the empty square.
-        flips = (flip for direction in self.__directions
-                      for flip in self._get_flips(move, direction, color))
-        assert len(flips)>0
+        # print(move)
+        flips = [flip for direction in self.__directions
+                      for flip in self._get_flips(move, direction, color)]
+        assert len(list(flips))>0
         for x, y in flips:
+            #print(self[x][y],color)
             self[x][y] = color
 
     def _discover_move(self, origin, direction):
@@ -138,19 +140,26 @@ class Board():
         flips = [origin]
 
         for x, y in Board._increment_move(origin, direction, self.n):
+            #print(x,y)
             if self[x][y] == 0:
                 return []
             if self[x][y] == -color:
                 flips.append((x, y))
             elif self[x][y] == color and len(flips) > 1:
+                #print(flips)
                 return flips
 
         return []
 
     @staticmethod
     def _increment_move(move, direction, n):
+        # print(move)
         """ Generator expression for incrementing moves """
         move = list(map(sum, zip(move, direction)))
+        #move = (move[0]+direction[0], move[1]+direction[1])
         while all(map(lambda x: 0 <= x < n, move)): 
+        #while 0<=move[0] and move[0]<n and 0<=move[1] and move[1]<n:
             yield move
-            move =list(map(sum, zip(move, direction)))
+            move=list(map(sum,zip(move,direction)))
+            #move = (move[0]+direction[0],move[1]+direction[1])
+
