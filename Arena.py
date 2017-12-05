@@ -55,6 +55,7 @@ class Arena():
         return self.game.getGameEnded(board, 1)
 
     def playGames(self, num, verbose=False):
+<<<<<<< HEAD
         num = int(num/2)
         oneWon = 0
         twoWon = 0
@@ -70,6 +71,23 @@ class Arena():
             else:
                 twoWon+=1
         return oneWon, twoWon
+=======
+    	num = int(num/2)
+    	oneWon = 0
+    	twoWon = 0
+    	for _ in range(num):
+    		if self.playGame(verbose=verbose)==1:
+    			oneWon+=1
+    		else:
+    			twoWon+=1
+    	self.player1, self.player2 = self.player2, self.player1
+    	for _ in range(num):
+    		if self.playGame(verbose=verbose)==-1:
+    			oneWon+=1
+    		else:
+    			twoWon+=1
+    	return oneWon, twoWon
+>>>>>>> b14450216bea591767afa362164394038dbf0be5
 
 class RandomPlayer():
     def __init__(self, game):
