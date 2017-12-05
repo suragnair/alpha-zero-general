@@ -90,6 +90,7 @@ class Board():
         for direction in self.__directions:
             move = self._discover_move(square, direction)
             if move:
+                # print(square,move,direction)
                 moves.append(move)
 
         # return the generated move list
@@ -118,11 +119,16 @@ class Board():
         flips = []
 
         for x, y in Board._increment_move(origin, direction, self.n):
-            if self[x][y] == 0 and flips:
-                return (x, y)
+            if self[x][y] == 0:
+                if flips:
+                    # print("Found", x,y)
+                    return (x, y)
+                else:
+                    return None
             elif self[x][y] == color:
                 return None
             elif self[x][y] == -color:
+                # print("Flip",x,y)
                 flips.append((x, y))
 
     def _get_flips(self, origin, direction, color):
