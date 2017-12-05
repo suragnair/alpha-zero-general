@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy as np
 
 def display(board):
@@ -29,7 +30,7 @@ class Arena():
     	self.player2 = player2
     	self.game = game
 
-    def playGame(self, verbose=False):
+    def playGame(self, verbose=True):
         # execute one game and return winner
         players = [self.player2, None, self.player1]
         curPlayer = 1
