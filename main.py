@@ -5,21 +5,21 @@ from utils import *
 
 args = dotdict({
     'numIters': 1000,
-    'numEps': 50,
-    'tempThreshold': 15,
-    'updateThreshold': 0.55,
-    'maxlenOfQueue': 50000,
-    'numMCTSSims': 20,
-    'arenaCompare': 20,
+    'numEps': 100,
+    'tempThreshold': 25,
+    'updateThreshold': 0.6,
+    'maxlenOfQueue': 100000,
+    'numMCTSSims': 25,
+    'arenaCompare': 40,
     'cpuct': 1,
 
-    'checkpoint': '/mnt/lol50x20/',
-    'load_model': True,
+    'checkpoint': '/dev/8x100x25/',
+    'load_model': False,
     'load_folder_file': ('/mnt/lol50x20','checkpoint_4.pth.tar'),
 })
 
 if __name__=="__main__":
-    g = OthelloGame(6)
+    g = OthelloGame(8)
     nnet = nn(g)
 
     if args.load_model:
