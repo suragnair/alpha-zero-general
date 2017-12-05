@@ -107,7 +107,7 @@ class Board():
         # Add the piece to the empty square.
         flips = (flip for direction in self.__directions
                       for flip in self._get_flips(move, direction, color))
-
+        assert len(flips)>0
         for x, y in flips:
             self[x][y] = color
 
@@ -138,6 +138,8 @@ class Board():
         flips = [origin]
 
         for x, y in Board._increment_move(origin, direction, self.n):
+            if self[x][y] == 0:
+                return []
             if self[x][y] == -color:
                 flips.append((x, y))
             elif self[x][y] == color and len(flips) > 1:
