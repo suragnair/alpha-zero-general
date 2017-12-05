@@ -113,47 +113,54 @@ class AiController(Controller):
             that it hasn't crashed.
         """
         size = board.shape[0]
-        print(size)
+        # print(size)
         new_board = Board(size,'RED')
         pieces = new_board.getBoardPieces()
         for i in xrange(size):
             for j in xrange(size):
                 # print(board[i][j])
-                if board[i][j] == +1:
-                    pieces[i*size+j].state = 'BLACK'
-                elif board[i][j] == -1:
-                    pieces[i*size+j].state = 'WHITE'
+                if board[i][j] == -1:
+                    new_board.set_black(j,i)
+                elif board[i][j] == +1:
+                    new_board.set_white(j,i)
 
         # raw_input()
         board = new_board
+        # print(board.draw())
+        # raw_input()
         brain = Brain(self.duration, stdoutmutex, workQueue, board.pieces, self.colour,
                       BLACK if self.colour is WHITE else WHITE)
         brain.start()
 
         threads.append(brain)
 
-        print('Brain is thinking ', end='')
+        # print('Brain is thinking ', end='')
         update_step_duration = datetime.timedelta(microseconds=10000)
         goal_time = datetime.datetime.now() + update_step_duration
         accumulated_time = datetime.datetime.now()
 
         while workQueue.empty():
             if accumulated_time >= goal_time:
-                print('.', end='')
+                # print('.', end='')
                 goal_time = datetime.datetime.now() + update_step_duration
                 sys.stdout.flush()
 
             accumulated_time = datetime.datetime.now()
 
-        print()
+        # print()
 
         for thread in threads:
             thread.join()
 
-        (i,j) = workQueue.get()
-        print(i,j)
-        raw_input()
-        return i*size+j
+        try:
+            (i,j) = workQueue.get()
+            # print(i,j)
+            return i+size*j
+        except:
+            return size**2
+       
+        # raw_input()
+        
 
     def get_colour(self):
         """ Returns the colour of the controller.

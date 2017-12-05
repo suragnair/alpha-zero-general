@@ -1,4 +1,4 @@
-from Arena import Arena, RandomPlayer, GreedyOthelloPlayer
+from Arena import Arena, RandomPlayer, GreedyOthelloPlayer, HumanOthelloPlayer
 from MCTS import MCTS
 import numpy as np
 from pytorch_classification.utils import Bar, Logger, AverageMeter
@@ -13,9 +13,16 @@ from game.board import Board
 
 
 curGame = OthelloGame(8)
-p1 = RandomPlayer(curGame)
-# p2 = GreedyOthelloPlayer(curGame)
-AI = controller.AiController(1, 'BLACK', 1000)
-arena = Arena(p1.play, AI.next_move, curGame)
-pwins, nwins = arena.playGames(2)
-print(pwins,nwins)
+p2 = RandomPlayer(curGame)
+AI = controller.AiController(1, 'WHITE', 5000000)
+p1 = GreedyOthelloPlayer(curGame)
+# p1 = HumanOthelloPlayer(curGame)
+# p2 = HumanOthelloPlayer(curGame)
+arena = Arena( AI.next_move,p1.play,curGame)
+c = 0
+# for i in xrange(100):
+print arena.playGame(verbose=False)
+# 		c+=1
+# 	print c
+# print c
+# print(pwins,nwins)

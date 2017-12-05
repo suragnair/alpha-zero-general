@@ -138,6 +138,8 @@ class Board():
         flips = [origin]
 
         for x, y in Board._increment_move(origin, direction, self.n):
+            if self[x][y] == 0:
+                return []
             if self[x][y] == -color:
                 flips.append((x, y))
             elif self[x][y] == color and len(flips) > 1:

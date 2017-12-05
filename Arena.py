@@ -12,7 +12,7 @@ def display(board):
     for y in range(n):
         print(y, "|",end="")    # print the row #
         for x in range(n):
-            piece = board[x][y]    # get the piece to print
+            piece = board[y][x]    # get the piece to print
             if piece == -1: print("b ",end="")
             elif piece == 1: print("W ",end="")
             else:
@@ -45,9 +45,12 @@ class Arena():
             action = players[curPlayer+1](self.game.getCanonicalForm(board, curPlayer))
 
             valids = self.game.getValidMoves(self.game.getCanonicalForm(board, curPlayer),1)
-            assert valids[action] >0
+            # if valids[action] == 0:
+            #     for i in range(len(valids)):
+            #         if valids[i] >0:
+            #             print(i/8,i%8)
 
-                # assert False
+            assert valids[action] >0
             board, curPlayer = self.game.getNextState(board, curPlayer, action)
         if verbose:
             print("Turn ", str(it), "Player ", str(curPlayer))
@@ -89,16 +92,16 @@ class HumanOthelloPlayer():
         self.game = game
 
     def play(self, board):
-        display(board)
+        # display(board)
         valid = self.game.getValidMoves(board, 1)
         for i in range(len(valid)):
             if valid[i]:
-                print(i%self.game.n, int(i/self.game.n))
+                print(i/self.game.n, int(i%self.game.n))
         a = input()
         print(a)
         
         x,y = int(a[0]),int(a[1])
-        a = self.game.n * y + x if x!= -1 else self.game.n ** 2
+        a = self.game.n * x + y if x!= -1 else self.game.n ** 2
 
         return a
 

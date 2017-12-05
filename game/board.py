@@ -15,6 +15,7 @@ class Board(object):
                             for y in range(0, self.height)
                             for x in range(0, self.width)))
 
+
     def getBoardPieces(self):
         return self.pieces
 
@@ -25,7 +26,7 @@ class Board(object):
 
         grid = ''
         i = 0
-        for row_of_pieces in chunks(self.pieces, size):
+        for row_of_pieces in chunks(self.pieces, self.width ):
             row = ''
             for p in row_of_pieces:
                 row += p.draw()
@@ -106,7 +107,6 @@ class Board(object):
             specified move for the specified player.
         """
         x, y = coordinates
-
         moves = [piece.get_position() for piece in self.get_move_pieces(player)]
 
         if coordinates not in moves:
@@ -127,26 +127,54 @@ class Board(object):
 
             to_flip = []
             if (tile >= 0) and (tile < WIDTH*HEIGHT):
-                while self.pieces[tile].get_state() != BOARD:
+                # while self.pieces[tile].get_state() != BOARD:
+                while True:
                     to_flip.append(self.pieces[tile])
                     if self.outside_board(tile, d):
                         break
                     else:
                         tile += d
 
-                start_flipping = False
-                for pp in reversed(to_flip):
-                    if not start_flipping:
-                        if pp.get_state() == opponent:
-                            continue
-                    start_flipping = True
-
-                    if player == WHITE:
-                        pp.set_white()
+                ours = [i for i in to_flip if i.get_state()==player]
+                if len(ours)==0:
+                    continue
+                our = ours[0]
+                blanks = [i for i in to_flip if i.get_state()==BOARD]
+                blank = None
+                if len(blanks)>0:
+                    blank = blanks[0]
+                t = True
+                for i in to_flip:
+                    if i==our:
+                        break
+                    if i==blank:
+                        t=False
+                        break
+                if not t:
+                    continue
+                for i in to_flip:
+                    if i==our:
+                        break
+                    if player==WHITE:
+                        i.set_white()
                     else:
-                        pp.set_black()
+                        # print("I AM BLACK")
+                        i.set_black()
 
-                self.pieces[start].reset_flipped()
+                # start_flipping = False
+
+                # for pp in reversed(to_flip):
+                #     if not start_flipping:
+                #         if pp.get_state() == opponent:
+                #             continue
+                #     start_flipping = True
+
+                #     if player == WHITE:
+                #         pp.set_white()
+                #     else:
+                #         pp.set_black()
+
+                # self.pieces[start].reset_flipped()
 
     def clear_moves(self):
         """ Sets all move pieces to board pieces.

@@ -41,7 +41,7 @@ class AlphaBetaPruner(object):
         moves = [(fn(action), action) for action in actions]
 
         if len(moves) == 0:
-            raise NoMovesError
+            return 8,0
 
         return max(moves, key=maxfn)[1]
 
