@@ -145,7 +145,7 @@ class Board():
                 return []
             if self[x][y] == -color:
                 flips.append((x, y))
-            elif self[x][y] == color and len(flips) > 1:
+            elif self[x][y] == color and len(flips) > 0:
                 #print(flips)
                 return flips
 
