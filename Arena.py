@@ -97,11 +97,15 @@ class HumanOthelloPlayer():
         for i in range(len(valid)):
             if valid[i]:
                 print(int(i/self.game.n), int(i%self.game.n))
-        a = input()
-        print(a)
-        
-        x,y = int(a[0]),int(a[1])
-        a = self.game.n * x + y if x!= -1 else self.game.n ** 2
+        while True:
+        	a = input()
+        	
+        	x,y = int(a[0]),int(a[1])
+        	a = self.game.n * x + y if x!= -1 else self.game.n ** 2
+        	if valid[a]:
+        		break
+        	else:
+        		print('Invalid')
 
         return a
 

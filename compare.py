@@ -21,7 +21,7 @@ p1 = GreedyOthelloPlayer(curGame)
 arena = Arena( AI.next_move,p1.play,curGame)
 c = 0
 # for i in xrange(100):
-print arena.playGame(verbose=False)
+print(arena.playGame(verbose=False))
 # 		c+=1
 # 	print c
 # print c
