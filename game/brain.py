@@ -1,7 +1,7 @@
 from __future__ import print_function
 import datetime
 import threading
-from ai import AlphaBetaPruner
+from game.ai import AlphaBetaPruner
 
 __author__ = 'bengt'
 

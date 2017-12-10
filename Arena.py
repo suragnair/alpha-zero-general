@@ -50,7 +50,9 @@ class Arena():
             #         if valids[i] >0:
             #             print(i/8,i%8)
 
-            assert valids[action] >0
+            if valids[action]==0:
+                print(action)
+                assert valids[action] >0
             board, curPlayer = self.game.getNextState(board, curPlayer, action)
         if verbose:
             print("Turn ", str(it), "Player ", str(curPlayer))

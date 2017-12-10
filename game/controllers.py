@@ -1,13 +1,13 @@
 from __future__ import print_function
 import datetime
 import os
-import Queue
+import queue
 import threading
 import sys
-from ai import AlphaBetaPruner
-from brain import Brain
-from settings import *
-from board import Board
+from game.ai import AlphaBetaPruner
+from game.brain import Brain
+from game.settings import *
+from game.board import Board
 
 __author__ = 'bengt'
 
@@ -89,7 +89,7 @@ class PlayerController(Controller):
 
 
 stdoutmutex = threading.Lock()
-workQueue = Queue.Queue(1)
+workQueue = queue.Queue(1)
 threads = []
 
 
@@ -116,8 +116,8 @@ class AiController(Controller):
         # print(size)
         new_board = Board(size,'RED')
         pieces = new_board.getBoardPieces()
-        for i in xrange(size):
-            for j in xrange(size):
+        for i in range(size):
+            for j in range(size):
                 # print(board[i][j])
                 if board[i][j] == -1:
                     new_board.set_black(j,i)

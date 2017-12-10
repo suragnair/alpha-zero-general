@@ -4,7 +4,7 @@ import sys
 
 __author__ = 'bengt'
 
-from settings import *
+from game.settings import *
 
 
 class AlphaBetaPruner(object):
@@ -41,7 +41,7 @@ class AlphaBetaPruner(object):
         moves = [(fn(action), action) for action in actions]
 
         if len(moves) == 0:
-            return 8,0
+            return 0,WIDTH
 
         return max(moves, key=maxfn)[1]
 
@@ -112,9 +112,9 @@ class AlphaBetaPruner(object):
                            (state[63] == opponent)
         corners_eval = corners_player + corners_opponent
 
-        edges_player = len([x for x in state if state == player and (state % 8 == 0 or state % 8 == 8)]) / (
+        edges_player = len([x for x in state if state == player and (state % WIDTH == 0 or state % HEIGHT == WIDTH)]) / (
             WIDTH * HEIGHT)
-        edges_opponent = -1 * len([x for x in state if state == opponent and (state % 8 == 0 or state % 8 == 8)]) / (
+        edges_opponent = -1 * len([x for x in state if state == opponent and (state % WIDTH == 0 or state % WIDTH == WIDTH)]) / (
             WIDTH * HEIGHT)
         edges_eval = edges_player + edges_opponent
 
@@ -143,7 +143,7 @@ class AlphaBetaPruner(object):
         state[xx + (yy * WIDTH)] = player
         for d in DIRECTIONS:
             tile = xx + (yy * WIDTH) + d
-            if tile < 0 or tile >= 64:
+            if tile < 0 or tile >= WIDTH*WIDTH:
                 continue
 
             while state[tile] != self.board:
@@ -170,17 +170,18 @@ class AlphaBetaPruner(object):
         """ Returns True whether the current tile piece is a move for the current player,
             otherwise it returns False.
         """
-        if not outside_board(tile, direction):
+        if not self.valid(tile, direction):
             tile += direction
         else:
             return False, int(tile % WIDTH), int(tile / HEIGHT), tile
 
         if pieces[tile] == opponent:
             while pieces[tile] == opponent:
-                if outside_board(tile, direction):
+                if self.valid(tile, direction):
                     break
                 else:
                     tile += direction
+                    #print(tile)
 
             if pieces[tile] == self.board:
                 return True, int(tile % WIDTH), int(tile / HEIGHT), tile
@@ -191,5 +192,11 @@ class AlphaBetaPruner(object):
         """ Returns True when the cutoff limit has been reached.
         """
         return depth > 1000 or datetime.datetime.now() > self.lifetime
+    def valid(self, tile, direction):
+        #print(tile, direction)
+        return (direction in (NORTHWEST, NORTH, NORTHEAST) and 0 <= tile <= WIDTH-1) or \
+           (direction in (SOUTHWEST, SOUTH, SOUTHEAST) and WIDTH*(WIDTH-1) <= tile <= WIDTH*WIDTH-1) or \
+           (direction in (NORTHEAST, EAST, SOUTHEAST) and tile % WIDTH == WIDTH-1) or \
+           (direction in (NORTHWEST, WEST, SOUTHWEST) and tile % WIDTH == 0)
 
 

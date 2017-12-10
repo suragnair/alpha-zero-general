@@ -1,7 +1,7 @@
 from __future__ import print_function
 import sys
-from settings import *
-import color as clr
+from game.settings import *
+import game.color as clr
 
 __author__ = 'bengt'
 

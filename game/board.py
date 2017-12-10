@@ -1,6 +1,6 @@
 from __future__ import print_function
-from piece import Piece
-from settings import *
+from game.piece import Piece
+from game.settings import *
 
 __author__ = 'bengt'
 
@@ -184,9 +184,10 @@ class Board(object):
     def outside_board(self, tile, direction):
         """ Returns true if a tile is outside the board.
         """
-        return (direction in (NORTHWEST, NORTH, NORTHEAST) and 0 <= tile <= 7) or \
-           (direction in (SOUTHWEST, SOUTH, SOUTHEAST) and 56 <= tile <= 63) or \
-           (direction in (NORTHEAST, EAST, SOUTHEAST) and tile % WIDTH == 7) or \
+        print(tile,direction)
+        return (direction in (NORTHWEST, NORTH, NORTHEAST) and 0 <= tile <= WIDTH-1) or \
+           (direction in (SOUTHWEST, SOUTH, SOUTHEAST) and WIDTH*(WIDTH-1) <= tile <= WIDTH*WIDTH-1) or \
+           (direction in (NORTHEAST, EAST, SOUTHEAST) and tile % WIDTH == WIDTH-1) or \
            (direction in (NORTHWEST, WEST, SOUTHWEST) and tile % WIDTH == 0)
 
     def __repr__(self):

@@ -17,7 +17,7 @@ class Game(object):
                  players=['ai', 'ai'],
                  colour=False):
 
-        self.board = Board(colour)
+        self.board = Board(WIDTH, colour)
         self.timeout = timeout
         self.ai_counter = 0
         self.list_of_colours = [BLACK, WHITE]
@@ -29,10 +29,10 @@ class Game(object):
         # self.board.set_black(3, 4)
         # self.board.set_white(4, 4)
         # self.board.set_white(3, 3)
-        self.board.set_white(4, 3)
-        self.board.set_black(4, 4)
-        self.board.set_white(4, 5)      
-        self.board.set_black(4, 6)
+	self.board.set_black(WIDTH/2, WIDTH/2-1)
+        self.board.set_black(WIDTH/2-1, WIDTH/2)
+        self.board.set_white(WIDTH/2, WIDTH/2)
+        self.board.set_white(WIDTH/2-1, WIDTH/2-1)
         self.board.mark_moves(self.player)
         self.previous_move = None
 

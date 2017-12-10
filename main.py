@@ -8,14 +8,14 @@ args = dotdict({
     'numEps': 100,
     'tempThreshold': 25,
     'updateThreshold': 0.6,
-    'maxlenOfQueue': 100000,
-    'numMCTSSims': 25,
+    'maxlenOfQueue': 200000,
+    'numMCTSSims': 50,
     'arenaCompare': 40,
     'cpuct': 1,
 
-    'checkpoint': '/dev/8x100x25/',
-    'load_model': False,
-    'load_folder_file': ('/mnt/lol50x20','checkpoint_4.pth.tar'),
+    'checkpoint': '/dev/models/8x100x50_cont/',
+    'load_model': True,
+    'load_folder_file': ('/dev/models/8x100x50','best.pth.tar'),
 })
 
 if __name__=="__main__":
