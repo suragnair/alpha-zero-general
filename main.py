@@ -9,17 +9,17 @@ args = dotdict({
     'tempThreshold': 25,
     'updateThreshold': 0.6,
     'maxlenOfQueue': 200000,
-    'numMCTSSims': 50,
+    'numMCTSSims': 25,
     'arenaCompare': 40,
     'cpuct': 1,
 
-    'checkpoint': '/dev/models/8x100x50_cont/',
-    'load_model': True,
+    'checkpoint': './temp/',
+    'load_model': False,
     'load_folder_file': ('/dev/models/8x100x50','best.pth.tar'),
 })
 
 if __name__=="__main__":
-    g = OthelloGame(8)
+    g = OthelloGame(6)
     nnet = nn(g)
 
     if args.load_model:

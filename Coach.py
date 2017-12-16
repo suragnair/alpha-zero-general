@@ -64,14 +64,16 @@ class Coach():
             bar.finish()
 
 
-            self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='checkpoint_' + str(i) + '.pth.tar')
+            self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
             pnet = NNet(self.game)
-            pnet.load_checkpoint(folder=self.args.checkpoint, filename='checkpoint_' + str(i) + '.pth.tar')
+            pnet.load_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
             pmcts = MCTS(self.game, pnet, self.args)
             self.nnet.train(trainExamples)
             nmcts = MCTS(self.game, self.nnet, self.args)
             arena = Arena(lambda x: np.argmax(pmcts.getActionProb(x, temp=0)),
                           lambda x: np.argmax(nmcts.getActionProb(x, temp=0)), self.game)
+
+            print('PITTING AGAINST PREVIOUS VERSION')
             pwins, nwins = arena.playGames(self.args.arenaCompare)
 
             print('ENDING ITER ' + str(i+1))
@@ -82,5 +84,6 @@ class Coach():
 
             else:
                 print('NEW MODEL AWESOME')
+                self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='checkpoint_' + str(i) + '.pth.tar')
                 self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')
                 self.mcts = MCTS(self.game, self.nnet, self.args)   # reset search tree
