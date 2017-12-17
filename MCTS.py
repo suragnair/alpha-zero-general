@@ -1,6 +1,5 @@
 import math
 import numpy as np
-import NNet
 import pdb
 from Arena import display
 

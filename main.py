@@ -1,6 +1,6 @@
 from Coach import Coach
-from OthelloGame import OthelloGame
-from NNet import NNetWrapper as nn
+from othello.OthelloGame import OthelloGame
+from othello.NNet import NNetWrapper as nn
 from utils import *
 
 args = dotdict({
@@ -24,6 +24,6 @@ if __name__=="__main__":
 
     if args.load_model:
         nnet.load_checkpoint(args.load_folder_file[0], args.load_folder_file[1])
-        
+
     c = Coach(g, nnet, args)
     c.learn()

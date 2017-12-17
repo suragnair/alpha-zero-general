@@ -1,3 +1,5 @@
+import sys
+sys.path.append('..')
 from utils import *
 
 import argparse

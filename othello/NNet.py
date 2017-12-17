@@ -5,6 +5,8 @@ import time
 import random
 import numpy as np
 import math
+import sys
+sys.path.append('..')
 from utils import *
 from pytorch_classification.utils import Bar, Logger, AverageMeter, accuracy, mkdir_p, savefig
 
@@ -24,7 +26,7 @@ args = dotdict({
     'dropout': 0.3,
     'epochs': 10,
     'batch_size': 64,
-    'cuda': True,
+    'cuda': False,
     'num_channels': 512,
 })
 

@@ -1,8 +1,10 @@
-import Game
+import sys
+sys.path.append('..')
+from Game import Game
 from OthelloLogic import Board
 import numpy as np
 
-class OthelloGame():
+class OthelloGame(Game):
     def __init__(self, n):
         self.n = n
 

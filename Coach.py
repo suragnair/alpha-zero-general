@@ -1,5 +1,5 @@
 from collections import deque
-from NNet import NNetWrapper as NNet
+from othello.NNet import NNetWrapper as NNet
 from Arena import Arena
 from MCTS import MCTS
 import numpy as np
