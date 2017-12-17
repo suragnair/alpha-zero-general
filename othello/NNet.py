@@ -20,7 +20,6 @@ from torchvision import datasets, transforms
 from torch.autograd import Variable
 
 from OthelloNNet import OthelloNNet as onnet
-import pdb
 
 args = dotdict({
     'lr': 0.001,

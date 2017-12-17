@@ -1,5 +1,4 @@
 from collections import deque
-from othello.NNet import NNetWrapper as NNet
 from Arena import Arena
 from MCTS import MCTS
 import numpy as np
@@ -7,22 +6,38 @@ from pytorch_classification.utils import Bar, Logger, AverageMeter
 import time
 
 class Coach():
+    """
+    This class executes the self-play + learning. It uses the functions defined
+    in Game and NeuralNet. args are specified in main.py.
+    """
     def __init__(self, game, nnet, args):
-        # maintain self.board, self.curPlayer
         self.game = game
         self.board = game.getInitBoard()
         self.nnet = nnet
         self.args = args
         self.mcts = MCTS(self.game, self.nnet, self.args)
-        # other hyperparams (numIters, numEps, MCTSParams etc)
 
     def executeEpisode(self):
-        # performs one full game
-        # returns a list of training examples from this episode [ < s,a_vec,r > ]
+        """
+        This function executes one episode of self-play, starting with player 1.
+        As the game is played, each turn is added as a training example to
+        trainExamples. The game is played till the game ends. After the game
+        ends, the outcome of the game is used to assign values to each example
+        in trainExamples.
+
+        It uses a temp=1 if episodeStep < tempThreshold, and thereafter
+        uses temp=0.
+
+        Returns:
+            trainExamples: a list of examples of the form (canonicalBoard,pi,v)
+                           pi is the MCTS informed policy vector, v is +1 if
+                           the player eventually won the game, else -1.
+        """
         trainExamples = []
         self.board = self.game.getInitBoard()
         self.curPlayer = 1
         episodeStep = 0
+
         while True:
             episodeStep += 1
             canonicalBoard = self.game.getCanonicalForm(self.board,self.curPlayer)
@@ -42,8 +57,14 @@ class Coach():
                 return [(x[0],x[2],r*((-1)**(x[1]!=self.curPlayer))) for x in trainExamples]
 
     def learn(self):
-        # performs numIters x numEps games
-        # after every Iter, retrains nnet and only updates if it wins > cutoff% games
+        """
+        Performs numIters iterations with numEps episodes of self-play in each
+        iteration. After every iteration, it retrains neural network with
+        examples in trainExamples (which has a maximium length of maxlenofQueue).
+        It then pits the new neural network against the old one and accepts it
+        only if it wins >= updateThreshold fraction of games.
+        """
+
         trainExamples = deque([], maxlen=self.args.maxlenOfQueue)
         for i in range(self.args.numIters):
             # bookkeeping
@@ -58,14 +79,14 @@ class Coach():
                 eps_time.update(time.time() - end)
                 end = time.time()
                 # plot progress
-                bar.suffix  = '({eps}/{maxeps}) Eps Time: {et:.3f}s | Total: {total:} | ETA: {eta:}'.format(eps=eps, maxeps=self.args.numEps, et=eps_time.avg,
+                bar.suffix  = '({eps}/{maxeps}) Eps Time: {et:.3f}s | Total: {total:} | ETA: {eta:}'.format(eps=eps+1, maxeps=self.args.numEps, et=eps_time.avg,
                                                                                                            total=bar.elapsed_td, eta=bar.eta_td)
                 bar.next()
             bar.finish()
 
 
             self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
-            pnet = NNet(self.game)
+            pnet = self.nnet.__class__(self.game)
             pnet.load_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
             pmcts = MCTS(self.game, pnet, self.args)
             self.nnet.train(trainExamples)
@@ -75,15 +96,14 @@ class Coach():
 
             print('PITTING AGAINST PREVIOUS VERSION')
             pwins, nwins = arena.playGames(self.args.arenaCompare)
-
-            print('ENDING ITER ' + str(i+1))
+            
             print('NEW/PREV WINS : ' + str(nwins) + '/' + str(pwins))
             if float(nwins)/(pwins+nwins) < self.args.updateThreshold:
-                print('NEW MODEL SUCKS')
+                print('REJECTING NEW MODEL')
                 self.nnet = pnet
 
             else:
-                print('NEW MODEL AWESOME')
+                print('ACCEPTING NEW MODEL')
                 self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='checkpoint_' + str(i) + '.pth.tar')
                 self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')
                 self.mcts = MCTS(self.game, self.nnet, self.args)   # reset search tree
