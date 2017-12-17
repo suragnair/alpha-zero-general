@@ -1,6 +1,7 @@
 class Game():
     """
-    To define your own game, subclass this class and define the functions below.
+    This class specifies the base Game class. To define your own game, subclass
+    this class and implement the functions below.
 
     TODOst: info on how player 1/-1 are handled
 

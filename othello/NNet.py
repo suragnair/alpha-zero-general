@@ -9,6 +9,7 @@ import sys
 sys.path.append('..')
 from utils import *
 from pytorch_classification.utils import Bar, Logger, AverageMeter, accuracy, mkdir_p, savefig
+from NeuralNet import NeuralNet
 
 import argparse
 import torch
@@ -30,7 +31,7 @@ args = dotdict({
     'num_channels': 512,
 })
 
-class NNetWrapper():
+class NNetWrapper(NeuralNet):
     def __init__(self, game):
         self.nnet = onnet(game, args)
         self.board_x, self.board_y = game.getBoardSize()
