@@ -23,7 +23,7 @@ class HumanOthelloPlayer():
         while True:
         	a = input()
 
-        	x,y = int(a[0]),int(a[1])
+        	x,y = [int(x) for x in a.split(' ')]
         	a = self.game.n * x + y if x!= -1 else self.game.n ** 2
         	if valid[a]:
         		break
