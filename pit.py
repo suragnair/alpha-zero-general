@@ -1,6 +1,7 @@
 import Arena
 from MCTS import MCTS
-from OthelloGame import OthelloGame
+from othello.OthelloGame import OthelloGame
+from othello.OthelloPlayers import *
 from NNet import NNetWrapper as NNet
 
 import numpy as np
@@ -9,9 +10,9 @@ from utils import *
 g = OthelloGame(8)
 
 # all players
-rp = Arena.RandomPlayer(g).play
-gp = Arena.GreedyOthelloPlayer(g).play
-hp = Arena.HumanOthelloPlayer(g).play
+rp = RandomPlayer(g).play
+gp = GreedyOthelloPlayer(g).play
+hp = HumanOthelloPlayer(g).play
 
 # nnet players
 n1 = NNet(g)
@@ -27,5 +28,5 @@ n1p = lambda x: np.argmax(mcts1.getActionProb(x, temp=0))
 #mcts2 = MCTS(g, n2, args2)
 #n2p = lambda x: np.argmax(mcts2.getActionProb(x, temp=0))
 
-arena = Arena.Arena(n1p, hp, g)
+arena = Arena.Arena(n1p, hp, g, display=OthelloGame.display)
 print(arena.playGames(2, verbose=True))

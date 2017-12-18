@@ -76,15 +76,15 @@ class Coach():
             for eps in range(self.args.numEps):
                 trainExamples += self.executeEpisode()
 
+                # bookkeeping + plot progress
                 eps_time.update(time.time() - end)
                 end = time.time()
-                # plot progress
                 bar.suffix  = '({eps}/{maxeps}) Eps Time: {et:.3f}s | Total: {total:} | ETA: {eta:}'.format(eps=eps+1, maxeps=self.args.numEps, et=eps_time.avg,
                                                                                                            total=bar.elapsed_td, eta=bar.eta_td)
                 bar.next()
             bar.finish()
 
-
+            # training new network, keeping a copy of the old one
             self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
             pnet = self.nnet.__class__(self.game)
             pnet.load_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
@@ -96,7 +96,7 @@ class Coach():
 
             print('PITTING AGAINST PREVIOUS VERSION')
             pwins, nwins = arena.playGames(self.args.arenaCompare)
-            
+
             print('NEW/PREV WINS : ' + str(nwins) + '/' + str(pwins))
             if float(nwins)/(pwins+nwins) < self.args.updateThreshold:
                 print('REJECTING NEW MODEL')

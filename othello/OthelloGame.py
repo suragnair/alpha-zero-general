@@ -86,3 +86,25 @@ class OthelloGame(Game):
         b = Board(self.n)
         b.pieces = np.copy(board)
         return b.countDiff(player)
+
+    def display(board):
+        n = board.shape[0]
+
+        for y in range(n):
+            print (y,"|",end="")
+        print("")
+        print(" -----------------------")
+        for y in range(n):
+            print(y, "|",end="")    # print the row #
+            for x in range(n):
+                piece = board[y][x]    # get the piece to print
+                if piece == -1: print("b ",end="")
+                elif piece == 1: print("W ",end="")
+                else:
+                    if x==n:
+                        print("-",end="")
+                    else:
+                        print("- ",end="")
+            print("|")
+
+        print("   -----------------------")

@@ -1,38 +1,33 @@
 from __future__ import print_function
 import numpy as np
-import pickle
 
-def display(board):
-    n = board.shape[0]
-    
-    for y in range(n):
-        print (y,"|",end="")
-    print("")
-    print(" -----------------------")
-    for y in range(n):
-        print(y, "|",end="")    # print the row #
-        for x in range(n):
-            piece = board[y][x]    # get the piece to print
-            if piece == -1: print("b ",end="")
-            elif piece == 1: print("W ",end="")
-            else:
-                if x==n:
-                    print("-",end="")
-                else:
-                    print("- ",end="")
-        print("|")
-
-    print("   -----------------------")
-    
 class Arena():
-    def __init__(self, player1, player2, game):
-        # player1 and player2 are functions which take in board, return action
+    """
+    An Arena class where any 2 agents can be pit against each other.
+    """
+    def __init__(self, player1, player2, game, display=None):
+        """
+        Input:
+            player 1,2: two functions that takes board as input, return action
+            game: Game object
+            display: a function that takes board as input and prints it (e.g.
+                     display in othello/OthelloGame)
+
+        see othello/OthelloPlayers.py for an example. See pit.py for pitting
+        human players/other baselines with each other.
+        """
         self.player1 = player1
         self.player2 = player2
         self.game = game
+        self.display = display
 
     def playGame(self, verbose=False):
-        # execute one game and return winner
+        """
+        Executes on episode of a game.
+
+        Returns:
+            winner: player who won the game (1 if player1, -1 if player2)
+        """
         players = [self.player2, None, self.player1]
         curPlayer = 1
         board = self.game.getInitBoard()
@@ -41,14 +36,10 @@ class Arena():
             it+=1
             if verbose:
                 print("Turn ", str(it), "Player ", str(curPlayer))
-                display(board)
+                self.display(board)
             action = players[curPlayer+1](self.game.getCanonicalForm(board, curPlayer))
 
             valids = self.game.getValidMoves(self.game.getCanonicalForm(board, curPlayer),1)
-            # if valids[action] == 0:
-            #     for i in range(len(valids)):
-            #         if valids[i] >0:
-            #             print(i/8,i%8)
 
             if valids[action]==0:
                 print(action)
@@ -56,12 +47,18 @@ class Arena():
             board, curPlayer = self.game.getNextState(board, curPlayer, action)
         if verbose:
             print("Turn ", str(it), "Player ", str(curPlayer))
-            display(board)
+            self.display(board)
         return self.game.getGameEnded(board, 1)
 
     def playGames(self, num, verbose=False):
+        """
+        Plays num games in which player1 starts num/2 games and player2 starts
+        num/2 games.
 
-
+        Returns:
+            oneWon: games won by player1
+            twoWon: games won by player2
+        """
     	num = int(num/2)
     	oneWon = 0
     	twoWon = 0
@@ -77,69 +74,3 @@ class Arena():
     		else:
     			twoWon+=1
     	return oneWon, twoWon
-
-class RandomPlayer():
-    def __init__(self, game):
-        self.game = game
-
-    def play(self, board):
-        a = np.random.randint(self.game.getActionSize())
-        valids = self.game.getValidMoves(board, 1)
-        while valids[a]!=1:
-            a = np.random.randint(self.game.getActionSize())
-        return a
-
-class HumanOthelloPlayer():
-    def __init__(self, game):
-        self.game = game
-
-    def play(self, board):
-        # display(board)
-        valid = self.game.getValidMoves(board, 1)
-        for i in range(len(valid)):
-            if valid[i]:
-                print(int(i/self.game.n), int(i%self.game.n))
-        while True:
-        	a = input()
-        	
-        	x,y = int(a[0]),int(a[1])
-        	a = self.game.n * x + y if x!= -1 else self.game.n ** 2
-        	if valid[a]:
-        		break
-        	else:
-        		print('Invalid')
-
-        return a
-
-
-class GreedyOthelloPlayer():
-    def __init__(self, game):
-        self.game = game
-
-    def play(self, board):
-        valids = self.game.getValidMoves(board, 1)
-        candidates = []
-        for a in range(self.game.getActionSize()):
-            if valids[a]==0:
-                continue
-            nextBoard, _ = self.game.getNextState(board, 1, a)
-            score = self.game.getScore(nextBoard, 1)
-            candidates += [(-score, a)]
-        candidates.sort()
-        return candidates[0][1]
-
-if __name__ == "__main__":
-    from OthelloGame import OthelloGame
-    curGame = OthelloGame(6)
-    p1 = RandomPlayer(curGame)
-    p2 = GreedyOthelloPlayer(curGame)
-    # p2 = HumanOthelloPlayer(curGame)
-
-    p1,p2 = p1, p2
-
-    arena = Arena(p1.play, p2.play, curGame)
-    for _ in range(20):
-        winner =  arena.playGame(verbose=False)
-        print(winner)
-        
-    
