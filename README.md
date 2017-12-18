@@ -9,6 +9,7 @@ To use a game of your choice, subclass the classes in ```Game.py``` and ```Neura
 ### Experiments
 We trained a model for 6x6 Othello. The pretrained model can be found in ```pretrained_models/```. You can play a game against it using ```pit.py```. Below is the performance of the model against a random and a greedy baseline with the number of iterations.
 ![alt tag](https://github.com/suragnair/alpha-zero-general/raw/master/pretrained_models/6x6.png)
+
 A concise description of our algorithm can be found in ```pretrained_models/writeup.pdf```. 
 
 ### Contributors and Credits
