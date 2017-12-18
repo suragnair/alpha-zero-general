@@ -23,7 +23,7 @@ class MCTS():
 		This function performs numMCTSSims simulations of MCTS starting from
 		canonicalBoard.
 
-		Retutns:
+		Returns:
 		 	probs: a policy vector where the probability of the	ith action is
 			       proportional to Nsa[(s,a)]**(1./temp)
 		"""
