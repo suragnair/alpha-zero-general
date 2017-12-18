@@ -61,18 +61,18 @@ class Arena():
             oneWon: games won by player1
             twoWon: games won by player2
         """
-    	num = int(num/2)
-    	oneWon = 0
-    	twoWon = 0
-    	for _ in range(num):
-    		if self.playGame(verbose=verbose)==1:
-    			oneWon+=1
-    		else:
-    			twoWon+=1
-    	self.player1, self.player2 = self.player2, self.player1
-    	for _ in range(num):
-    		if self.playGame(verbose=verbose)==-1:
-    			oneWon+=1
-    		else:
-    			twoWon+=1
-    	return oneWon, twoWon
+        num = int(num/2)
+        oneWon = 0
+        twoWon = 0
+        for _ in range(num):
+            if self.playGame(verbose=verbose)==1:
+                oneWon+=1
+            else:
+                twoWon+=1
+        self.player1, self.player2 = self.player2, self.player1
+        for _ in range(num):
+            if self.playGame(verbose=verbose)==-1:
+                oneWon+=1
+            else:
+                twoWon+=1
+        return oneWon, twoWon
