@@ -6,6 +6,11 @@ To use a game of your choice, subclass the classes in ```Game.py``` and ```Neura
 
 ```Coach.py``` contains the core training loop and ```MCTS.py``` performs the Monte Carlo Tree Search. The parameters for the self-play can be specified in ```main.py```. Additional neural network parameters are in ```othello/NNet.py```. 
 
+To start training a model for Othello:
+```bash
+python main.py
+```
+
 ### Experiments
 We trained a model for 6x6 Othello (~80 iterations, 100 episodes per iteration and 25 MCTS simulations per turn). The pretrained model can be found in ```pretrained_models/```. You can play a game against it using ```pit.py```. Below is the performance of the model against a random and a greedy baseline with the number of iterations.
 ![alt tag](https://github.com/suragnair/alpha-zero-general/raw/master/pretrained_models/6x6.png)
