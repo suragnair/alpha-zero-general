@@ -1,8 +1,10 @@
+from __future__ import print_function
 import sys
 sys.path.append('..')
 from Game import Game
 from OthelloLogic import Board
 import numpy as np
+
 
 class OthelloGame(Game):
     def __init__(self, n):
@@ -87,24 +89,24 @@ class OthelloGame(Game):
         b.pieces = np.copy(board)
         return b.countDiff(player)
 
-    def display(board):
-        n = board.shape[0]
+def display(board):
+    n = board.shape[0]
 
-        for y in range(n):
-            print (y,"|",end="")
-        print("")
-        print(" -----------------------")
-        for y in range(n):
-            print(y, "|",end="")    # print the row #
-            for x in range(n):
-                piece = board[y][x]    # get the piece to print
-                if piece == -1: print("b ",end="")
-                elif piece == 1: print("W ",end="")
+    for y in range(n):
+        print (y,"|",end="")
+    print("")
+    print(" -----------------------")
+    for y in range(n):
+        print(y, "|",end="")    # print the row #
+        for x in range(n):
+            piece = board[y][x]    # get the piece to print
+            if piece == -1: print("b ",end="")
+            elif piece == 1: print("W ",end="")
+            else:
+                if x==n:
+                    print("-",end="")
                 else:
-                    if x==n:
-                        print("-",end="")
-                    else:
-                        print("- ",end="")
-            print("|")
+                    print("- ",end="")
+        print("|")
 
-        print("   -----------------------")
+    print("   -----------------------")

@@ -1,9 +1,10 @@
 class Game():
     """
     This class specifies the base Game class. To define your own game, subclass
-    this class and implement the functions below.
+    this class and implement the functions below. This works when the game is
+    two-player, adversarial and turn-based.
 
-    TODOst: info on how player 1/-1 are handled
+    Use 1 for player1 and -1 for player2.
 
     See othello/OthelloGame.py for an example implementation.
     """
@@ -36,12 +37,12 @@ class Game():
         """
         Input:
             board: current board
-            player: current player
+            player: current player (1 or -1)
             action: action taken by current player
 
         Returns:
             nextBoard: board after applying action
-            nextPlayer: player who plays in the next turn
+            nextPlayer: player who plays in the next turn (should be -player)
         """
         pass
 
@@ -62,24 +63,27 @@ class Game():
         """
         Input:
             board: current board
-            player: current player
+            player: current player (1 or -1)
 
         Returns:
-            r: TODOst
+            r: 0 if game has not ended. 1 if player won, -1 if player lost.
         """
-        # return 0 if not ended, 1 if player won, -1 if player lost
         pass
 
     def getCanonicalForm(self, board, player):
         """
         Input:
             board: current board
-            player: current player
+            player: current player (1 or -1)
 
         Returns:
-            canonicalBoard: TODOst
+            canonicalBoard: returns canonical form of board. The canonical form
+                            should be independent of player. For e.g. in chess,
+                            the canonical form can be chosen to be from the pov
+                            of white. When the player is white, we can return
+                            board as is. When the player is black, we can invert
+                            the colors and return the board.
         """
-        # return state if player==0, else return -state ?
         pass
 
     def getSymmetries(self, board, pi):

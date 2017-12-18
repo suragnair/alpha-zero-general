@@ -1,4 +1,3 @@
-from __future__ import print_function
 import numpy as np
 
 class Arena():
@@ -11,7 +10,8 @@ class Arena():
             player 1,2: two functions that takes board as input, return action
             game: Game object
             display: a function that takes board as input and prints it (e.g.
-                     display in othello/OthelloGame)
+                     display in othello/OthelloGame). Is necessary for verbose
+                     mode.
 
         see othello/OthelloPlayers.py for an example. See pit.py for pitting
         human players/other baselines with each other.
@@ -23,7 +23,7 @@ class Arena():
 
     def playGame(self, verbose=False):
         """
-        Executes on episode of a game.
+        Executes one episode of a game.
 
         Returns:
             winner: player who won the game (1 if player1, -1 if player2)
@@ -35,6 +35,7 @@ class Arena():
         while self.game.getGameEnded(board, curPlayer)==0:
             it+=1
             if verbose:
+                assert(self.display)
                 print("Turn ", str(it), "Player ", str(curPlayer))
                 self.display(board)
             action = players[curPlayer+1](self.game.getCanonicalForm(board, curPlayer))
@@ -46,6 +47,7 @@ class Arena():
                 assert valids[action] >0
             board, curPlayer = self.game.getNextState(board, curPlayer, action)
         if verbose:
+            assert(self.display)
             print("Turn ", str(it), "Player ", str(curPlayer))
             self.display(board)
         return self.game.getGameEnded(board, 1)

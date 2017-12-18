@@ -5,12 +5,12 @@ from utils import *
 
 args = dotdict({
     'numIters': 1000,
-    'numEps': 100,
+    'numEps': 1,
     'tempThreshold': 15,
     'updateThreshold': 0.6,
     'maxlenOfQueue': 200000,
-    'numMCTSSims': 25,
-    'arenaCompare': 40,
+    'numMCTSSims': 2,
+    'arenaCompare': 2,
     'cpuct': 1,
 
     'checkpoint': './temp/',
