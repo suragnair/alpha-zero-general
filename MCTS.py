@@ -40,7 +40,7 @@ class MCTS():
 			return probs
 
 		counts = [x**(1./temp) for x in counts]
-		probs = [x/sum(counts) for x in counts]
+		probs = [x/float(sum(counts)) for x in counts]
 		return probs
 
 

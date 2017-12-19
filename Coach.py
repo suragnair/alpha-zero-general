@@ -48,7 +48,7 @@ class Coach():
             for b,p in sym:
                 trainExamples.append([b, self.curPlayer, p, None])
 
-            action = np.argmax(pi)
+            action = np.random.choice(len(pi), p=pi)
             self.board, self.curPlayer = self.game.getNextState(self.board, self.curPlayer, action)
 
             r = self.game.getGameEnded(self.board, self.curPlayer)
