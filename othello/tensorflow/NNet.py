@@ -1,4 +1,3 @@
-import argparse
 import os
 import shutil
 import time
@@ -6,12 +5,11 @@ import random
 import numpy as np
 import math
 import sys
-sys.path.append('..')
+sys.path.append('../../')
 from utils import *
 from pytorch_classification.utils import Bar, Logger, AverageMeter, accuracy, mkdir_p, savefig
 from NeuralNet import NeuralNet
 
-import argparse
 import tensorflow as tf
 from .OthelloNNet import OthelloNNet as onnet
 
@@ -20,7 +18,6 @@ args = dotdict({
     'dropout': 0.3,
     'epochs': 10,
     'batch_size': 64,
-    'cuda': False,
     'num_channels': 512,
 })
 
