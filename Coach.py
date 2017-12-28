@@ -2,7 +2,7 @@ from collections import deque
 from Arena import Arena
 from MCTS import MCTS
 import numpy as np
-from pytorch_classification.utils import Bar, Logger, AverageMeter
+from pytorch_classification.utils import Bar, AverageMeter
 import time
 
 class Coach():

@@ -8,7 +8,7 @@ import math
 import sys
 sys.path.append('../../')
 from utils import *
-from pytorch_classification.utils import Bar, Logger, AverageMeter, accuracy, mkdir_p, savefig
+from pytorch_classification.utils import Bar, AverageMeter
 from NeuralNet import NeuralNet
 
 import argparse
