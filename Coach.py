@@ -74,7 +74,8 @@ class Coach():
             end = time.time()
 
             for eps in range(self.args.numEps):
-                trainExamples += self.executeEpisode()
+                self.mcts = MCTS(self.game, self.nnet, self.args)   # reset search tree
+                trainExamples += self.executeEpisode()                
 
                 # bookkeeping + plot progress
                 eps_time.update(time.time() - end)
@@ -105,5 +106,4 @@ class Coach():
             else:
                 print('ACCEPTING NEW MODEL')
                 self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='checkpoint_' + str(i) + '.pth.tar')
-                self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')
-                self.mcts = MCTS(self.game, self.nnet, self.args)   # reset search tree
+                self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')                
