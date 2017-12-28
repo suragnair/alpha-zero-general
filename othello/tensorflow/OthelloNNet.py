@@ -13,7 +13,7 @@ class OthelloNNet():
 
         # Renaming functions 
         Relu = tf.nn.relu
-        Sigmoid = tf.nn.sigmoid
+        Tanh = tf.nn.tanh
         BatchNormalization = tf.layers.batch_normalization
         Dropout = tf.layers.dropout
         Dense = tf.layers.dense
@@ -33,7 +33,7 @@ class OthelloNNet():
             s_fc1 = Dropout(Relu(BatchNormalization(Dense(h_conv4_flat, 1024), axis=1)), rate=self.dropout) # batch_size x 1024
             s_fc2 = Dropout(Relu(BatchNormalization(Dense(s_fc1, 512), axis=1)), rate=self.dropout)         # batch_size x 512
             self.pi = Dense(s_fc2, self.action_size)                                                        # batch_size x self.action_size
-            self.v = Sigmoid(Dense(s_fc2, 1))                                                               # batch_size x 1
+            self.v = Tanh(Dense(s_fc2, 1))                                                               # batch_size x 1
 
             self.calculate_loss()
 
