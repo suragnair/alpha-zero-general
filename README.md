@@ -18,6 +18,14 @@ We trained a PyTorch model for 6x6 Othello (~80 iterations, 100 episodes per ite
 
 A concise description of our algorithm can be found [here](https://github.com/suragnair/alpha-zero-general/raw/master/pretrained_models/writeup.pdf).
 
+### Contributing
+While the current code is fairly functional, we could benefit from the following contributions:
+* Game logic files for more games that follow the specifications in ```Game.py```, along with their neural networks
+* Neural networks in other frameworks
+* Pre-trained models for different game configurations
+* An asynchronous version of the code- parallel processes for self-play, neural net training and model comparison. 
+* Asynchronous MCTS as described in the paper
+
 ### Contributors and Credits
 * [Shantanu Thakoor](https://github.com/ShantanuThakoor)
 * [Megha Jhunjhunwala](https://github.com/jjw-megha)
