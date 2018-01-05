@@ -1,3 +1,6 @@
+import numpy as np
+
+
 class RandomPlayer():
     def __init__(self, game):
         self.game = game
