@@ -96,10 +96,10 @@ class Coach():
             print('PITTING AGAINST PREVIOUS VERSION')
             arena = Arena(lambda x: np.argmax(pmcts.getActionProb(x, temp=0)),
                           lambda x: np.argmax(nmcts.getActionProb(x, temp=0)), self.game)
-            pwins, nwins = arena.playGames(self.args.arenaCompare)
+            pwins, nwins, draws = arena.playGames(self.args.arenaCompare)
 
-            print('NEW/PREV WINS : ' + str(nwins) + '/' + str(pwins))
-            if float(nwins)/(pwins+nwins) < self.args.updateThreshold:
+            print('NEW/PREV WINS : ' + str(nwins) + '/' + str(pwins) + ' ; DRAWS : ' + str(draws))
+            if pwins+nwins > 0 and float(nwins)/(pwins+nwins) < self.args.updateThreshold:
                 print('REJECTING NEW MODEL')
                 self.nnet = pnet
 
