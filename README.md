@@ -10,13 +10,15 @@ To start training a model for Othello:
 ```bash
 python main.py
 ```
-Choose your framework in ```main.py```.
+Choose your framework and game in ```main.py```.
 
 ### Experiments
-We trained a PyTorch model for 6x6 Othello (~80 iterations, 100 episodes per iteration and 25 MCTS simulations per turn). This took about 3 days on an NVIDIA Tesla K80. The pretrained model (PyTorch) can be found in ```pretrained_models/pytorch/```. You can play a game against it using ```pit.py```. Below is the performance of the model against a random and a greedy baseline with the number of iterations.
+We trained a PyTorch model for 6x6 Othello (~80 iterations, 100 episodes per iteration and 25 MCTS simulations per turn). This took about 3 days on an NVIDIA Tesla K80. The pretrained model (PyTorch) can be found in ```pretrained_models/othello/pytorch/```. You can play a game against it using ```pit.py```. Below is the performance of the model against a random and a greedy baseline with the number of iterations.
 ![alt tag](https://github.com/suragnair/alpha-zero-general/raw/master/pretrained_models/6x6.png)
 
 A concise description of our algorithm can be found [here](https://github.com/suragnair/alpha-zero-general/raw/master/pretrained_models/writeup.pdf).
+
+In addition, [Evgeny Tyurin](https://github.com/evg-tyurin) has contributed rules and a trained model for TicTacToe.
 
 ### Contributing
 While the current code is fairly functional, we could benefit from the following contributions:
