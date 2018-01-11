@@ -76,8 +76,17 @@ class MCTS():
             # leaf node
             self.Ps[s], v = self.nnet.predict(canonicalBoard)
             valids = self.game.getValidMoves(canonicalBoard, 1)
+            ps_no_masking = np.copy(self.Ps[s])
+
             self.Ps[s] = self.Ps[s]*valids      # masking invalid moves
-            self.Ps[s] /= np.sum(self.Ps[s])    # renormalize
+            t = np.sum(self.Ps[s])
+            if not np.isclose(t, 0):
+                self.Ps[s] /= t; #renomalize
+            else:
+                print('sum of self.Ps[s] after masking is too small: {}'.format(t))
+                print('current board state s : {}'.format(s))
+                print('self.Ps[s] after masking : {}'.format(self.Ps[s]))
+                print('self.Ps[s] without masking: {}'.format(ps_no_masking))
 
             self.Vs[s] = valids
             self.Ns[s] = 0
