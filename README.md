@@ -18,8 +18,6 @@ We trained a PyTorch model for 6x6 Othello (~80 iterations, 100 episodes per ite
 
 A concise description of our algorithm can be found [here](https://github.com/suragnair/alpha-zero-general/raw/master/pretrained_models/writeup.pdf).
 
-In addition, [Evgeny Tyurin](https://github.com/evg-tyurin) has contributed rules and a trained model for TicTacToe.
-
 ### Contributing
 While the current code is fairly functional, we could benefit from the following contributions:
 * Game logic files for more games that follow the specifications in ```Game.py```, along with their neural networks
@@ -29,8 +27,8 @@ While the current code is fairly functional, we could benefit from the following
 * Asynchronous MCTS as described in the paper
 
 ### Contributors and Credits
-* [Shantanu Thakoor](https://github.com/ShantanuThakoor)
-* [Megha Jhunjhunwala](https://github.com/jjw-megha)
-* [Shantanu Kumar](https://github.com/SourKream)
+* [Shantanu Thakoor](https://github.com/ShantanuThakoor) and [Megha Jhunjhunwala](https://github.com/jjw-megha) helped with core design and implementation.
+* [Shantanu Kumar](https://github.com/SourKream) contributed TensorFlow and Keras models for Othello.
+* [Evgeny Tyurin](https://github.com/evg-tyurin) contributed rules and a trained model for TicTacToe.
 
 Thanks to [pytorch-classification](https://github.com/bearpaw/pytorch-classification) and [progress](https://github.com/verigak/progress).
