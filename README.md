@@ -1,6 +1,6 @@
 # Alpha Zero General (any game, any framework!)
 
-A simplified, highly flexible, commented and (hopefully) easy to understand implementation of self-play based reinforcement learning based on the AlphaGo Zero paper (Silver et al). It is designed to be easy to adopt for any two-player turn-based adversarial game and any deep learning framework of your choice. A sample implementation has been provided for the game of Othello in PyTorch, Keras and TensorFlow. An accompanying tutorial can be found [here](http://web.stanford.edu/~surag/posts/alphazero.html).
+A simplified, highly flexible, commented and (hopefully) easy to understand implementation of self-play based reinforcement learning based on the AlphaGo Zero paper (Silver et al). It is designed to be easy to adopt for any two-player turn-based adversarial game and any deep learning framework of your choice. A sample implementation has been provided for the game of Othello in PyTorch, Keras and TensorFlow. An accompanying tutorial can be found [here](http://web.stanford.edu/~surag/posts/alphazero.html). We also have impmenetations for GoBang and TocTacToe.
 
 To use a game of your choice, subclass the classes in ```Game.py``` and ```NeuralNet.py``` and implement their functions. Example implementations for Othello can be found in ```othello/OthelloGame.py``` and ```othello/{pytorch,keras,tensorflow}/NNet.py```. 
 
@@ -30,5 +30,6 @@ While the current code is fairly functional, we could benefit from the following
 * [Shantanu Thakoor](https://github.com/ShantanuThakoor) and [Megha Jhunjhunwala](https://github.com/jjw-megha) helped with core design and implementation.
 * [Shantanu Kumar](https://github.com/SourKream) contributed TensorFlow and Keras models for Othello.
 * [Evgeny Tyurin](https://github.com/evg-tyurin) contributed rules and a trained model for TicTacToe.
+* [MBoss] (https://github.com/1424667164) contributed rules and a model for GoBang.
 
 Thanks to [pytorch-classification](https://github.com/bearpaw/pytorch-classification) and [progress](https://github.com/verigak/progress).
