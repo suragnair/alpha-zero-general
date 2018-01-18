@@ -6,6 +6,7 @@ import random
 import numpy as np
 import math
 import sys
+import tensorflow as tf
 sys.path.append('..')
 from utils import *
 from NeuralNet import NeuralNet
@@ -22,8 +23,11 @@ args = dotdict({
     'num_channels': 512,
 })
 
+
+
 class NNetWrapper(NeuralNet):
     def __init__(self, game):
+        self.graph = tf.get_default_graph()
         self.nnet = onnet(game, args)
         self.board_x, self.board_y = game.getBoardSize()
         self.action_size = game.getActionSize()
@@ -43,13 +47,14 @@ class NNetWrapper(NeuralNet):
         board: np array with board
         """
         # timing
-        start = time.time()
+        # start = time.time()
 
         # preparing input
         board = board[np.newaxis, :, :]
-
-        # run
-        pi, v = self.nnet.model.predict(board)
+        with self.graph.as_default():
+            # run
+            self.nnet.model._make_predict_function()
+            pi, v = self.nnet.model.predict(board)
 
         #print('PREDICTION TIME TAKEN : {0:03f}'.format(time.time()-start))
         return pi[0], v[0]
