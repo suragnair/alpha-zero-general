@@ -53,6 +53,8 @@ class GobangGame(Game):
     def getGameEnded(self, board, player):
         # return 0 if not ended, 1 if player 1 won, -1 if player 1 lost
         # player = 1
+        b = Board(self.n)
+        b.pieces = np.copy(board)
         n = self.n_in_row
 
         for w in range(self.n):
@@ -61,15 +63,17 @@ class GobangGame(Game):
                         len(set(board[i][h] for i in range(w, w + n))) == 1):
                     return board[w][h]
                 if (h in range(self.n - n + 1) and board[w][h] != 0 and
-                        len(set(board[w][i] for i in range(h, h + n))) == 1):
+                        len(set(board[w][j] for j in range(h, h + n))) == 1):
                     return board[w][h]
                 if (w in range(self.n - n + 1) and h in range(self.n - n + 1) and board[w][h] != 0 and
-                        len(set(board[w + i][h + i] for i in range(n))) == 1):
+                        len(set(board[w + k][h + k] for k in range(n))) == 1):
                     return board[w][h]
-                if (w in range(n - 1, self.n) and h in range(self.n - n + 1) and board[w][h] != 0 and
-                        len(set(board[w - i][h - i] for i in range(n))) == 1):
+                if (w in range(self.n - n + 1) and h in range(self.n - n + 1, self.n) and board[w][h] != 0 and
+                        len(set(board[w + l][h - l] for l in range(n))) == 1):
                     return board[w][h]
-        return 0
+        if b.has_legal_moves():
+            return 0
+        return 1e-4
 
     def getCanonicalForm(self, board, player):
         # return state if player==1, else return -state if player==-1

@@ -91,7 +91,7 @@ class NNetWrapper(NeuralNet):
         board: np array with board
         """
         # timing
-        start = time.time()
+        # start = time.time()
 
         # preparing input
         board = board[np.newaxis, :, :]
