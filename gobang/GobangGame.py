@@ -63,13 +63,13 @@ class GobangGame(Game):
                         len(set(board[i][h] for i in range(w, w + n))) == 1):
                     return board[w][h]
                 if (h in range(self.n - n + 1) and board[w][h] != 0 and
-                        len(set(board[w][i] for i in range(h, h + n))) == 1):
+                        len(set(board[w][j] for j in range(h, h + n))) == 1):
                     return board[w][h]
                 if (w in range(self.n - n + 1) and h in range(self.n - n + 1) and board[w][h] != 0 and
-                        len(set(board[w + i][h + i] for i in range(n))) == 1):
+                        len(set(board[w + k][h + k] for k in range(n))) == 1):
                     return board[w][h]
-                if (w in range(n - 1, self.n) and h in range(self.n - n + 1) and board[w][h] != 0 and
-                        len(set(board[w - i][h - i] for i in range(n))) == 1):
+                if (w in range(self.n - n + 1) and h in range(self.n - n + 1, self.n) and board[w][h] != 0 and
+                        len(set(board[w + l][h - l] for l in range(n))) == 1):
                     return board[w][h]
         if b.has_legal_moves():
             return 0
