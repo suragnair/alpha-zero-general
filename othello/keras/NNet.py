@@ -69,3 +69,10 @@ class NNetWrapper(NeuralNet):
         if not os.path.exists(filepath):
             raise("No model in path {}".format(filepath))
         self.nnet.model.load_weights(filepath)
+
+    def recreate(self, folder='checkpoint', filename='checkpoint.pth.tar'):
+        """ Destroy wrapped NNet to clear as much resources as possible.
+            Then recreate wrapped NNet and load it from the given checkpoint """
+        self.nnet.destroy()
+        self.nnet = onnet(self.game, args)
+        self.load_checkpoint(folder, filename)
