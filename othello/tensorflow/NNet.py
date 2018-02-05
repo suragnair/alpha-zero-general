@@ -55,7 +55,7 @@ class NNetWrapper(NeuralNet):
                 boards, pis, vs = list(zip(*[examples[i] for i in sample_ids]))
 
                 # predict and compute gradient and do SGD step
-                input_dict = {self.nnet.input_boards: boards, self.nnet.target_pis: pis, self.nnet.target_vs: vs, self.nnet.dropout: args.dropout}
+                input_dict = {self.nnet.input_boards: boards, self.nnet.target_pis: pis, self.nnet.target_vs: vs, self.nnet.dropout: args.dropout, self.nnet.isTraining: True}
 
                 # measure data loading time
                 data_time.update(time.time() - end)
@@ -97,11 +97,10 @@ class NNetWrapper(NeuralNet):
         board = board[np.newaxis, :, :]
 
         # run
-        pi, v = self.sess.run([self.nnet.pi, self.nnet.v], feed_dict={self.nnet.input_boards: board, self.nnet.dropout: 0})
+        prob, v = self.sess.run([self.nnet.prob, self.nnet.v], feed_dict={self.nnet.input_boards: board, self.nnet.dropout: 0, self.nnet.isTraining: False})
 
         #print('PREDICTION TIME TAKEN : {0:03f}'.format(time.time()-start))
-        pi = np.exp(pi) / np.sum(np.exp(pi))
-        return pi[0], v[0]
+        return prob[0], v[0]
 
     def save_checkpoint(self, folder='checkpoint', filename='checkpoint.pth.tar'):
         filepath = os.path.join(folder, filename)
@@ -110,15 +109,15 @@ class NNetWrapper(NeuralNet):
             os.mkdir(folder)
         else:
             print("Checkpoint Directory exists! ")
-        if self.saver == None:
+        if self.saver == None:            
             self.saver = tf.train.Saver(self.nnet.graph.get_collection('variables'))
-        self.saver.save(self.sess, filepath)
+        with self.nnet.graph.as_default():
+            self.saver.save(self.sess, filepath)
 
     def load_checkpoint(self, folder='checkpoint', filename='checkpoint.pth.tar'):
-        # https://github.com/pytorch/examples/blob/master/imagenet/main.py#L98
         filepath = os.path.join(folder, filename)
         if not os.path.exists(filepath+'.meta'):
             raise("No model in path {}".format(filepath))
         with self.nnet.graph.as_default():
-            self.saver = tf.train.import_meta_graph(filepath  + '.meta')
+            self.saver = tf.train.Saver()
             self.saver.restore(self.sess, filepath)
