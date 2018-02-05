@@ -14,6 +14,7 @@ class Coach():
         self.game = game
         self.board = game.getInitBoard()
         self.nnet = nnet
+        self.pnet = self.nnet.__class__(self.game)  # the competitor network
         self.args = args
         self.mcts = MCTS(self.game, self.nnet, self.args)
 
@@ -84,38 +85,26 @@ class Coach():
                                                                                                            total=bar.elapsed_td, eta=bar.eta_td)
                 bar.next()
             bar.finish()
-            
-            # to be garbage collected asap
-            self.mcts = None
 
             # training new network, keeping a copy of the old one
             self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
-            pnet = self.nnet.__class__(self.game)
-            pnet.load_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
-            pmcts = MCTS(self.game, pnet, self.args)
+            self.pnet.load_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
+            pmcts = MCTS(self.game, self.pnet, self.args)
+            
             self.nnet.train(trainExamples)
             nmcts = MCTS(self.game, self.nnet, self.args)
-            
-            # if self.args.arenaCompare is large enough both nmcts and pmcts consume huge amount of RAM.
-            # RAM consumed depends also on your game implementation, particularly on game.getActionSize
-            # and size of game.stringRepresentation.
+
             print('PITTING AGAINST PREVIOUS VERSION')
             arena = Arena(lambda x: np.argmax(pmcts.getActionProb(x, temp=0)),
                           lambda x: np.argmax(nmcts.getActionProb(x, temp=0)), self.game)
             pwins, nwins, draws = arena.playGames(self.args.arenaCompare)
 
-            print('NEW/PREV WINS : ' + str(nwins) + '/' + str(pwins) + ' ; DRAWS : ' + str(draws))
+            print('NEW/PREV WINS : %d / %d ; DRAWS : %d' % (nwins, pwins, draws))
             if pwins+nwins > 0 and float(nwins)/(pwins+nwins) < self.args.updateThreshold:
                 print('REJECTING NEW MODEL')
-                # self.nnet = pnet
-                self.nnet.recreate(folder=self.args.checkpoint, filename='temp.pth.tar')
+                self.nnet.load_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
 
             else:
                 print('ACCEPTING NEW MODEL')
                 self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='checkpoint_' + str(i) + '.pth.tar')
-                self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')
-                self.nnet.recreate(folder=self.args.checkpoint, filename='best.pth.tar')
-
-            # to be garbage collected asap
-            pmcts = None
-            nmcts = None
+                self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')                
