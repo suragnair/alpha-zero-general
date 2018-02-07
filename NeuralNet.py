@@ -49,9 +49,3 @@ class NeuralNet():
         """
         pass
 
-    def recreate(self, folder='checkpoint', filename='checkpoint.pth.tar'):
-        """ 
-        Destroy wrapped NNet to clear as much resources as possible.
-        Then recreate wrapped NNet and load it from the given checkpoint.
-        It must be implemented at least for Keras+TF.
-        """
