@@ -48,4 +48,3 @@ class NeuralNet():
         Loads parameters of the neural network from folder/filename
         """
         pass
-
