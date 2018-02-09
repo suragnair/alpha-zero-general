@@ -12,8 +12,6 @@ args = dotdict({
     'numMCTSSims': 25,
     'arenaCompare': 40,
     'cpuct': 1,
-    'dirAlpha': 0.3,
-    'epsilon': 0.25, 
 
     'checkpoint': './temp/',
     'load_model': False,
