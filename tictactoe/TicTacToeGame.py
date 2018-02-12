@@ -97,10 +97,14 @@ class TicTacToeGame(Game):
 def display(board):
     n = board.shape[0]
 
+    print("   ", end="")
     for y in range(n):
-        print (y,"|",end="")
+        print (y,"", end="")
     print("")
-    print(" -----------------------")
+    print("  ", end="")
+    for _ in range(n):
+        print ("-", end="-")
+    print("--")
     for y in range(n):
         print(y, "|",end="")    # print the row #
         for x in range(n):
@@ -114,4 +118,7 @@ def display(board):
                     print("- ",end="")
         print("|")
 
-    print("   -----------------------")
+    print("  ", end="")
+    for _ in range(n):
+        print ("-", end="-")
+    print("--")
