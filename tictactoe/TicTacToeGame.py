@@ -35,7 +35,7 @@ class TicTacToeGame(Game):
         # if player takes action on board, return next (board,player)
         # action must be a valid move
         if action == self.n*self.n:
-        	return (board, -player)
+            return (board, -player)
         b = Board(self.n)
         b.pieces = np.copy(board)
         move = (int(action/self.n), action%self.n)
@@ -49,10 +49,10 @@ class TicTacToeGame(Game):
         b.pieces = np.copy(board)
         legalMoves =  b.get_legal_moves(player)
         if len(legalMoves)==0:
-        	valids[-1]=1
-        	return np.array(valids)
+            valids[-1]=1
+            return np.array(valids)
         for x, y in legalMoves:
-        	valids[self.n*x+y]=1
+            valids[self.n*x+y]=1
         return np.array(valids)
 
     def getGameEnded(self, board, player):
@@ -62,7 +62,7 @@ class TicTacToeGame(Game):
         b.pieces = np.copy(board)
 
         if b.is_win(player):
-        	return 1
+            return 1
         if b.is_win(-player):
             return -1
         if b.has_legal_moves():
@@ -91,8 +91,8 @@ class TicTacToeGame(Game):
         return l
 
     def stringRepresentation(self, board):
-    	# 8x8 numpy array (canonical board)
-    	return board.tostring()
+        # 8x8 numpy array (canonical board)
+        return board.tostring()
 
 def display(board):
     n = board.shape[0]
