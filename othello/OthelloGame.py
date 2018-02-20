@@ -27,7 +27,7 @@ class OthelloGame(Game):
         # if player takes action on board, return next (board,player)
         # action must be a valid move
         if action == self.n*self.n:
-        	return (board, -player)
+            return (board, -player)
         b = Board(self.n)
         b.pieces = np.copy(board)
         move = (int(action/self.n), action%self.n)
@@ -41,10 +41,10 @@ class OthelloGame(Game):
         b.pieces = np.copy(board)
         legalMoves =  b.get_legal_moves(player)
         if len(legalMoves)==0:
-        	valids[-1]=1
-        	return np.array(valids)
+            valids[-1]=1
+            return np.array(valids)
         for x, y in legalMoves:
-        	valids[self.n*x+y]=1
+            valids[self.n*x+y]=1
         return np.array(valids)
 
     def getGameEnded(self, board, player):
@@ -55,9 +55,9 @@ class OthelloGame(Game):
         if b.has_legal_moves(player):
             return 0
         if b.has_legal_moves(-player):
-        	return 0
+            return 0
         if b.countDiff(player) > 0:
-        	return 1
+            return 1
         return -1
 
     def getCanonicalForm(self, board, player):
@@ -81,8 +81,8 @@ class OthelloGame(Game):
         return l
 
     def stringRepresentation(self, board):
-    	# 8x8 numpy array (canonical board)
-    	return board.tostring()
+        # 8x8 numpy array (canonical board)
+        return board.tostring()
 
     def getScore(self, board, player):
         b = Board(self.n)
