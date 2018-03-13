@@ -1,5 +1,6 @@
 import math
 import numpy as np
+EPS = 1e-8
 
 class MCTS():
     """
@@ -103,7 +104,7 @@ class MCTS():
                 if (s,a) in self.Qsa:
                     u = self.Qsa[(s,a)] + self.args.cpuct*self.Ps[s][a]*math.sqrt(self.Ns[s])/(1+self.Nsa[(s,a)])
                 else:
-                    u = self.args.cpuct*self.Ps[s][a]*math.sqrt(self.Ns[s])     # Q = 0 ?
+                    u = self.args.cpuct*self.Ps[s][a]*math.sqrt(self.Ns[s] + EPS)     # Q = 0 ?
 
                 if u > cur_best:
                     cur_best = u
