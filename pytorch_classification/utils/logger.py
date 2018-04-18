@@ -1,10 +1,10 @@
 # A simple torch style logger
 # (C) Wei YANG 2017
 from __future__ import absolute_import
-#import matplotlib.pyplot as plt
 import os
 import sys
 import numpy as np
+import matplotlib.pyplot as plt
 
 __all__ = ['Logger', 'LoggerMonitor', 'savefig']
 
