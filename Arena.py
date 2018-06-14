@@ -6,7 +6,7 @@ class Arena():
     """
     An Arena class where any 2 agents can be pit against each other.
     """
-    def __init__(self, player1, player2, game, display=None):
+    def __init__(self, player1, player2, game, display=None, mcts1=None, mcts2=None):
         """
         Input:
             player 1,2: two functions that takes board as input, return action
@@ -22,6 +22,14 @@ class Arena():
         self.player2 = player2
         self.game = game
         self.display = display
+        self.mcts1 = mcts1
+        self.mcts2 = mcts2
+    
+    def clearMCTS(self):
+        if self.mcts1:
+            self.mcts1.clear()
+        if self.mcts2:
+            self.mcts2.clear()
 
     def playGame(self, verbose=False):
         """
@@ -33,6 +41,8 @@ class Arena():
             or
                 draw result returned from the game that is neither 1, -1, nor 0.
         """
+        self.clearMCTS()
+        
         players = [self.player2, None, self.player1]
         curPlayer = 1
         board = self.game.getInitBoard()
