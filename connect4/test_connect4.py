@@ -71,9 +71,9 @@ def test_get_valid_moves():
 def test_symmetries():
     """Tests symetric board are produced."""
     board, player, game = init_board_from_moves([0, 0, 1, 0, 6])
-    pi = 0.8
+    pi = [0.1, 0.2, 0.3]
     (board1, pi1), (board2, pi2) = game.getSymmetries(board, pi)
-    assert pi == pi1 and pi == pi2
+    assert [0.1, 0.2, 0.3] == pi1 and [0.3, 0.2, 0.1] == pi2
 
     expected_board1 = textwrap.dedent("""\
         [[ 0.  0.  0.  0.  0.  0.  0.]
