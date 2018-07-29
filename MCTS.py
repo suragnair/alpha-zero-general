@@ -19,6 +19,31 @@ class MCTS():
         self.Es = {}        # stores game.getGameEnded ended for board s
         self.Vs = {}        # stores game.getValidMoves for board s
 
+    def clear(self):
+        self.Qsa = {}
+        self.Nsa = {}
+        self.Ns = {}
+        self.Ps = {}
+        self.Es = {}
+        self.Vs = {}
+
+    def predict(self, board):
+        # randomly rotate and flip before network predict
+        r = np.random.randint(8)
+        b = np.copy(board)
+        b = np.rot90(b, r%4)
+        if r >= 4:
+            b = np.fliplr(b)
+        pi, v = self.nnet.predict(b)
+
+        # policy need to rotate and flip back
+        pi_board = np.reshape(pi[:-1], (self.game.n, self.game.n))
+        if r >= 4:
+            pi_board = np.fliplr(pi_board)
+        pi_board = np.rot90(pi_board, 4-r%4)
+        p = list(pi_board.ravel()) + [pi[-1]]
+        return p, v
+
     def getActionProb(self, canonicalBoard, temp=1):
         """
         This function performs numMCTSSims simulations of MCTS starting from
@@ -75,7 +100,8 @@ class MCTS():
 
         if s not in self.Ps:
             # leaf node
-            self.Ps[s], v = self.nnet.predict(canonicalBoard)
+            p, v = self.predict(canonicalBoard)
+            self.Ps[s] = p
             valids = self.game.getValidMoves(canonicalBoard, 1)
             self.Ps[s] = self.Ps[s]*valids      # masking invalid moves
             sum_Ps_s = np.sum(self.Ps[s])
