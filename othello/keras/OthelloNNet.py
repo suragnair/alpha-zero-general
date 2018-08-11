@@ -3,6 +3,8 @@ sys.path.append('..')
 from utils import *
 
 import argparse
+import plaidml.keras
+plaidml.keras.install_backend()
 from keras.models import *
 from keras.layers import *
 from keras.optimizers import *
