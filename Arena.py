@@ -70,7 +70,7 @@ class Arena():
         eps_time = AverageMeter()
         bar = Bar('Arena.playGames', max=num)
         end = time.time()
-        eps = 0
+        eps = -1
         maxeps = int(num)
 
         num = int(num/2)

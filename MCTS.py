@@ -1,5 +1,6 @@
 import math
 import numpy as np
+import random
 EPS = 1e-8
 
 class MCTS():
@@ -19,6 +20,27 @@ class MCTS():
         self.Es = {}        # stores game.getGameEnded ended for board s
         self.Vs = {}        # stores game.getValidMoves for board s
 
+    def getRandRotationBoard(self,board):
+        rand_roat = random.randint(0,7)
+        x = int(rand_roat/4)
+        is_rotation = rand_roat%4
+        new_board = np.copy(board)
+
+        is_fliplr = False
+        if(x>0):
+            is_fliplr = True
+        if(is_rotation!=0):
+            new_board = np.rot90(new_board,k=is_rotation)
+        if(is_fliplr):
+            new_board = np.fliplr(new_board)
+
+        return new_board
+
+    def predict(self, board):
+        rotation_board = self.getRandRotationBoard(board)
+        p,v = self.nnet.predict(rotation_board)
+        return p, v
+
     def getActionProb(self, canonicalBoard, temp=1):
         """
         This function performs numMCTSSims simulations of MCTS starting from
@@ -28,6 +50,34 @@ class MCTS():
             probs: a policy vector where the probability of the ith action is
                    proportional to Nsa[(s,a)]**(1./temp)
         """
+
+        #------
+        valids = self.game.getValidMoves(canonicalBoard,1)
+        templist = []
+        temp_i = 0
+        #get valid move list
+        for i in valids:
+            if(i==1):
+                templist.append(temp_i)
+            temp_i +=1
+        temp_high = []
+        #get every valid move's value
+        for i in templist:
+            next_board = self.game.getNextState(canonicalBoard,1,i)
+            next_policy, next_value = self.predict(next_board[0])
+            temp_high.append(next_value)
+        #get max value move
+        max_value = np.argmax(temp_high)
+        #create return list
+        return_move = []
+        for i in range(37):
+            if(i==templist[max_value]):
+                return_move.append(1)
+            else:
+                return_move.append(0)
+        return return_move
+        #------
+
         for i in range(self.args.numMCTSSims):
             self.search(canonicalBoard)
 
