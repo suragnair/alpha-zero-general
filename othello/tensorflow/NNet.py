@@ -11,7 +11,7 @@ from pytorch_classification.utils import Bar, AverageMeter
 from NeuralNet import NeuralNet
 
 import tensorflow as tf
-from .OthelloNNet import OthelloNNet as onnet
+from .OthelloNNet import ResNet as onnet
 
 args = dotdict({
     'lr': 0.001,
