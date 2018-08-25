@@ -17,7 +17,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
-from torch.autograd import Variable
 
 from .OthelloNNet import OthelloNNet as onnet
 
@@ -67,7 +66,6 @@ class NNetWrapper(NeuralNet):
                 # predict
                 if args.cuda:
                     boards, target_pis, target_vs = boards.contiguous().cuda(), target_pis.contiguous().cuda(), target_vs.contiguous().cuda()
-                boards, target_pis, target_vs = Variable(boards), Variable(target_pis), Variable(target_vs)
 
                 # measure data loading time
                 data_time.update(time.time() - end)
@@ -117,11 +115,11 @@ class NNetWrapper(NeuralNet):
         # preparing input
         board = torch.FloatTensor(board.astype(np.float64))
         if args.cuda: board = board.contiguous().cuda()
-        board = Variable(board, volatile=True)
-        board = board.view(1, self.board_x, self.board_y)
+        with torch.no_grad():
+            board = board.view(1, self.board_x, self.board_y)
 
-        self.nnet.eval()
-        pi, v = self.nnet(board)
+            self.nnet.eval()
+            pi, v = self.nnet(board)
 
         #print('PREDICTION TIME TAKEN : {0:03f}'.format(time.time()-start))
         return torch.exp(pi).data.cpu().numpy()[0], v.data.cpu().numpy()[0]
