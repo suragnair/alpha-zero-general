@@ -4,3 +4,6 @@
 /temp/
 /.project
 /.pydevproject
+
+# checkpoint
+checkpoints/
