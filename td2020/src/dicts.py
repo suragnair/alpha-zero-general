@@ -24,11 +24,9 @@ INITIAL_GOLD = 200
 TIMEOUT = 100
 DAMAGE = 5
 DAMAGE_ANYWHERE = True
-KILL_ALL = True
+DESTROY_ALL = True
 #############################################
 #############################################
-
-
 
 d_a_type = dotdict({
     'Gold': 1,
@@ -46,7 +44,6 @@ d_a_type = dotdict({
 # })
 
 
-
 # d_acts_int = dotdict({
 #     1: [],  # Gold
 #     2: [0, 1, 2, 3, 4, 5, 6, 10, 11],  # Work
@@ -57,16 +54,15 @@ d_a_type = dotdict({
 
 d_acts = dotdict({
     1: [],  # Gold
-    2: ['idle', 'up', 'down', 'left', 'right', 'barracks','npc'],  # Work
-    3: ['idle', 'rifle_infantry','npc'],  # Barr
-    4: ['idle', 'up', 'down', 'left', 'right', 'attack','npc'],  # Rifl
+    2: ['idle', 'up', 'down', 'left', 'right', 'barracks', 'npc'],  # Work
+    3: ['idle', 'rifle_infantry', 'npc'],  # Barr
+    4: ['idle', 'up', 'down', 'left', 'right', 'attack', 'npc'],  # Rifl
     5: ['idle', 'npc'],  # Hall
 })
 
-
 d_acts_int = dotdict({
     1: [],  # Gold
-    2: [0, 1, 2, 3, 4,  10, 8],  # Work
+    2: [0, 1, 2, 3, 4, 10, 8],  # Work
     3: [0, 9, 8],  # Barr
     4: [0, 1, 2, 3, 4, 7, 8],  # Rifl
     5: [0, 8],  # Hall

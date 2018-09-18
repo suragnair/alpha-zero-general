@@ -2,7 +2,7 @@ from typing import List, Any
 
 import numpy as np
 
-from td2020.src.dicts import d_a_type, a_m_health, d_acts, EXCLUDE_IDLE, A_TYPE_IDX, P_NAME_IDX, CARRY_IDX, MONEY_IDX, a_cost, NUM_ACTS, ACTS_REV, NUM_ENCODERS, MONEY_INC, HEALTH_IDX, TIMEOUT, REMAIN_IDX, INITIAL_GOLD, DAMAGE, DAMAGE_ANYWHERE, KILL_ALL, VERBOSE
+from td2020.src.dicts import d_a_type, a_m_health, d_acts, EXCLUDE_IDLE, A_TYPE_IDX, P_NAME_IDX, CARRY_IDX, MONEY_IDX, a_cost, NUM_ACTS, ACTS_REV, NUM_ENCODERS, MONEY_INC, HEALTH_IDX, TIMEOUT, REMAIN_IDX, INITIAL_GOLD, DAMAGE, DAMAGE_ANYWHERE, DESTROY_ALL, VERBOSE
 
 
 class Board:
@@ -105,7 +105,7 @@ class Board:
 
     def _attack_nearby(self, square):
         (x, y) = square
-        if DAMAGE_ANYWHERE or KILL_ALL:
+        if DAMAGE_ANYWHERE or DESTROY_ALL:
             coords = [(n_x,n_y) for n_x in range(self.n) for n_y in range(self.n) if n_x != x and n_y != y]
         else:
             coords = [(x - 1, y + 1),
@@ -126,12 +126,12 @@ class Board:
 
                         self[n_x][n_y] = [0] * NUM_ENCODERS
 
-                        if not KILL_ALL:
+                        if not DESTROY_ALL:
                             return
 
                     if VERBOSE:
                         print("damaged unit type", self[n_x][n_y][A_TYPE_IDX], "on", n_x, n_y, "and damager of type", self[x][y][A_TYPE_IDX], "on", x, y)
-                    if not KILL_ALL:
+                    if not DESTROY_ALL:
                         return
 
     def _spawn_nearby(self, square, a_type):

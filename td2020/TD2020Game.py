@@ -6,7 +6,6 @@ from td2020.src.Board import Board
 from td2020.src.dicts import NUM_ENCODERS, NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, HEALTH_IDX, REMAIN_IDX, VERBOSE, FPS
 
 
-
 # noinspection PyPep8Naming
 class TD2020Game:
     def __init__(self, n) -> None:
