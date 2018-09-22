@@ -33,14 +33,49 @@ if DESTROY_ALL:
     DAMAGE_ANYWHERE = True
     DAMAGE = 10000
 
+############################################
+#############################################
+P_NAME_IDX_INC = 1
+A_TYPE_IDX_INC = 1
+HEALTH_IDX_INC = 1
+CARRY_IDX_INC = 1
+MONEY_IDX_INC = 1
+REMAIN_IDX_INC = 1
+
+USE_ONE_HOT = False
+
+if USE_ONE_HOT:
+    P_NAME_IDX_INC = 2   # playerName 2 bit - 00(neutral), 01(1) or 10(-1),
+    A_TYPE_IDX_INC = 4   # actor type -> 4 bit,
+    HEALTH_IDX_INC = 2   # health-> 2 bit,
+    CARRY_IDX_INC = 1    # carrying-> 1 bit,
+    MONEY_IDX_INC = 5    # money-> 5 bits (32 aka 4 town halls or 32 workers) [every unit has the same for player]
+    REMAIN_IDX_INC = 13  # 2^13 8192(za total annihilation)
+
 #############################################
 #############################################
+
+# builds indexes for character encoding - if not using one hot encoding, max indexes are incremented by 1 from previous index, but for one hot encoding, its incremented by num bits
 P_NAME_IDX = 0
-A_TYPE_IDX = 1
-HEALTH_IDX = 2
-CARRY_IDX = 3
-MONEY_IDX = 4
-REMAIN_IDX = 5
+P_NAME_IDX_MAX = P_NAME_IDX_INC
+
+A_TYPE_IDX = P_NAME_IDX_MAX
+A_TYPE_IDX_MAX = A_TYPE_IDX + A_TYPE_IDX_INC
+
+HEALTH_IDX = A_TYPE_IDX_MAX
+HEALTH_IDX_MAX = HEALTH_IDX + HEALTH_IDX_INC
+
+CARRY_IDX = HEALTH_IDX_MAX
+CARRY_IDX_MAX = CARRY_IDX + CARRY_IDX_INC
+
+MONEY_IDX = CARRY_IDX_MAX
+MONEY_IDX_MAX = MONEY_IDX + MONEY_IDX_INC
+
+REMAIN_IDX = MONEY_IDX_MAX
+REMAIN_IDX_MAX = REMAIN_IDX + REMAIN_IDX_INC
+
+print("ONE HOT ENCODING")
+
 #############################################
 #############################################
 

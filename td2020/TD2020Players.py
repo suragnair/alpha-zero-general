@@ -149,7 +149,7 @@ class HumanTD2020Player:
 
                     if event.key == pygame.K_ESCAPE:
                         pygame.quit()
-                        raise SystemExit(0)
+                        os._exit(0)
 
                 # handle mouse
                 if event.type == pygame.MOUSEBUTTONUP:
@@ -157,7 +157,6 @@ class HumanTD2020Player:
                     pos = pygame.mouse.get_pos()
 
                     if event.button == lmb:
-
                         clicked_actor = self.select_object(board, pos)
                         if clicked_actor and board[clicked_actor.x][clicked_actor.y][P_NAME_IDX] == USER_PLAYER and board[clicked_actor.x][clicked_actor.y][A_TYPE_IDX] != d_a_type['Gold']:
                             clicked_actor_index_arr = [clicked_actor.x, clicked_actor.y]

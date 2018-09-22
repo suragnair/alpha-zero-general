@@ -9,6 +9,7 @@ from td2020.keras.TD2020NNet import TD2020NNet
 sys.path.append('../..')
 from utils import *
 from NeuralNet import NeuralNet
+
 """
 args = dotdict({
     'lr': 0.001,
@@ -28,11 +29,12 @@ args = dotdict({
     'num_channels': 512,
 })
 
+
 # noinspection PyMissingConstructor
 class NNetWrapper(NeuralNet):
     def __init__(self, game):
         self.nnet = TD2020NNet(game, args)
-        self.board_x, self.board_y,num_encoders= game.getBoardSize()
+        self.board_x, self.board_y, num_encoders = game.getBoardSize()
         self.action_size = game.getActionSize()
 
     def train(self, examples):

@@ -57,6 +57,14 @@ Each actor is encoded using following 6 properties:
 - **Carry**: [0,1] If Worker unit is carrying resources or not - it gets set when worker uses mine_resources near resource source and gets removed when worker uses return_resources near resources drain actor.
 - **Money**: [0-*] Current amount of money that this player has at current time (When money updates, it updates on every players actor)
 - **Remaining time**: [*-0] Countdown time that gets updated on every board tile when move gets executed
+#### One Hot Tile Encoding:
+- **Player Name**: [2] - 00(neutral), 01(1) or 10(-1),
+- **Actor Type**: [4] - 4 bit,
+- **Health**: [2] - 2 bit,
+- **Carry**: [1] - 1 bit,
+- **Money**: [5] - 5 bits (32 aka 4 town halls or 32 workers) [every unit has the same for player]
+- **Remaining time**: [13] - 2^13 8192 (this should be enough for total game)
+
 ### Board presentation
 Board is presented as 3D integer array of dimensions width, height, 6 (which represents number of properties in Tile encoding)
 ### Action checking sequence
@@ -102,6 +110,12 @@ because player is repeating same move multiple times.
 because nodes do not get properly evaluated during backpropagation.
 
 Proper end condition must be found or change of source is needed in order to exclude timeouts, because they are not returning best resuts.
+### Model composition
+
+### Possible learning idea
+Idea is to incrementally learn model by changing end game condition.
+First start learning model on simple end game condition like producing workers and when model is successfully creating workers, add another condition on top of that already learnt model.
+- Possible problem might occur because of model size
 ## Players
 ### Greedy Player
 Greedy player calculates score by summing health of all his actors.
