@@ -1,5 +1,6 @@
 import os
 
+from td2020.src.encoders import OneHotEncoder
 from utils import dotdict
 
 USE_TF_CPU = False
@@ -8,7 +9,7 @@ PATH: str = os.path.dirname(os.path.realpath(__file__))
 
 SHOW_TENSORFLOW_GPU: bool = False
 SHOW_PYGAME_WELCOME: bool = False
-VERBOSE: int = 4
+VERBOSE: int = 0
 FPS: int = 100  # only relevant when pygame
 
 #############################################
@@ -17,7 +18,6 @@ FPS: int = 100  # only relevant when pygame
 USER_PLAYER = 1  # used by Human Player - this does not change if human pit player is 1 or -1
 
 NUM_ACTS = 12  # num all actions
-NUM_ENCODERS = 6  # player_name, act_type, health, carrying, money, remaining_time
 EXCLUDE_IDLE = True  # exclude idle action from all actions
 MONEY_INC = 1  # how much money is returned when returned resources
 
@@ -35,46 +35,20 @@ if DESTROY_ALL:
 
 ############################################
 #############################################
-P_NAME_IDX_INC = 1
-A_TYPE_IDX_INC = 1
-HEALTH_IDX_INC = 1
-CARRY_IDX_INC = 1
-MONEY_IDX_INC = 1
-REMAIN_IDX_INC = 1
 
-USE_ONE_HOT = False
+# encoder = NumericEncoder()
+encoder = OneHotEncoder()
 
-if USE_ONE_HOT:
-    P_NAME_IDX_INC = 2   # playerName 2 bit - 00(neutral), 01(1) or 10(-1),
-    A_TYPE_IDX_INC = 4   # actor type -> 4 bit,
-    HEALTH_IDX_INC = 2   # health-> 2 bit,
-    CARRY_IDX_INC = 1    # carrying-> 1 bit,
-    MONEY_IDX_INC = 5    # money-> 5 bits (32 aka 4 town halls or 32 workers) [every unit has the same for player]
-    REMAIN_IDX_INC = 13  # 2^13 8192(za total annihilation)
+print(" TODO - THIS DOESNT WORK BECAUSE THEN I WOULD HAVE TO REPLACE EVERYTHING IN GAME STATE WITH BITS -BUT REPLACE NUM_ENCODERS ONLY IN TD2020Net.py")
+#NUM_ENCODERS = encoder.num_encoders  # player_name, act_type, health, carrying, money, remaining_time
+NUM_ENCODERS = 6  # player_name, act_type, health, carrying, money, remaining_time
 
-#############################################
-#############################################
-
-# builds indexes for character encoding - if not using one hot encoding, max indexes are incremented by 1 from previous index, but for one hot encoding, its incremented by num bits
 P_NAME_IDX = 0
-P_NAME_IDX_MAX = P_NAME_IDX_INC
-
-A_TYPE_IDX = P_NAME_IDX_MAX
-A_TYPE_IDX_MAX = A_TYPE_IDX + A_TYPE_IDX_INC
-
-HEALTH_IDX = A_TYPE_IDX_MAX
-HEALTH_IDX_MAX = HEALTH_IDX + HEALTH_IDX_INC
-
-CARRY_IDX = HEALTH_IDX_MAX
-CARRY_IDX_MAX = CARRY_IDX + CARRY_IDX_INC
-
-MONEY_IDX = CARRY_IDX_MAX
-MONEY_IDX_MAX = MONEY_IDX + MONEY_IDX_INC
-
-REMAIN_IDX = MONEY_IDX_MAX
-REMAIN_IDX_MAX = REMAIN_IDX + REMAIN_IDX_INC
-
-print("ONE HOT ENCODING")
+A_TYPE_IDX = 1
+HEALTH_IDX = 2
+CARRY_IDX = 3
+MONEY_IDX = 4
+REMAIN_IDX = 5
 
 #############################################
 #############################################
@@ -113,9 +87,9 @@ d_type_rev = dotdict({
 a_m_health = dotdict({
     1: 1,  # Gold
     2: 1,  # Work
-    3: 3,  # Barr
+    3: 2,  # Barr
     4: 2,  # Rifl
-    5: 4,  # Hall
+    5: 3,  # Hall
 })
 a_cost = dotdict({
     1: 0,  # Gold

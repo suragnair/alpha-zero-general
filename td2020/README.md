@@ -26,9 +26,9 @@ Game visualisation is also presented in PyGame and Unreal Engine 4.
 #### Actor health
 - **Gold** - 1
 - **Worker** - 1
-- **Barracks** - 3
+- **Barracks** - 2
 - **Rifle Unit** - 2
-- **Town Hall** - 4
+- **Town Hall** - 3
 #### Actor actions
 - **Gold** - [],
 - **Worker** - [idle, up, down, left, right, barracks, npc],
@@ -53,11 +53,12 @@ Game visualisation is also presented in PyGame and Unreal Engine 4.
 Each actor is encoded using following 6 properties:
 - **Player Name**: [-1,0,1] (player -1, empty field, player 1)
 - **Actor Type**: [1-5] Numerically encoded Actor Type of written above
-- **Health**: [1-4] Current actor health - when actor has 0 health, it gets destroyed
+- **Health**: [1-3] Current actor health - when actor has 0 health, it gets destroyed
 - **Carry**: [0,1] If Worker unit is carrying resources or not - it gets set when worker uses mine_resources near resource source and gets removed when worker uses return_resources near resources drain actor.
 - **Money**: [0-*] Current amount of money that this player has at current time (When money updates, it updates on every players actor)
 - **Remaining time**: [*-0] Countdown time that gets updated on every board tile when move gets executed
 #### One Hot Tile Encoding:
+Now each actor is encoded with binary vector of length 27.
 - **Player Name**: [2] - 00(neutral), 01(1) or 10(-1),
 - **Actor Type**: [4] - 4 bit,
 - **Health**: [2] - 2 bit,

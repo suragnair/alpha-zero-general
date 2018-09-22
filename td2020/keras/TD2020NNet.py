@@ -1,7 +1,7 @@
 import os
 import sys
 
-from td2020.src.dicts import USE_TF_CPU, SHOW_TENSORFLOW_GPU
+from td2020.src.dicts import USE_TF_CPU, SHOW_TENSORFLOW_GPU, encoder
 
 sys.path.append('..')
 
@@ -15,12 +15,16 @@ if not SHOW_TENSORFLOW_GPU:
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 
-class TD2020NNet():
+class TD2020NNet:
     def __init__(self, game, args):
         # game params
         self.board_x, self.board_y, num_encoders = game.getBoardSize()
         self.action_size = game.getActionSize()
         self.args = args
+
+        print("TODO - MAYBE THIS WAY ")
+        num_encoders = encoder.num_encoders
+
 
         # Neural Net
         self.input_boards = Input(shape=(self.board_x, self.board_y, num_encoders))  # s: batch_size x board_x x board_y x num_encoders

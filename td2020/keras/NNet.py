@@ -5,6 +5,7 @@ import time
 import numpy as np
 
 from td2020.keras.TD2020NNet import TD2020NNet
+from td2020.src.dicts import encoder
 
 sys.path.append('../..')
 from utils import *
@@ -45,6 +46,11 @@ class NNetWrapper(NeuralNet):
         input_boards = np.asarray(input_boards)
         target_pis = np.asarray(target_pis)
         target_vs = np.asarray(target_vs)
+
+        print(" TEMP PRINTING INPUT BOARDS SHAPE", input_boards.shape())
+        input_boards = encoder.encode(input_boards)
+        print(" TODO - CHECK DIMSNSIONS BEFORE ONE HOT ENCODING AND AFTER")
+
         self.nnet.model.fit(x=input_boards, y=[target_pis, target_vs], batch_size=args.batch_size, epochs=args.epochs)
 
     def predict(self, board):
@@ -53,6 +59,10 @@ class NNetWrapper(NeuralNet):
         """
         # timing
         start = time.time()
+
+        print(" TEMP PRINTING BOARD SHAPE", board.shape())
+        board = encoder.encode(board)
+        print(" TODO - CHECK DIMSNSIONS BEFORE ONE HOT ENCODING AND AFTER")
 
         # preparing input
         board = board[np.newaxis, :, :]
