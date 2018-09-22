@@ -1,105 +1,132 @@
-from math import sqrt, ceil
+import ctypes
+from math import sqrt
 
 import numpy as np
-import pandas as pd
-import pygame
-from numpy import size
 from pygame.rect import Rect
 
-from td2020.src.config_file import CANVAS_SCALE, BORDER
+from td2020.src.Board import Board
+from td2020.src.Graphics import init_visuals, update_graphics, message_display
+from td2020.src.dicts import NUM_ACTS, VERBOSE, P_NAME_IDX, A_TYPE_IDX, d_user_shortcuts, USER_PLAYER, FPS, ACTS, d_a_type, ACTS_REV, d_user_shortcuts_rev, SHOW_PYGAME_WELCOME
+from utils import dotdict
 
-from td2020.src import Board
-from td2020.src.FunctionLibrary import arr_into_action, action_into_array_print
+if SHOW_PYGAME_WELCOME:
+    import pygame
+else:
+    import os
+    import sys
+
+    with open(os.devnull, 'w') as f:
+        # disable stdout
+        old_std_out = sys.stdout
+        sys.stdout = f
+        import pygame
+
+        # enable stdout
+        sys.stdout = old_std_out
 
 
-class RandomTD2020Player:
-    def __init__(self, game) -> None:
+class RandomPlayer:
+    def __init__(self, game):
         self.game = game
 
-    def play(self, board: 'Board.Board', player: int) -> int:
-        action_size = self.game.getActionSize
-        a = np.random.randint(action_size)
-        valids = self.game.getValidMoves(board, player)
+    def play(self, board):
+        a = np.random.randint(self.game.getActionSize())
+        valids = self.game.getValidMoves(board, 1)
         while valids[a] != 1:
-            a = np.random.randint(action_size)
+            a = np.random.randint(self.game.getActionSize())
         return a
 
 
 class HumanTD2020Player:
     def __init__(self, game) -> None:
-        self.game= game
+        self.game = game
 
-    def play(self, board: 'Board.Board', player: int) -> int:
-        # board.display()
-        print("----------")
-        valid = self.game.getValidMoves(board, player)
-        for i in range(len(valid)):
-            if valid[i]:
-                action_into_array_print(board, i)
-                print("----------")
+    def play(self, board: np.ndarray) -> int:
+        n = board.shape[0]
+        valid = self.game.getValidMoves(board, 1)
+        self.display_valid_moves(board, valid)
         while True:
 
-            if board.verbose > 3:
-                print("select action on canvas")
-                a = self._manage_input(board, player)
-                print("action from pygame returned:", a)
+            if VERBOSE > 3:
+                a = self._manage_input(board)
+
             else:
-                a = ("1 " + input('type one of above actions\n')).split(" ")
+                a = (input('type one of above actions in "x y action_index" format\n')).split(" ")
             # convert to action index in valids array
-            a = arr_into_action(board, a)
-            print("action parsed in player.py", a)
+
+            try:
+                x, y, action_index = a
+                x = int(x)
+                y = int(y)
+                action_index = int(action_index)
+
+                tup = (int(y), int(x), int(action_index))
+                a = np.ravel_multi_index(tup, (n, n, NUM_ACTS))
+            except Exception as e:
+                print("Could not parse action")
             if valid[a]:
                 break
             else:
-                print('This action is invalid')
+                print('This action is invalid!')
+                self.display_valid_moves(board, valid)
 
         return a
 
+    def display_valid_moves(self, board, valid) -> None:
+        if valid is None:
+            valid = self.game.getValidMoves(board, 1)
+        n = board.shape[0]
+        print("----------")
+        for i in range(len(valid)):
+            if valid[i]:
+                # print("printing i", i)
+                y, x, action_index = np.unravel_index(i, [n, n, NUM_ACTS])
+
+                # print("numpy action index", np.ravel_multi_index((y, x, action_index), (n, n, NUM_ACTS)))
+
+                print(x, y, ACTS_REV[action_index])
+                # action_into_array_print(board, i)
+                print("----------")
+
     @staticmethod
-    def select_object(board, click_location: tuple) -> tuple:
+    def select_object(board: np.ndarray, click_location: tuple) -> dotdict:
+
+        n = board.shape[0]
+        CANVAS_SCALE: int = int(ctypes.windll.user32.GetSystemMetrics(1) * (16 / 30) / n)  # for drawing - it takes 2 thirds of screen height
+
         # select object by clicking on it - you can select only your objects
 
-        # draw objects
-        border = CANVAS_SCALE / 20
+        for y in range(n):
 
-        for y in range(board.height):
+            for x in range(n):
 
-            for x in range(board.width):
-                tile = board[x][y]
-                num_actors = size(tile.actors)
-                if num_actors == 0:
-                    continue
+                actor_location = (int(x * CANVAS_SCALE + CANVAS_SCALE / 2 + CANVAS_SCALE), int(y * CANVAS_SCALE + CANVAS_SCALE / 2) + CANVAS_SCALE)
+                actor_x, actor_y = actor_location
+                actor_size = int(CANVAS_SCALE / 3)
 
-                num_in_row_column = ceil(sqrt(num_actors))
-                actor_size = int((CANVAS_SCALE / 2 - 2 * border) / num_in_row_column)
+                click_x, click_y = click_location
 
-                for actor_index, actor in enumerate(tile.actors):
-                    # print("DRAWING ACTOR " + str(type(_actor)))
+                # check if actor is within click bounds
 
-                    # offset if multiple actors are on same tile
-                    multiple_offset = int((CANVAS_SCALE / num_in_row_column) * actor_index)
+                dist = sqrt((actor_x - click_x) ** 2 + (actor_y - click_y) ** 2)
+                if dist <= actor_size:
+                    return dotdict({
+                        "x": x,
+                        "y": y
+                    })
+        return None
+        # return [actor, actor_location, actor_size], [1, x, y, actor_index]  # has to have prefix number 1
 
-                    actor_x = int(actor.x * CANVAS_SCALE + int(multiple_offset % CANVAS_SCALE) + actor_size + border)
-                    actor_y = int(actor.y * CANVAS_SCALE + int(multiple_offset / CANVAS_SCALE) * actor_size * 2 + actor_size + border)
-                    actor_location = (actor_x, actor_y)
-                    click_x, click_y = click_location
-
-                    # check if actor is within click bounds
-
-                    dist = sqrt((actor_x - click_x) ** 2 + (actor_y - click_y) ** 2)
-                    if dist <= actor_size:
-                        print("actor selected", str(type(actor)))
-                        return [actor, actor_location, actor_size], [1, x, y, actor_index]  # has to have prefix number 1
-        return [None] * 3, [None] * 4
-
-    def _manage_input(self, board, player: int) -> list:
+    def _manage_input(self, board: np.ndarray) -> list:
         # returns array like this [1, 7, 7, 0, "idle")
+        n = board.shape[0]
 
-        from td2020.src.Graphics import init_visuals, update_graphics
-        game_display, clock = init_visuals(board.width, board.height, board.verbose)
-        update_graphics(board, game_display, clock, board.fps)
+        game_display, clock = init_visuals(n, n, VERBOSE)
+        update_graphics(board, game_display, clock, FPS)
 
-        from td2020.src.Actors import MyActor
+        CANVAS_SCALE: int = int(ctypes.windll.user32.GetSystemMetrics(1) * (16 / 30) / n)  # for drawing - it takes 2 thirds of screen height
+
+        # from td2020.src.Actors import MyActor
         clicked_actor = None
         clicked_actor_index_arr = []  # index on which this actor is located - x,y,actor_index
         while True:
@@ -109,65 +136,17 @@ class HumanTD2020Player:
                     pygame.quit()
                     raise SystemExit(0)
                 if event.type == pygame.KEYDOWN:
-                    if clicked_actor and issubclass(type(clicked_actor), MyActor) and clicked_actor.player == player:
-                        # now this is our actor
-                        if event.key == pygame.K_UP:
-                            print("pressed up...")
-                            clicked_actor_index_arr.append("up")
+
+                    if clicked_actor and (board[clicked_actor.x][clicked_actor.y][P_NAME_IDX] == USER_PLAYER):
+                        try:
+
+                            shortcut_pressed = d_user_shortcuts[event.unicode]
+                            action_to_execute = shortcut_pressed
+                            clicked_actor_index_arr.append(action_to_execute)
                             return clicked_actor_index_arr
-                        if event.key == pygame.K_DOWN:
-                            print("pressed down...")
-                            clicked_actor_index_arr.append("down")
-                            return clicked_actor_index_arr
-                        if event.key == pygame.K_LEFT:
-                            print("pressed left...")
-                            clicked_actor_index_arr.append("left")
-                            return clicked_actor_index_arr
-                        if event.key == pygame.K_RIGHT:
-                            print("pressed right...")
-                            clicked_actor_index_arr.append("right")
-                            return clicked_actor_index_arr
-                        from td2020.src.FunctionLibrary import retrieve_json
-                        print("retrieving shortcut for", str(type(clicked_actor).__name__))
-                        td_my_actor: pd.DataFrame = retrieve_json('td_myactor', str(type(clicked_actor).__name__))
-                        actor_shortcut = td_my_actor["Shortcut"].values[0]
-                        print("printing actor shortcut", actor_shortcut)
-                        from td2020.src.Actors import TownHall, Barracks, NPC
-                        if type(clicked_actor) == TownHall:  # these if statements are hardcoded - (optional) - use variable actor_shortcut
-                            if event.key == pygame.K_q:
-                                clicked_actor_index_arr.append("npc")
-                                return clicked_actor_index_arr
-                        if type(clicked_actor) == Barracks:
-                            if event.key == pygame.K_q:
-                                print("mele infantry unsupported")
-                            if event.key == pygame.K_w:
-                                clicked_actor_index_arr.append("rifle_infantry")
-                                return clicked_actor_index_arr
-                            if event.key == pygame.K_e:
-                                print("bow infantry unsupported")
-                        if type(clicked_actor) == NPC:
-                            if event.key == pygame.K_q:
-                                clicked_actor_index_arr.append("town_hall")
-                                return clicked_actor_index_arr
-                            if event.key == pygame.K_w:
-                                print("shack unsupported")
-                            if event.key == pygame.K_e:
-                                print("constr office unsupported")
-                            if event.key == pygame.K_a:
-                                clicked_actor_index_arr.append("mining_shack")
-                                return clicked_actor_index_arr
-                            if event.key == pygame.K_s:
-                                print("apartment unsupported")
-                            if event.key == pygame.K_d:
-                                clicked_actor_index_arr.append("barracks")
-                                return clicked_actor_index_arr
-                            if event.key == pygame.K_y:
-                                clicked_actor_index_arr.append("sentry")
-                                return clicked_actor_index_arr
-                        # idle
-                        if event.key == pygame.K_SPACE:
-                            clicked_actor_index_arr.append("idle")
-                            return clicked_actor_index_arr
+                        except Exception as e:
+                            print("shortcut '" + event.unicode + "' not supported.")
+
                     if event.key == pygame.K_ESCAPE:
                         pygame.quit()
                         raise SystemExit(0)
@@ -178,86 +157,122 @@ class HumanTD2020Player:
                     pos = pygame.mouse.get_pos()
 
                     if event.button == lmb:
-                        actor_arr, index_arr = self.select_object(board, pos)
-                        temp_clicked_actor, actor_location, clicked_actor_size = actor_arr[0], actor_arr[1], actor_arr[2]
 
-                        if issubclass(type(temp_clicked_actor), MyActor) and temp_clicked_actor.player == player:
-                            clicked_actor = temp_clicked_actor
-                            clicked_actor_index_arr = index_arr
+                        clicked_actor = self.select_object(board, pos)
+                        if clicked_actor and board[clicked_actor.x][clicked_actor.y][P_NAME_IDX] == USER_PLAYER and board[clicked_actor.x][clicked_actor.y][A_TYPE_IDX] != d_a_type['Gold']:
+                            clicked_actor_index_arr = [clicked_actor.x, clicked_actor.y]
 
                             # draw selected bounding box
-                            from td2020.src.Graphics import init_visuals, update_graphics
-                            game_display, clock = init_visuals(board.width, board.height, board.verbose)
-                            update_graphics(board, game_display, clock, board.fps)
-                            actor_x, actor_y = actor_location
-                            rect = Rect((actor_x - clicked_actor_size, actor_y - clicked_actor_size), (2 * clicked_actor_size, 2 * clicked_actor_size))
+                            game_display, clock = init_visuals(n, n, VERBOSE)
+                            update_graphics(board, game_display, clock, FPS)
+
+                            actor_size = int(CANVAS_SCALE / 3)
+                            actor_location = (int(clicked_actor.x * CANVAS_SCALE + CANVAS_SCALE / 2 + CANVAS_SCALE - actor_size), int(clicked_actor.y * CANVAS_SCALE + CANVAS_SCALE / 2 + CANVAS_SCALE - actor_size))
+                            rect = Rect(actor_location, (2 * actor_size, 2 * actor_size))
+
                             blue = (0, 0, 255)
-                            pygame.draw.rect(game_display, blue, rect, BORDER)
+                            pygame.draw.rect(game_display, blue, rect, int(CANVAS_SCALE / 20))
+
+                            # display valid actions on canvas
+
+                            b = Board(n)
+                            b.pieces = np.copy(board)
+
+                            valids_square = b.get_moves_for_square((clicked_actor.x, clicked_actor.y))
+
+                            printed_actions = 0
+                            for i in range(len(valids_square)):
+                                if valids_square[i]:
+                                    text_scale = int(actor_size * 0.5)
+                                    message_display(game_display, u"" + ACTS_REV[i] + " s: '" + d_user_shortcuts_rev[i] + "'", (n * CANVAS_SCALE + CANVAS_SCALE / 2, CANVAS_SCALE / 4 + printed_actions * text_scale), text_scale)
+                                    printed_actions += 1
+                            # update display
                             pygame.display.update()
+
                         else:
-                            print("left clicked invalid actor - it may not be our or its not of type MyActor")
+                            print("You can select only your actors!")
                     if event.button == rmb:
                         if clicked_actor:
 
-                            actor_arr, _ = self.select_object(board, pos)
-                            right_clicked_actor = actor_arr[0]
-                            if right_clicked_actor:
-                                if issubclass(type(right_clicked_actor), MyActor):
-                                    # this is actor of type MyActor
-                                    if right_clicked_actor.player == player:
-                                        print("right clicked our actor")
+                            l_x = clicked_actor.x
+                            l_y = clicked_actor.y
+                            l_type = board[l_x][l_y][A_TYPE_IDX]
 
-                                        if right_clicked_actor.current_production_time < right_clicked_actor.production_time:
-                                            print("right clicked on construction proxy")
+                            right_clicked_actor = self.select_object(board, pos)
 
-                                            clicked_actor_index_arr.append("continue_building")
-                                        else:
-                                            print("return resources")
-                                            clicked_actor_index_arr.append("return_resources")
-                                    else:
-                                        clicked_actor.action_manager.enemy_actor = right_clicked_actor
-                                        clicked_actor_index_arr.append("attack")
-                                else:
-                                    print("right clicked minerals")
-                                    clicked_actor_index_arr.append("mine_resources")
+                            # right clicked actor exists and (if player 1 or player -1) and not clicked self
+                            if right_clicked_actor and board[right_clicked_actor.x][right_clicked_actor.y][P_NAME_IDX] != 0 and right_clicked_actor != clicked_actor:
+                                r_x = right_clicked_actor.x
+                                r_y = right_clicked_actor.y
+                                r_type = board[r_x][r_y][A_TYPE_IDX]
+                                r_player = board[r_x][r_y][P_NAME_IDX]
+
+                                # this is actor of type MyActor
+
+                                if l_type == d_a_type['Work']:
+                                    if r_player == USER_PLAYER:
+                                        if r_type == d_a_type['Gold']:
+                                            clicked_actor_index_arr.append(ACTS["mine_resources"])
+                                        if r_type == d_a_type['Hall']:
+                                            clicked_actor_index_arr.append(ACTS["return_resources"])
+
+                                if l_type == d_a_type['Rifl']:
+                                    if r_player != USER_PLAYER and r_type != d_a_type['Gold']:
+                                        clicked_actor_index_arr.append(ACTS["attack"])
                             else:
+
+                                actor_size = int(CANVAS_SCALE / 3)
+
                                 clicked_x, clicked_y = pos
 
-                                if abs(clicked_y - clicked_actor.y * CANVAS_SCALE) > abs(clicked_x - clicked_actor.x * CANVAS_SCALE):
+                                clicked_actors_world_x = int(l_x * CANVAS_SCALE + CANVAS_SCALE / 2 + CANVAS_SCALE - actor_size)
+                                clicked_actors_world_y = int(l_y * CANVAS_SCALE + CANVAS_SCALE / 2 + CANVAS_SCALE - actor_size)
+                                if abs(clicked_y - clicked_actors_world_y) > abs(clicked_x - clicked_actors_world_x):
                                     # we moved mouse more in y direction than x, so its vertical movement
-                                    if clicked_y < clicked_actor.y * CANVAS_SCALE:
+                                    if clicked_y < clicked_actors_world_y:
                                         print("clicked up...")
-                                        clicked_actor_index_arr.append("up")
-                                    if clicked_y > clicked_actor.y * CANVAS_SCALE:
+                                        clicked_actor_index_arr.append(ACTS["up"])
+                                    if clicked_y > clicked_actors_world_y:
                                         print("clicked down...")
-                                        clicked_actor_index_arr.append("down")
+                                        clicked_actor_index_arr.append(ACTS["down"])
                                 else:
                                     # we moved mouse more in x direction than y, so its horizontal movement
-                                    if clicked_x < clicked_actor.x * CANVAS_SCALE:
+                                    if clicked_x < clicked_actors_world_x:
                                         print("clicked left...")
-                                        clicked_actor_index_arr.append("left")
+                                        clicked_actor_index_arr.append(ACTS["left"])
 
-                                    if clicked_x > clicked_actor.x * CANVAS_SCALE:
+                                    if clicked_x > clicked_actors_world_x:
                                         print("clicked right...")
-                                        clicked_actor_index_arr.append("right")
-                            return clicked_actor_index_arr
+                                        clicked_actor_index_arr.append(ACTS["right"])
+                            if len(clicked_actor_index_arr) == 3:
+                                return clicked_actor_index_arr
+                            else:
+                                print("invalid")
+                                self.display_valid_moves(board, None)
                         else:
-                            print("first left click on actor to select it")
+                            print("First left click on actor to select it")
 
 
 class GreedyTD2020Player:
-    def __init__(self, game) -> None:
+    def __init__(self, game):
         self.game = game
 
-    def play(self, board: Board, player: int) -> int:
-        valids = self.game.getValidMoves(board, player)
+    def play(self, board):
+        valids = self.game.getValidMoves(board, 1)
+
+        print("sum valids", sum(valids))
         candidates = []
-        action_size = self.game.getActionSize
-        for a in range(action_size):
+        for a in range(self.game.getActionSize()):
             if valids[a] == 0:
                 continue
-            next_board, _ = self.game.getNextState(board, player, a)
-            score = self.game.getScore(next_board, player)
+            nextBoard, _ = self.game.getNextState(board, 1, a)
+            score = self.game.getScore(nextBoard, 1)
             candidates += [(-score, a)]
         candidates.sort()
+
+        n = board.shape[0]
+        y, x, action_index = np.unravel_index(candidates[0][1], [n, n, NUM_ACTS])
+
+        print("returned act", x, y, ACTS_REV[action_index])
+
         return candidates[0][1]

@@ -8,12 +8,7 @@ from td2020.src.dicts import d_a_type, a_m_health, d_acts, EXCLUDE_IDLE, A_TYPE_
 class Board:
 
     def __init__(self, n) -> None:
-
-        """Set up initial board configuration."""
-
         self.n = n
-        # Create the empty board array.
-        # self.pieces = [[[0] * NUM_ENCODERS] * self.n] * self.n
         self.pieces = []
         for i in range(self.n):
             rows = []
@@ -75,19 +70,23 @@ class Board:
             return
         if act == "barracks":
             if VERBOSE:
-                print("spawned barracks")
+                pass
+                # print("spawned barracks")
             self._update_money(player, -a_cost[3])
             self._spawn_nearby((x, y), 3)
             return
         if act == "rifle_infantry":
             if VERBOSE:
-                print("spawned rifle inf")
+                pass
+
+                # print("spawned rifle inf")
             self._update_money(player, -a_cost[4])
             self._spawn_nearby((x, y), 4)
             return
         if act == "town_hall":
             if VERBOSE:
-                print("spawned town hall")
+                pass
+                # print("spawned town hall")
             self._update_money(player, -a_cost[5])
             self._spawn_nearby((x, y), 5)
             return
@@ -95,6 +94,7 @@ class Board:
     def _move(self, x, y, new_x, new_y):
         self[new_x][new_y] = self[x][y]
         self[x][y] = [0] * NUM_ENCODERS
+        self[x][y][REMAIN_IDX] = self[new_x][new_y][REMAIN_IDX]  # set time back to empty tile
 
     def _update_money(self, player, money_update):
         for y in range(self.n):
@@ -105,47 +105,50 @@ class Board:
 
     def _attack_nearby(self, square):
         (x, y) = square
-        if DAMAGE_ANYWHERE or DESTROY_ALL:
-            coords = [(n_x,n_y) for n_x in range(self.n) for n_y in range(self.n) if n_x != x and n_y != y]
+
+        if DAMAGE_ANYWHERE:
+            coordinates = [(n_x, n_y) for n_x in range(self.n) for n_y in range(self.n) if (n_x, n_y) != (x, y)]
         else:
-            coords = [(x - 1, y + 1),
-                      (x, y + 1),
-                      (x + 1, y + 1),
-                      (x - 1, y),
-                      (x + 1, y),
-                      (x - 1, y - 1),
-                      (x, y - 1),
-                      (x + 1, y - 1)]
-        for n_x, n_y in coords:
+            coordinates = [(x - 1, y + 1),
+                           (x, y + 1),
+                           (x + 1, y + 1),
+                           (x - 1, y),
+                           (x + 1, y),
+                           (x - 1, y - 1),
+                           (x, y - 1),
+                           (x + 1, y - 1)]
+        for n_x, n_y in coordinates:
             if 0 <= n_x < self.n and 0 <= n_y < self.n:
                 if (self[n_x][n_y][P_NAME_IDX] == -self[x][y][P_NAME_IDX]) and self[n_x][n_y][A_TYPE_IDX] != d_a_type['Gold']:
                     self[n_x][n_y][HEALTH_IDX] -= DAMAGE
+
                     if self[n_x][n_y][HEALTH_IDX] <= 0:
                         if VERBOSE:
                             print("destroyed unit type", self[n_x][n_y][A_TYPE_IDX], "on", n_x, n_y, "and destroyer of type", self[x][y][A_TYPE_IDX], "on", x, y)
 
                         self[n_x][n_y] = [0] * NUM_ENCODERS
-
+                        self[n_x][n_y][REMAIN_IDX] = self[x][y][REMAIN_IDX]  # set time back to empty tile just in case
                         if not DESTROY_ALL:
                             return
 
                     if VERBOSE:
-                        print("damaged unit type", self[n_x][n_y][A_TYPE_IDX], "on", n_x, n_y, "and damager of type", self[x][y][A_TYPE_IDX], "on", x, y)
+                        print("damaged unit type", self[n_x][n_y][A_TYPE_IDX], "on", n_x, n_y, "and damage initiator of type", self[x][y][A_TYPE_IDX], "on", x, y)
                     if not DESTROY_ALL:
                         return
+        print("returning")
 
     def _spawn_nearby(self, square, a_type):
         (x, y) = square
 
-        coords = [(x - 1, y + 1),
-                  (x, y + 1),
-                  (x + 1, y + 1),
-                  (x - 1, y),
-                  (x + 1, y),
-                  (x - 1, y - 1),
-                  (x, y - 1),
-                  (x + 1, y - 1)]
-        for n_x, n_y in coords:
+        coordinates = [(x - 1, y + 1),
+                       (x, y + 1),
+                       (x + 1, y + 1),
+                       (x - 1, y),
+                       (x + 1, y),
+                       (x - 1, y - 1),
+                       (x, y - 1),
+                       (x + 1, y - 1)]
+        for n_x, n_y in coordinates:
             if 0 <= n_x < self.n and 0 <= n_y < self.n:
                 if self[n_x][n_y][P_NAME_IDX] == 0:
                     self[n_x][n_y] = [self[x][y][P_NAME_IDX], a_type, a_m_health[a_type], 0, self[x][y][MONEY_IDX], self[x][y][REMAIN_IDX]]
@@ -174,7 +177,6 @@ class Board:
 
             if act in acts:
                 # a is now string action
-
                 move = self._valid_act(square, act) * 1
 
                 if move:
@@ -205,7 +207,6 @@ class Board:
             return self[x][y][CARRY_IDX] == 1 and self._check_if_nearby(square, d_a_type['Hall'], check_friendly=True)
         if act == "attack":
             return self._check_if_nearby_attack(square)
-
         if act == "npc":
             return a_cost[2] <= money and self._check_if_nearby_empty(square)
         if act == "barracks":
@@ -222,17 +223,17 @@ class Board:
     def _check_if_nearby_attack(self, square):
         (x, y) = square
         if DAMAGE_ANYWHERE:
-            coords = [(n_x,n_y) for n_x in range(self.n) for n_y in range(self.n) if n_x != x and n_y != y]
+            coordinates = [(n_x, n_y) for n_x in range(self.n) for n_y in range(self.n) if (n_x, n_y) != (x, y)]
         else:
-            coords = [(x - 1, y + 1),
-                      (x, y + 1),
-                      (x + 1, y + 1),
-                      (x - 1, y),
-                      (x + 1, y),
-                      (x - 1, y - 1),
-                      (x, y - 1),
-                      (x + 1, y - 1)]
-        for n_x, n_y in coords:
+            coordinates = [(x - 1, y + 1),
+                           (x, y + 1),
+                           (x + 1, y + 1),
+                           (x - 1, y),
+                           (x + 1, y),
+                           (x - 1, y - 1),
+                           (x, y - 1),
+                           (x + 1, y - 1)]
+        for n_x, n_y in coordinates:
             if 0 <= n_x < self.n and 0 <= n_y < self.n:
                 if (self[n_x][n_y][P_NAME_IDX] == -self[x][y][P_NAME_IDX]) and self[n_x][n_y][A_TYPE_IDX] != d_a_type['Gold']:
                     return True
@@ -240,15 +241,15 @@ class Board:
 
     def _check_if_nearby_empty(self, square):
         (x, y) = square
-        coords = [(x - 1, y + 1),
-                  (x, y + 1),
-                  (x + 1, y + 1),
-                  (x - 1, y),
-                  (x + 1, y),
-                  (x - 1, y - 1),
-                  (x, y - 1),
-                  (x + 1, y - 1)]
-        for n_x, n_y in coords:
+        coordinates = [(x - 1, y + 1),
+                       (x, y + 1),
+                       (x + 1, y + 1),
+                       (x - 1, y),
+                       (x + 1, y),
+                       (x - 1, y - 1),
+                       (x, y - 1),
+                       (x + 1, y - 1)]
+        for n_x, n_y in coordinates:
             if 0 <= n_x < self.n and 0 <= n_y < self.n:
                 if self[n_x][n_y][P_NAME_IDX] == 0:
                     return True
@@ -256,15 +257,15 @@ class Board:
 
     def _check_if_nearby(self, square, a_type, check_friendly=False):
         (x, y) = square
-        coords = [(x - 1, y + 1),
-                  (x, y + 1),
-                  (x + 1, y + 1),
-                  (x - 1, y),
-                  (x + 1, y),
-                  (x - 1, y - 1),
-                  (x, y - 1),
-                  (x + 1, y - 1)]
-        for n_x, n_y in coords:
+        coordinates = [(x - 1, y + 1),
+                       (x, y + 1),
+                       (x + 1, y + 1),
+                       (x - 1, y),
+                       (x + 1, y),
+                       (x - 1, y - 1),
+                       (x, y - 1),
+                       (x + 1, y - 1)]
+        for n_x, n_y in coordinates:
             if 0 <= n_x < self.n and 0 <= n_y < self.n:
                 if self[n_x][n_y][A_TYPE_IDX] == a_type:
                     if not check_friendly:

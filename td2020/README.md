@@ -59,6 +59,32 @@ Each actor is encoded using following 6 properties:
 - **Remaining time**: [*-0] Countdown time that gets updated on every board tile when move gets executed
 ### Board presentation
 Board is presented as 3D integer array of dimensions width, height, 6 (which represents number of properties in Tile encoding)
+### Action checking sequence
+Following actions are checked and executed in some order:
+- mine_resources
+- return_resources
+- attack
+- npc
+- rifle_infantry
+- barracks
+- town_hall
+```python
+coords = [(x - 1, y + 1),
+          (x, y + 1),
+          (x + 1, y + 1),
+          (x - 1, y),
+          (x + 1, y),
+          (x - 1, y - 1),
+          (x, y - 1),
+          (x + 1, y - 1)]
+for n_x, n_y in coords:
+    # check action condition or execute action
+```
+- When first tile is free in these coordinates, building or unit is spawned there.
+- When first enemy in this tile sequence is chosen, it is attacked.
+
+This results in building units and buildings towards lower-left corner, as units progress towards x-1, y+1 as this tile is free, expanding towards upper-right corner only when all other options are used.
+- Fix for this would be to make actions for each of these coordinates for each of actions that use them, resulting in much higher action space.
 ### Game end
 Instance of game is finished in following conditions:
 - One of players does not have any available moves left (board is populated or one player is surrounded),
@@ -76,9 +102,28 @@ because player is repeating same move multiple times.
 because nodes do not get properly evaluated during backpropagation.
 
 Proper end condition must be found or change of source is needed in order to exclude timeouts, because they are not returning best resuts.
+## Players
+### Greedy Player
+Greedy player calculates score by summing health of all his actors.
+### Human Player
+#### PyGame
+
+In PyGame, user can interact with his figures via keyboard or mouse.
+
+User must first select figure with *left mouse click* and then choose one of actions written in canvas.
+Other figure can be selected by clicking another figure or deselecting it with *right mouse button* on empty tile.
+- Moving: User can move workers and infantry by 1 square in all 4 directions if they are empty by clicking on one of 4 corresponding tiles.
+- Attacking: With selected infantry unit, user can attack enemy units that are in range.
+- Gathering and returning resources: With worker selected, user can mine resources by clicking *right mouse button* on Gold actor if in range.
+This goes the same when returning resources, but worker must be nearby Town Hall actor.
+- Building: For building units and buildings, user must use one of keyboard shortcuts written on canvas.
+- Idle: User can press space to idle with selected actor.
+#### Console
+Type one of listed commands seperated by space and press Enter.
+
 
 ## PyGame visual presentation
-Quick visual presentation of Python game in PyGame
+![Example of PyGame](https://i.imgur.com/b4olJTx.png)
 ## Unreal Engine visual presentation
 - Used repository [JernejHabjan/TrumpDefense2020](https://github.com/JernejHabjan/TrumpDefense2020)
 - Python communication plugin:  [getnamo/tensorflow-ue4](https://github.com/getnamo/tensorflow-ue4)

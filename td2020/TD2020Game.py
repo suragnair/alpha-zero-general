@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import Tuple
 
 import numpy as np
 
@@ -6,15 +6,11 @@ from td2020.src.Board import Board
 from td2020.src.dicts import NUM_ENCODERS, NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, HEALTH_IDX, REMAIN_IDX, VERBOSE, FPS
 
 
-# noinspection PyPep8Naming
 class TD2020Game:
     def __init__(self, n) -> None:
         self.n = n
 
     def getInitBoard(self) -> np.ndarray:
-        """
-        :return: List[List[List[int]]]
-        """
         b = Board(self.n)
         return np.array(b.pieces)
 
@@ -29,38 +25,23 @@ class TD2020Game:
         b = Board(self.n)
         b.pieces = np.copy(board)
 
-        # move = (int(action / self.n), action % self.n, )
-        move = self._TEMP_ACT_INTO_ARR(action)
+        y, x, action_index = np.unravel_index(action, [self.n, self.n, NUM_ACTS])
+        move = (x, y, action_index)
 
         # update timer on every tile:
         b.pieces[:, :, REMAIN_IDX] -= 1
 
         b.execute_move(move, player)
-
-        # print("changed next state to -player")
-        # return b.pieces, -player
-        # returning player 1, because it gets negated anyway board for current player
-
-        return b.pieces, 1
-
-    def _TEMP_ACT_INTO_ARR(self, action):
-        index = 0
-        for y in range(self.n):
-            for x in range(self.n):
-                for action_index in range(NUM_ACTS):
-                    if index == action:
-                        return x, y, action_index
-                    index += 1
+        return b.pieces, -player
 
     def getValidMoves(self, board: np.ndarray, player: int):
-        # return a fixed size binary vector of size "getActionSize"
         valids = []
         b = Board(self.n)
         b.pieces = np.copy(board)
 
         for y in range(self.n):
             for x in range(self.n):
-                if b[x][y][P_NAME_IDX] == player and b[x][y][A_TYPE_IDX] != 1:  # for this player and not minerals
+                if b[x][y][P_NAME_IDX] == player and b[x][y][A_TYPE_IDX] != 1:  # for this player and not Gold
                     valids.extend(b.get_moves_for_square((x, y)))
                 else:
                     valids.extend([0] * NUM_ACTS)
@@ -72,6 +53,7 @@ class TD2020Game:
 
         # return 0 if not ended, 1 if player 1 won, -1 if player 1 lost
         # player = 1
+
         n = board.shape[0]
 
         # detect timeout
@@ -139,28 +121,19 @@ class TD2020Game:
         return 0
 
     def getCanonicalForm(self, board: np.ndarray, player: int):
-        # dont multiply player * board, because then player -1 will have negative gold and health...
-
-        # return player * board
-        # return board # EASY TRICK
-
-        n = board.shape[0]
+        b = np.copy(board)
+        n = b.shape[0]
         for y in range(n):
             for x in range(n):
-                act_encode = board[x][y]
-                # act_encode[P_NAME_IDX] = - act_encode[P_NAME_IDX]
+                act_encode = b[x][y]
                 act_encode[P_NAME_IDX] = act_encode[P_NAME_IDX] * player
-        return board
+        return b
 
-    def getSymmetries(self, board: np.ndarray, pi) -> List[Tuple[List[List[List[int]]], List[float]]]:
-
-        # print("Todo im not sure these dimensions are correct")
-
+    def getSymmetries(self, board: np.ndarray, pi):
         # mirror, rotational
         assert (len(pi) == self.n * self.n * NUM_ACTS + 1)  # 1 for pass
         pi_board = np.reshape(pi[:-1], (self.n, self.n, NUM_ACTS))
         l = []
-
         for i in range(1, 5):
             for j in [True, False]:
                 newB = np.rot90(board, i)
@@ -169,11 +142,9 @@ class TD2020Game:
                     newB = np.fliplr(newB)
                     newPi = np.fliplr(newPi)
                 l += [(newB, list(newPi.ravel()) + [pi[-1]])]
-
         return l
 
     def stringRepresentation(self, board: np.ndarray):
-
         return board.tostring()
 
     def getScore(self, board: np.array, player: int):
@@ -182,16 +153,12 @@ class TD2020Game:
 
 
 def display(board):
-    n = board.shape[0]
-
     from td2020.src.Graphics import init_visuals, update_graphics
 
-    """
-    prints current board state in console
-    """
     if not VERBOSE:
         return
 
+    n = board.shape[0]
     if VERBOSE > 3:
         game_display, clock = init_visuals(n, n, VERBOSE)
         update_graphics(board, game_display, clock, FPS)
@@ -200,9 +167,12 @@ def display(board):
             print('-' * (n * 6 + 1))
             for x in range(n):
                 a_player = board[x][y][P_NAME_IDX]
-                if a_player == 1: a_player = '+1'
-                if a_player == -1: a_player = '-1'
-                if a_player == 0: a_player = ' 0'
+                if a_player == 1:
+                    a_player = '+1'
+                if a_player == -1:
+                    a_player = '-1'
+                if a_player == 0:
+                    a_player = ' 0'
                 print("|" + a_player + " " + str(board[x][y][A_TYPE_IDX]) + " ", end="")
             print("|")
         print('-' * (n * 6 + 1))
