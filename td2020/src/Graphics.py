@@ -3,7 +3,7 @@ from typing import Any, Tuple, Optional
 
 import numpy as np
 
-from td2020.src.dicts import P_NAME_IDX, A_TYPE_IDX, d_a_color, d_type_rev, PATH, SHOW_PYGAME_WELCOME, MONEY_IDX, REMAIN_IDX, CARRY_IDX, HEALTH_IDX
+from td2020.src.dicts import P_NAME_IDX, A_TYPE_IDX, d_a_color, d_type_rev, PATH, SHOW_PYGAME_WELCOME, MONEY_IDX, TIME_IDX, CARRY_IDX, HEALTH_IDX
 
 if SHOW_PYGAME_WELCOME:
     import pygame
@@ -70,7 +70,7 @@ def update_graphics(board: np.ndarray, game_display, clock, fps: int = 1) -> Non
     message_display(game_display, u"" + 'Gold Player +1: ' + str(gold_p1), (int((n / 4) * CANVAS_SCALE), int(0 + CANVAS_SCALE / 6)), int(CANVAS_SCALE / 3))
     message_display(game_display, u"" + 'Gold Player -1: ' + str(gold_p2), (int((n / 4) * CANVAS_SCALE), int(0 + CANVAS_SCALE * (2 / 3))), int(CANVAS_SCALE / 3))
 
-    time_remaining = board[0][0][REMAIN_IDX]
+    time_remaining = board[0][0][TIME_IDX]
 
     message_display(game_display, u"" + 'Remaining ' + str(time_remaining), (int((n * (3 / 4)) * CANVAS_SCALE), int(0 + CANVAS_SCALE / 6)), int(CANVAS_SCALE / 3))
 

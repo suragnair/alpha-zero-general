@@ -53,18 +53,18 @@ Game visualisation is also presented in PyGame and Unreal Engine 4.
 Each actor is encoded using following 6 properties:
 - **Player Name**: [-1,0,1] (player -1, empty field, player 1)
 - **Actor Type**: [1-5] Numerically encoded Actor Type of written above
-- **Health**: [1-3] Current actor health - when actor has 0 health, it gets destroyed
+- **Health**: [1-31] Current actor health - when actor has 0 health, it gets destroyed
 - **Carry**: [0,1] If Worker unit is carrying resources or not - it gets set when worker uses mine_resources near resource source and gets removed when worker uses return_resources near resources drain actor.
 - **Money**: [0-*] Current amount of money that this player has at current time (When money updates, it updates on every players actor)
-- **Remaining time**: [*-0] Countdown time that gets updated on every board tile when move gets executed
+- **Time**: [*-0 or 0-8191] Countdown time that gets updated on every board tile when move gets executed. Also timer that increases, and special milestones, health is decreased for all units by formula.
 #### One Hot Tile Encoding:
 Now each actor is encoded with binary vector of length 27.
 - **Player Name**: [2] - 00(neutral), 01(1) or 10(-1),
 - **Actor Type**: [4] - 4 bit,
-- **Health**: [2] - 2 bit,
+- **Health**: [5] - 5 bit. This much because of life decrease every milestone in getNextState
 - **Carry**: [1] - 1 bit,
 - **Money**: [5] - 5 bits (32 aka 4 town halls or 32 workers) [every unit has the same for player]
-- **Remaining time**: [13] - 2^13 8192 (this should be enough for total game)
+- **Time**: [13] - 2^13 8192 (this should be enough for total game)
 
 ### Board presentation
 Board is presented as 3D integer array of dimensions width, height, 6 (which represents number of properties in Tile encoding)

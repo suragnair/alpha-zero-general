@@ -3,7 +3,7 @@ from typing import Tuple
 import numpy as np
 
 from td2020.src.Board import Board
-from td2020.src.dicts import NUM_ENCODERS, NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, HEALTH_IDX, REMAIN_IDX, VERBOSE, FPS
+from td2020.src.dicts import NUM_ENCODERS, NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, HEALTH_IDX, TIME_IDX, VERBOSE, FPS, USE_TIMEOUT, MAX_TIME
 
 
 class TD2020Game:
@@ -29,7 +29,11 @@ class TD2020Game:
         move = (x, y, action_index)
 
         # update timer on every tile:
-        b.pieces[:, :, REMAIN_IDX] -= 1
+        if USE_TIMEOUT:
+            b.pieces[:, :, TIME_IDX] -= 1
+        else:
+            b.pieces[:, :, TIME_IDX] += 1
+            b.time_killer()
 
         b.execute_move(move, player)
         return b.pieces, -player
@@ -57,10 +61,18 @@ class TD2020Game:
         n = board.shape[0]
 
         # detect timeout
-        if board[0, 0, REMAIN_IDX] < 1:
-            if VERBOSE:
-                print("timeout")
-            return 0.001
+
+        if USE_TIMEOUT:
+            if board[0, 0, TIME_IDX] < 1:
+                if VERBOSE:
+                    print("timeout")
+                return 0.001
+        else:
+            if board[0, 0, TIME_IDX] >= MAX_TIME:
+                print("######################################## ERROR ####################################")
+                print("################ YOU HAVE TIMEOUTED BECAUSE NO PLAYER HAS LOST YET#################")
+                print("###################################### END ERROR ##################################")
+                return 0.001
 
         # detect win condition
         sum_p1 = 0
@@ -75,14 +87,14 @@ class TD2020Game:
         if sum_p1 > 3:
             if VERBOSE:
                 print("#############################################################")
-                print("game end player +1, tick", board[0, 0, REMAIN_IDX])
+                print("game end player +1, tick", board[0, 0, TIME_IDX])
                 print("#############################################################")
 
             return 1
         if sum_p2 > 3:
             if VERBOSE:
                 print("#############################################################")
-                print("game end player -1,tick", board[0, 0, REMAIN_IDX])
+                print("game end player -1,tick", board[0, 0, TIME_IDX])
                 print("#############################################################")
 
             return -1
@@ -93,14 +105,14 @@ class TD2020Game:
         if sum_p1 < 2:  # SUM IS 1 WHEN PLAYER ONLY HAS MINERALS LEFT
             if VERBOSE:
                 print("#############################################################")
-                print("game end player -1, tick", board[0, 0, REMAIN_IDX])
+                print("game end player -1, tick", board[0, 0, TIME_IDX])
                 print("#############################################################")
 
             return -1
         if sum_p2 < 2:  # SUM IS 1 WHEN PLAYER ONLY HAS MINERALS LEFT
             if VERBOSE:
                 print("#############################################################")
-                print("game end player +1,tick", board[0, 0, REMAIN_IDX])
+                print("game end player +1,tick", board[0, 0, TIME_IDX])
                 print("#############################################################")
             return +1
 

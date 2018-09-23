@@ -2,7 +2,8 @@ from typing import List, Any
 
 import numpy as np
 
-from td2020.src.dicts import d_a_type, a_m_health, d_acts, EXCLUDE_IDLE, A_TYPE_IDX, P_NAME_IDX, CARRY_IDX, MONEY_IDX, a_cost, NUM_ACTS, ACTS_REV, NUM_ENCODERS, MONEY_INC, HEALTH_IDX, TIMEOUT, REMAIN_IDX, INITIAL_GOLD, DAMAGE, DAMAGE_ANYWHERE, DESTROY_ALL, VERBOSE
+from td2020.src.dicts import d_a_type, a_m_health, d_acts, EXCLUDE_IDLE, A_TYPE_IDX, P_NAME_IDX, CARRY_IDX, MONEY_IDX, a_cost, NUM_ACTS, ACTS_REV, NUM_ENCODERS, MONEY_INC, HEALTH_IDX, TIMEOUT, TIME_IDX, INITIAL_GOLD, DAMAGE, DAMAGE_ANYWHERE, DESTROY_ALL, VERBOSE, MAX_GOLD, HEAL_AMOUNT, \
+    a_max_health, SACRIFICIAL_HEAL
 
 
 class Board:
@@ -27,7 +28,7 @@ class Board:
         self[int(self.n / 2)][int(self.n / 2)] = [-1, t_hall, h_hall, 0, INITIAL_GOLD, TIMEOUT]
 
         # remaining time is stored in all squares
-        self.pieces[:, :, REMAIN_IDX] = TIMEOUT
+        self.pieces[:, :, TIME_IDX] = TIMEOUT
 
     def __getitem__(self, index: int) -> List[List[int]]:
         return self.pieces[index]
@@ -57,12 +58,16 @@ class Board:
             self[x][y][CARRY_IDX] = 1
             return
         if act == "return_resources":
-            # print("RETURNED RESOURCES - old money->", self[x][y][MONEY_IDX])
+            if VERBOSE:
+                print("RETURNED RESOURCES - new money->", self[x][y][MONEY_IDX] + MONEY_INC)
             self[x][y][CARRY_IDX] = 0
             self._update_money(player, MONEY_INC)
             return
         if act == "attack":
             self._attack_nearby((x, y))
+            return
+        if act == "heal":
+            self._heal_nearby((x, y))
             return
         if act == "npc":
             self._update_money(player, -a_cost[2])
@@ -70,23 +75,19 @@ class Board:
             return
         if act == "barracks":
             if VERBOSE:
-                pass
-                # print("spawned barracks")
+                print("spawned barracks")
             self._update_money(player, -a_cost[3])
             self._spawn_nearby((x, y), 3)
             return
         if act == "rifle_infantry":
             if VERBOSE:
-                pass
-
-                # print("spawned rifle inf")
+                print("spawned rifle inf")
             self._update_money(player, -a_cost[4])
             self._spawn_nearby((x, y), 4)
             return
         if act == "town_hall":
             if VERBOSE:
-                pass
-                # print("spawned town hall")
+                print("spawned town hall")
             self._update_money(player, -a_cost[5])
             self._spawn_nearby((x, y), 5)
             return
@@ -94,7 +95,7 @@ class Board:
     def _move(self, x, y, new_x, new_y):
         self[new_x][new_y] = self[x][y]
         self[x][y] = [0] * NUM_ENCODERS
-        self[x][y][REMAIN_IDX] = self[new_x][new_y][REMAIN_IDX]  # set time back to empty tile
+        self[x][y][TIME_IDX] = self[new_x][new_y][TIME_IDX]  # set time back to empty tile
 
     def _update_money(self, player, money_update):
         for y in range(self.n):
@@ -102,6 +103,35 @@ class Board:
                 if self[x][y][P_NAME_IDX] == player:
                     assert self[x][y][MONEY_IDX] + money_update >= 0
                     self[x][y][MONEY_IDX] = self[x][y][MONEY_IDX] + money_update
+
+    def _heal_nearby(self, square):
+        (x, y) = square
+        coordinates = [(x - 1, y + 1),
+                       (x, y + 1),
+                       (x + 1, y + 1),
+                       (x - 1, y),
+                       (x + 1, y),
+                       (x - 1, y - 1),
+                       (x, y - 1),
+                       (x + 1, y - 1)]
+        for n_x, n_y in coordinates:
+            if 0 <= n_x < self.n and 0 <= n_y < self.n:
+                if (self[n_x][n_y][P_NAME_IDX] == self[x][y][P_NAME_IDX]) and self[n_x][n_y][A_TYPE_IDX] != d_a_type['Gold'] and a_max_health[self[n_x][n_y][A_TYPE_IDX]] >= self[n_x][n_y][HEALTH_IDX] + HEAL_AMOUNT:
+
+                    if SACRIFICIAL_HEAL:
+                        self[x][x][HEALTH_IDX] -= HEAL_AMOUNT
+                        if self[x][y][HEALTH_IDX] <= 0:
+                            if VERBOSE:
+                                print("unit sacrificed itself to heal other unit")
+                            self[x][y] = [0] * NUM_ENCODERS
+                            self[x][y][TIME_IDX] = self[x][y][TIME_IDX]  # set time back to empty tile just in case
+
+                        self[n_x][n_y][HEALTH_IDX] += HEAL_AMOUNT
+                        print("healed")
+                    elif self[n_x][n_y][MONEY_IDX] - a_cost[2] >= 0:
+                        self[n_x][n_y][HEALTH_IDX] += HEAL_AMOUNT
+                        self._update_money(self[n_x][n_y][P_NAME_IDX], -HEAL_AMOUNT)
+                        print("healed")
 
     def _attack_nearby(self, square):
         (x, y) = square
@@ -127,7 +157,7 @@ class Board:
                             print("destroyed unit type", self[n_x][n_y][A_TYPE_IDX], "on", n_x, n_y, "and destroyer of type", self[x][y][A_TYPE_IDX], "on", x, y)
 
                         self[n_x][n_y] = [0] * NUM_ENCODERS
-                        self[n_x][n_y][REMAIN_IDX] = self[x][y][REMAIN_IDX]  # set time back to empty tile just in case
+                        self[n_x][n_y][TIME_IDX] = self[x][y][TIME_IDX]  # set time back to empty tile just in case
                         if not DESTROY_ALL:
                             return
 
@@ -151,15 +181,15 @@ class Board:
         for n_x, n_y in coordinates:
             if 0 <= n_x < self.n and 0 <= n_y < self.n:
                 if self[n_x][n_y][P_NAME_IDX] == 0:
-                    self[n_x][n_y] = [self[x][y][P_NAME_IDX], a_type, a_m_health[a_type], 0, self[x][y][MONEY_IDX], self[x][y][REMAIN_IDX]]
+                    self[n_x][n_y] = [self[x][y][P_NAME_IDX], a_type, a_m_health[a_type], 0, self[x][y][MONEY_IDX], self[x][y][TIME_IDX]]
                     return
 
-    ##############################################
-    ##############################################
-    ##############################################
-    ##############################################
-    ##############################################
-    ##############################################
+        ##############################################
+        ##############################################
+        ##############################################
+        ##############################################
+        ##############################################
+        ##############################################
 
     def get_moves_for_square(self, square) -> Any:
         (x, y) = square
@@ -204,9 +234,11 @@ class Board:
         if act == "mine_resources":
             return self[x][y][CARRY_IDX] == 0 and self._check_if_nearby(square, d_a_type['Gold'])
         if act == "return_resources":
-            return self[x][y][CARRY_IDX] == 1 and self._check_if_nearby(square, d_a_type['Hall'], check_friendly=True)
+            return self[x][y][CARRY_IDX] == 1 and self._check_if_nearby(square, d_a_type['Hall'], check_friendly=True) and (MAX_GOLD >= self[x][y][MONEY_IDX] + MONEY_INC)
         if act == "attack":
             return self._check_if_nearby_attack(square)
+        if act == "heal":
+            return self._check_if_nearby_heal(square)
         if act == "npc":
             return a_cost[2] <= money and self._check_if_nearby_empty(square)
         if act == "barracks":
@@ -216,7 +248,8 @@ class Board:
         if act == "town_hall":
             return a_cost[5] <= money and self._check_if_nearby_empty(square)
 
-    # noinspection PyChainedComparisons
+        # noinspection PyChainedComparisons
+
     def _check_if_empty(self, new_x, new_y):
         return 0 <= new_x < self.n and 0 <= new_y < self.n and self[new_x][new_y][P_NAME_IDX] == 0
 
@@ -237,6 +270,27 @@ class Board:
             if 0 <= n_x < self.n and 0 <= n_y < self.n:
                 if (self[n_x][n_y][P_NAME_IDX] == -self[x][y][P_NAME_IDX]) and self[n_x][n_y][A_TYPE_IDX] != d_a_type['Gold']:
                     return True
+        return False
+
+    def _check_if_nearby_heal(self, square):
+        print("TODO - check if heal cheker works and if heal executor works - for both sacrificial and non-sacrificial")
+        (x, y) = square
+        coordinates = [(x - 1, y + 1),
+                       (x, y + 1),
+                       (x + 1, y + 1),
+                       (x - 1, y),
+                       (x + 1, y),
+                       (x - 1, y - 1),
+                       (x, y - 1),
+                       (x + 1, y - 1)]
+        for n_x, n_y in coordinates:
+            if 0 <= n_x < self.n and 0 <= n_y < self.n:
+                if (self[n_x][n_y][P_NAME_IDX] == self[x][y][P_NAME_IDX]) and self[n_x][n_y][A_TYPE_IDX] != d_a_type['Gold'] and a_max_health[self[n_x][n_y][A_TYPE_IDX]] >= self[n_x][n_y][HEALTH_IDX] + HEAL_AMOUNT:
+
+                    if SACRIFICIAL_HEAL:
+                        return True
+                    elif self[n_x][n_y][MONEY_IDX] - a_cost[2] >= 0:
+                        return True
         return False
 
     def _check_if_nearby_empty(self, square):
@@ -273,3 +327,24 @@ class Board:
                     if self[n_x][n_y][P_NAME_IDX] == self[x][y][P_NAME_IDX]:
                         return True
         return False
+
+    def time_killer(self):
+
+        current_time = self[0][0][TIME_IDX]
+
+        # TODO - REDUCE ALL ACTORS HEALTH BY SOME FORMULA ON SOME MILESTONES - ALL BUT MINERALS
+        print("TODO - REDUCE ALL ACTORS HEALTH BY SOME FORMULA ON SOME MILESTONES - ALL BUT MINERALS")
+        if current_time % 10 == 0:
+            print("killing every 10 turns")
+
+            damage_amount = current_time ** 1.2
+            # damage_amount = np.exp(np.sqrt(current_time))
+            print("damaging all actors in time", current_time, "by", damage_amount)
+
+            for y in range(self.n):
+                for x in range(self.n):
+                    if self[x][y][P_NAME_IDX] != 0 and self[x][y][A_TYPE_IDX] != 1:  # player actor and if not Gold
+                        self[x][y][HEALTH_IDX] -= damage_amount
+                        if self[x][y][HEALTH_IDX] <= 0:
+                            if VERBOSE:
+                                print("actor died because of timer kill function", self[x][y][A_TYPE_IDX])

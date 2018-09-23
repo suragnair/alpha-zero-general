@@ -6,7 +6,7 @@ from pygame.rect import Rect
 
 from td2020.src.Board import Board
 from td2020.src.Graphics import init_visuals, update_graphics, message_display
-from td2020.src.dicts import NUM_ACTS, VERBOSE, P_NAME_IDX, A_TYPE_IDX, d_user_shortcuts, USER_PLAYER, FPS, ACTS, d_a_type, ACTS_REV, d_user_shortcuts_rev, SHOW_PYGAME_WELCOME
+from td2020.src.dicts import NUM_ACTS, VERBOSE, P_NAME_IDX, A_TYPE_IDX, d_user_shortcuts, FPS, ACTS, d_a_type, ACTS_REV, d_user_shortcuts_rev, SHOW_PYGAME_WELCOME
 from utils import dotdict
 
 if SHOW_PYGAME_WELCOME:
@@ -40,6 +40,9 @@ class RandomPlayer:
 class HumanTD2020Player:
     def __init__(self, game) -> None:
         self.game = game
+        self.USER_PLAYER = 1  # used by Human Player - this does not change if human pit player is 1 or -1
+
+
 
     def play(self, board: np.ndarray) -> int:
         n = board.shape[0]
@@ -137,7 +140,7 @@ class HumanTD2020Player:
                     raise SystemExit(0)
                 if event.type == pygame.KEYDOWN:
 
-                    if clicked_actor and (board[clicked_actor.x][clicked_actor.y][P_NAME_IDX] == USER_PLAYER):
+                    if clicked_actor and (board[clicked_actor.x][clicked_actor.y][P_NAME_IDX] == self.USER_PLAYER):
                         try:
 
                             shortcut_pressed = d_user_shortcuts[event.unicode]
@@ -158,7 +161,7 @@ class HumanTD2020Player:
 
                     if event.button == lmb:
                         clicked_actor = self.select_object(board, pos)
-                        if clicked_actor and board[clicked_actor.x][clicked_actor.y][P_NAME_IDX] == USER_PLAYER and board[clicked_actor.x][clicked_actor.y][A_TYPE_IDX] != d_a_type['Gold']:
+                        if clicked_actor and board[clicked_actor.x][clicked_actor.y][P_NAME_IDX] == self.USER_PLAYER and board[clicked_actor.x][clicked_actor.y][A_TYPE_IDX] != d_a_type['Gold']:
                             clicked_actor_index_arr = [clicked_actor.x, clicked_actor.y]
 
                             # draw selected bounding box
@@ -209,14 +212,14 @@ class HumanTD2020Player:
                                 # this is actor of type MyActor
 
                                 if l_type == d_a_type['Work']:
-                                    if r_player == USER_PLAYER:
+                                    if r_player == self.USER_PLAYER:
                                         if r_type == d_a_type['Gold']:
                                             clicked_actor_index_arr.append(ACTS["mine_resources"])
                                         if r_type == d_a_type['Hall']:
                                             clicked_actor_index_arr.append(ACTS["return_resources"])
 
                                 if l_type == d_a_type['Rifl']:
-                                    if r_player != USER_PLAYER and r_type != d_a_type['Gold']:
+                                    if r_player != self.USER_PLAYER and r_type != d_a_type['Gold']:
                                         clicked_actor_index_arr.append(ACTS["attack"])
                             else:
 
