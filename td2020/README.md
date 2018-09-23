@@ -58,7 +58,7 @@ Each actor is encoded using following 6 properties:
 - **Money**: [0-*] Current amount of money that this player has at current time (When money updates, it updates on every players actor)
 - **Time**: [*-0 or 0-8191] Countdown time that gets updated on every board tile when move gets executed. Also timer that increases, and special milestones, health is decreased for all units by formula.
 #### One Hot Tile Encoding:
-Now each actor is encoded with binary vector of length 27.
+Now each actor is encoded with binary vector of length 30.
 - **Player Name**: [2] - 00(neutral), 01(1) or 10(-1),
 - **Actor Type**: [4] - 4 bit,
 - **Health**: [5] - 5 bit. This much because of life decrease every milestone in getNextState
@@ -99,6 +99,10 @@ Instance of game is finished in following conditions:
 - One of players does not have any available moves left (board is populated or one player is surrounded),
 - One players' actors get destroyed,
 - When remaining time reaches 0
+#### Game end idea - Health decreasing
+![Image that shows decreasing health function](https://i.imgur.com/weMuVvR.png)
+Decrease health of all units by some amount, retrieved by curves' formula.
+This decrease is executed every N ticks.
 ### Initial board configuration
 Board gets setup with a town hall for each player in the middle, with 2 patches of resource source actor - Minerals.
 Each mineral patch is assigned its player (-1,1), because value 0 game recognises as unpopulated area.
