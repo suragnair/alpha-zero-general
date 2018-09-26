@@ -3,6 +3,7 @@ from typing import List
 import numpy as np
 
 
+
 class Encoder:
 
     def __init__(self):
@@ -98,6 +99,7 @@ class OneHotEncoder(Encoder):
         from td2020.src.dicts import P_NAME_IDX, A_TYPE_IDX, HEALTH_IDX, CARRY_IDX, MONEY_IDX, TIME_IDX
 
         n = board.shape[0]
+
         b = np.zeros((n, n, self.NUM_ENCODERS))
         for y in range(n):
             for x in range(n):

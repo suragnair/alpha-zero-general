@@ -22,9 +22,7 @@ class TD2020NNet:
         self.action_size = game.getActionSize()
         self.args = args
 
-        print("TODO - MAYBE THIS WAY ")
         num_encoders = encoder.num_encoders
-
 
         # Neural Net
         self.input_boards = Input(shape=(self.board_x, self.board_y, num_encoders))  # s: batch_size x board_x x board_y x num_encoders

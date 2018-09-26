@@ -3,11 +3,11 @@ import os
 from td2020.src.encoders import OneHotEncoder
 from utils import dotdict
 
-USE_TF_CPU = False
+USE_TF_CPU = True
 
 PATH: str = os.path.dirname(os.path.realpath(__file__))
 
-SHOW_TENSORFLOW_GPU: bool = False
+SHOW_TENSORFLOW_GPU: bool = True
 SHOW_PYGAME_WELCOME: bool = False
 VERBOSE: int = 0
 FPS: int = 100  # only relevant when pygame
@@ -29,15 +29,19 @@ if EXCLUDE_IDLE and INITIAL_GOLD == 0:
     # let players have at least some gold so they have any valid moves
     INITIAL_GOLD = 1
 
-USE_TIMEOUT = False
+USE_TIMEOUT = True
+MAX_TIME = 8191 # this gets used by kill function that determines the end point
 if USE_TIMEOUT:
-
+    print("Using Timeout")
     TIMEOUT = 100  # how many turns until game end - this gets reduced when each turn is executed
 else:
-    MAX_TIME = 8191
+    print("Using Kill Function")
+    print("TODO - REDUCE ALL ACTORS HEALTH BY SOME FORMULA ON SOME MILESTONES - ALL BUT MINERALS")
+    print("TODO - MAKE SURE YOU DONT KILL BOTH PLAYERS AT ONCE")
+
     TIMEOUT = 0 # sets initial tick to 0 and then in getGameEnded it gets incremented unitl number 8191
 
-
+print("TODO - check if heal cheker works and if heal executor works - for both sacrificial and non-sacrificial")
 
 
 DAMAGE = 20  # how much damage is dealt to attacked actor

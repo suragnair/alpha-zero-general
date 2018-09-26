@@ -128,10 +128,12 @@ class Board:
 
                         self[n_x][n_y][HEALTH_IDX] += HEAL_AMOUNT
                         print("healed")
+                        return
                     elif self[n_x][n_y][MONEY_IDX] - a_cost[2] >= 0:
                         self[n_x][n_y][HEALTH_IDX] += HEAL_AMOUNT
                         self._update_money(self[n_x][n_y][P_NAME_IDX], -HEAL_AMOUNT)
                         print("healed")
+                        return
 
     def _attack_nearby(self, square):
         (x, y) = square
@@ -165,7 +167,6 @@ class Board:
                         print("damaged unit type", self[n_x][n_y][A_TYPE_IDX], "on", n_x, n_y, "and damage initiator of type", self[x][y][A_TYPE_IDX], "on", x, y)
                     if not DESTROY_ALL:
                         return
-        print("returning")
 
     def _spawn_nearby(self, square, a_type):
         (x, y) = square
@@ -273,7 +274,6 @@ class Board:
         return False
 
     def _check_if_nearby_heal(self, square):
-        print("TODO - check if heal cheker works and if heal executor works - for both sacrificial and non-sacrificial")
         (x, y) = square
         coordinates = [(x - 1, y + 1),
                        (x, y + 1),
@@ -331,21 +331,25 @@ class Board:
     def time_killer(self):
 
         current_time = self[0][0][TIME_IDX]
-        print("TODO - MAKE SURE YOU DONT KILL BOTH PLAYERS AT ONCE")
 
         # TODO - REDUCE ALL ACTORS HEALTH BY SOME FORMULA ON SOME MILESTONES - ALL BUT MINERALS
-        print("TODO - REDUCE ALL ACTORS HEALTH BY SOME FORMULA ON SOME MILESTONES - ALL BUT MINERALS")
         if current_time % 10 == 0:
             print("killing every 10 turns")
 
             damage_amount = current_time ** 1.2
             # damage_amount = np.exp(np.sqrt(current_time))
-            print("damaging all actors in time", current_time, "by", damage_amount)
+
+            # Todo - figure out right formula for damage per time
+            # print("damaging all actors in time", current_time, "by", damage_amount)
 
             for y in range(self.n):
                 for x in range(self.n):
                     if self[x][y][P_NAME_IDX] != 0 and self[x][y][A_TYPE_IDX] != 1:  # player actor and if not Gold
                         self[x][y][HEALTH_IDX] -= damage_amount
+
                         if self[x][y][HEALTH_IDX] <= 0:
                             if VERBOSE:
                                 print("actor died because of timer kill function", self[x][y][A_TYPE_IDX])
+
+                            self[x][y] = [0] * NUM_ENCODERS
+                            self[x][y][TIME_IDX] = self[x][y][TIME_IDX]  # set time back to empty tile just in case
