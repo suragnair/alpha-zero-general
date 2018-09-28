@@ -18,18 +18,6 @@ class Board:
             self.pieces.append(rows)
         self.pieces = np.array(self.pieces)
 
-        t_hall = d_a_type['Hall']
-        h_hall = a_m_health[t_hall]
-        t_gold = d_a_type['Gold']
-        h_gold = a_m_health[t_gold]
-        self[int(self.n / 2) - 1][int(self.n / 2)] = [1, t_gold, h_gold, 0, INITIAL_GOLD, TIMEOUT]
-        self[int(self.n / 2)][int(self.n / 2) - 1] = [-1, t_gold, h_gold, 0, INITIAL_GOLD, TIMEOUT]
-        self[int(self.n / 2) - 1][int(self.n / 2) - 1] = [1, t_hall, h_hall, 0, INITIAL_GOLD, TIMEOUT]
-        self[int(self.n / 2)][int(self.n / 2)] = [-1, t_hall, h_hall, 0, INITIAL_GOLD, TIMEOUT]
-
-        # remaining time is stored in all squares
-        self.pieces[:, :, TIME_IDX] = TIMEOUT
-
     def __getitem__(self, index: int) -> List[List[int]]:
         return self.pieces[index]
 

@@ -3,15 +3,80 @@ from typing import Tuple
 import numpy as np
 
 from td2020.src.Board import Board
-from td2020.src.dicts import NUM_ENCODERS, NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, HEALTH_IDX, TIME_IDX, VERBOSE, FPS, USE_TIMEOUT, MAX_TIME
+from td2020.src.dicts import NUM_ENCODERS, NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, HEALTH_IDX, TIME_IDX, VERBOSE, FPS, USE_TIMEOUT, MAX_TIME, d_a_type, a_m_health, INITIAL_GOLD, TIMEOUT
 
 
 class TD2020Game:
     def __init__(self, n) -> None:
         self.n = n
 
+        ###################################################
+        ################## LAZY OPTION ####################
+        ###################################################
+
+        from utils import dotdict
+
+        self.initial_board_config = [
+            dotdict({
+                'x': int(self.n / 2) - 1,
+                'y': int(self.n / 2),
+                'player': 1,
+                'a_type': d_a_type['Gold'],
+                'health': a_m_health[d_a_type['Gold']],
+                'carry': 0,
+                'gold': INITIAL_GOLD,
+                'timeout': TIMEOUT
+            }),
+            dotdict({
+                'x': int(self.n / 2),
+                'y': int(self.n / 2) - 1,
+                'player': -1,
+                'a_type': d_a_type['Gold'],
+                'health': a_m_health[d_a_type['Gold']],
+                'carry': 0,
+                'gold': INITIAL_GOLD,
+                'timeout': TIMEOUT
+            }),
+            dotdict({
+                'x': int(self.n / 2) - 1,
+                'y': int(self.n / 2) - 1,
+                'player': 1,
+                'a_type': d_a_type['Hall'],
+                'health': a_m_health[d_a_type['Hall']],
+                'carry': 0,
+                'gold': INITIAL_GOLD,
+                'timeout': TIMEOUT
+            }),
+            dotdict({
+                'x': int(self.n / 2),
+                'y': int(self.n / 2),
+                'player': -1,
+                'a_type': d_a_type['Hall'],
+                'health': a_m_health[d_a_type['Hall']],
+                'carry': 0,
+                'gold': INITIAL_GOLD,
+                'timeout': TIMEOUT
+            }),
+        ]
+
+    def setInitBoard(self, board_config) -> None:
+        self.initial_board_config = board_config
+
+    ###################################################
+    ###################################################
+
     def getInitBoard(self) -> np.ndarray:
         b = Board(self.n)
+        ###################################################
+
+        for e in self.initial_board_config:
+            b.pieces[e.x, e.y] = [e.player, e.a_type, e.health, e.carry, e.gold, e.timeout]
+        # remaining time is stored in all squares
+        print("dont forget not to overwrite ingame timout if we are setting already existing game from UE4")
+        b.pieces[:, :, TIME_IDX] = TIMEOUT
+
+        ###################################################
+
         return np.array(b.pieces)
 
     def getBoardSize(self) -> Tuple[int, int, int]:

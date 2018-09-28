@@ -52,16 +52,15 @@ class HumanTD2020Player:
 
             if VERBOSE > 3:
                 a = self._manage_input(board)
+                x, y, action_index = a
 
             else:
                 a = (input('type one of above actions in "x y action_index" format\n')).split(" ")
+                x, y, action = a
+                action_index = ACTS[action]
             # convert to action index in valids array
 
             try:
-                x, y, action_index = a
-                x = int(x)
-                y = int(y)
-                action_index = int(action_index)
 
                 tup = (int(y), int(x), int(action_index))
                 a = np.ravel_multi_index(tup, (n, n, NUM_ACTS))
@@ -86,6 +85,7 @@ class HumanTD2020Player:
                 y, x, action_index = np.unravel_index(i, [n, n, NUM_ACTS])
 
                 # print("numpy action index", np.ravel_multi_index((y, x, action_index), (n, n, NUM_ACTS)))
+
 
                 print(x, y, ACTS_REV[action_index])
                 # action_into_array_print(board, i)

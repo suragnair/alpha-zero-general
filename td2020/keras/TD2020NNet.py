@@ -10,6 +10,7 @@ from tensorflow.python.keras.layers import Conv2D, BatchNormalization, Activatio
 from tensorflow.python.keras.optimizers import Adam
 
 if USE_TF_CPU:
+    print("Using TensorFlow CPU")
     os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 if not SHOW_TENSORFLOW_GPU:
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
