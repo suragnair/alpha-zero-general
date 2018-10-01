@@ -3,7 +3,7 @@ from typing import Tuple
 import numpy as np
 
 from td2020.src.Board import Board
-from td2020.src.dicts import NUM_ENCODERS, NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, HEALTH_IDX, TIME_IDX, VERBOSE, FPS, USE_TIMEOUT, MAX_TIME, d_a_type, a_m_health, INITIAL_GOLD, TIMEOUT
+from td2020.src.config import NUM_ENCODERS, NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, HEALTH_IDX, TIME_IDX, VERBOSE, FPS, USE_TIMEOUT, MAX_TIME, d_a_type, a_m_health, INITIAL_GOLD, TIMEOUT
 
 
 class TD2020Game:
@@ -230,7 +230,7 @@ class TD2020Game:
 
 
 def display(board):
-    from td2020.src.Graphics import init_visuals, update_graphics
+    from td2020.visualization.Graphics import init_visuals, update_graphics
 
     if not VERBOSE:
         return

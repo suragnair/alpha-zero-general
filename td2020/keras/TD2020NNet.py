@@ -1,7 +1,7 @@
 import os
 import sys
 
-from td2020.src.dicts import USE_TF_CPU, SHOW_TENSORFLOW_GPU, encoder
+from td2020.src.config import USE_TF_CPU, SHOW_TENSORFLOW_GPU, encoder
 
 sys.path.append('..')
 

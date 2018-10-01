@@ -96,7 +96,7 @@ class OneHotEncoder(Encoder):
         return np.asarray(new_boards)
 
     def encode(self, board) -> np.ndarray:
-        from td2020.src.dicts import P_NAME_IDX, A_TYPE_IDX, HEALTH_IDX, CARRY_IDX, MONEY_IDX, TIME_IDX
+        from td2020.src.config import P_NAME_IDX, A_TYPE_IDX, HEALTH_IDX, CARRY_IDX, MONEY_IDX, TIME_IDX
 
         n = board.shape[0]
 

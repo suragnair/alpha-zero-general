@@ -5,7 +5,7 @@ import time
 import numpy as np
 
 from td2020.keras.TD2020NNet import TD2020NNet
-from td2020.src.dicts import encoder
+from td2020.src.config import encoder
 
 sys.path.append('../..')
 from utils import *

@@ -5,8 +5,8 @@ import numpy as np
 from pygame.rect import Rect
 
 from td2020.src.Board import Board
-from td2020.src.Graphics import init_visuals, update_graphics, message_display
-from td2020.src.dicts import NUM_ACTS, VERBOSE, P_NAME_IDX, A_TYPE_IDX, d_user_shortcuts, FPS, ACTS, d_a_type, ACTS_REV, d_user_shortcuts_rev, SHOW_PYGAME_WELCOME
+from td2020.visualization.Graphics import init_visuals, update_graphics, message_display
+from td2020.src.config import NUM_ACTS, VERBOSE, P_NAME_IDX, A_TYPE_IDX, d_user_shortcuts, FPS, ACTS, d_a_type, ACTS_REV, d_user_shortcuts_rev, SHOW_PYGAME_WELCOME
 from utils import dotdict
 
 if SHOW_PYGAME_WELCOME:
