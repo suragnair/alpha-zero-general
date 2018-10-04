@@ -6,7 +6,7 @@ from TFPluginAPI import TFPluginAPI
 from tensorflow.python.keras.backend import clear_session
 
 from MCTS import MCTS
-from td2020.TD2020Game import TD2020Game
+from td2020.TD2020Game import TD2020Game, display
 from td2020.keras.NNet import NNetWrapper as NNet
 from td2020.src.config import NUM_ACTS, ACTS_REV
 from utils import dotdict
@@ -30,7 +30,8 @@ class TD2020LearnAPI(TFPluginAPI):
         # nnet players
         self.n1 = NNet(self.g)
         self.n1.load_checkpoint(dirname, 'temp.pth.tar')
-        args = dotdict({'numMCTSSims': 500000, 'cpuct': 1.0})
+        # args = dotdict({'numMCTSSims': 500000, 'cpuct': 1.0})
+        args = dotdict({'numMCTSSims': 500, 'cpuct': 1.0})
         self.mcts = MCTS(self.g, self.n1, args)
 
         self.recommended_act = None
@@ -38,12 +39,10 @@ class TD2020LearnAPI(TFPluginAPI):
     # expected api: storedModel and session, json inputs
     def onJsonInput(self, jsonInput):
 
-
         if self.recommended_act:
             act1 = self.recommended_act
             self.recommended_act = None
             return act1
-
 
         """
         this function is synced with game
@@ -68,15 +67,15 @@ class TD2020LearnAPI(TFPluginAPI):
                     'health': encoded_actor['health'],
                     'carry': encoded_actor['carry'],
                     'gold': encoded_actor['money'],
-                    'timeout': 100
+                    'timeout': encoded_actor['remaining']
                 })
-                # TODO - TODO -THIS TIMEOUT IS HARDCODED
             )
 
         self.initial_board_config = initial_board_config
+        """
+        print("printing initial board config")
 
-
-
+        print(self.initial_board_config)
         t = time.time()
         self.g.setInitBoard(initial_board_config)
         b = self.g.getInitBoard()
@@ -89,7 +88,8 @@ class TD2020LearnAPI(TFPluginAPI):
 
 
         return {"action": str(recommended_act)}
-
+        """
+        return ""
 
     # expected api: no params forwarded for training? TBC
     def onBeginTraining(self):
@@ -103,20 +103,21 @@ class TD2020LearnAPI(TFPluginAPI):
         self.g.setInitBoard(self.initial_board_config)
         b = self.g.getInitBoard()
 
+        print("PRINTING INITIAL BOARD")
+
+        display(b)
+        print("board", b)
         n1p = lambda x: np.argmax(self.mcts.getActionProb(x, temp=0))
 
         recommended_act = n1p(self.g.getCanonicalForm(b, 1))
-
 
         y, x, action_index = np.unravel_index(recommended_act, [b.shape[0], b.shape[0], NUM_ACTS])
 
         # print("numpy action index", np.ravel_multi_index((y, x, action_index), (n, n, NUM_ACTS)))
 
-        ue.print_string("took "+ str(time.time() - t))
+        ue.print_string("took " + str(time.time() - t))
 
         self.recommended_act = {"x": str(x), "y": str(y), "action": ACTS_REV[action_index]}
-
-
 
         return ""
 
