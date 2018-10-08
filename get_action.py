@@ -1,3 +1,70 @@
+import numpy as np
+# noinspection PyUnresolvedReferences
+import unreal_engine as ue
+# noinspection PyUnresolvedReferences
+from TFPluginAPI import TFPluginAPI
+from tensorflow.python.keras.backend import clear_session
+
+from MCTS import MCTS
+from td2020.TD2020Game import TD2020Game
+from td2020.keras.NNet import NNetWrapper as NNet
+from utils import dotdict
+
+
+class TD2020LearnAPI(TFPluginAPI):
+
+    # expected api: setup your model for your use cases
+    def onSetup(self):
+        # setup or load your model and pass it into stored
+
+        # Usually store session, graph, and model if using keras
+        pass
+
+    # expected api: storedModel and session, json inputs
+    def onJsonInput(self, jsonInput):
+        clear_session()
+        import os
+        dirname = os.path.dirname(__file__)
+        dirname = os.path.join(dirname, 'temp/')
+
+        g = TD2020Game(8)
+
+        # nnet players
+        n1 = NNet(g)
+        n1.load_checkpoint(dirname, 'temp.pth.tar')
+        # args = dotdict({'numMCTSSims': 500000, 'cpuct': 1.0})
+        args = dotdict({'numMCTSSims': 500, 'cpuct': 1.0})
+        mcts = MCTS(g, n1, args)
+
+        b = g.getInitBoard()
+
+        n1p = lambda x: np.argmax(mcts.getActionProb(x, temp=0))
+        canonicalBoard = g.getCanonicalForm(b, 1)
+
+        # self.n1.nnet.model._make_predict_function()
+
+        recommended_act = n1p(canonicalBoard)
+
+        return {"action": str(recommended_act)}
+
+    # expected api: no params forwarded for training? TBC
+    def onBeginTraining(self):
+        """
+        this function is Async
+        :return:
+        """
+        return ""
+
+    def run(self, args):
+        pass
+
+
+# required function to get our api
+def getApi():
+    return TD2020LearnAPI.getInstance()
+
+
+"""
 import time
 # noinspection PyUnresolvedReferences
 import unreal_engine as ue
@@ -20,6 +87,8 @@ class TD2020LearnAPI(TFPluginAPI):
         # setup or load your model and pass it into stored
 
         # Usually store session, graph, and model if using keras
+        clear_session()
+
 
         import os
         dirname = os.path.dirname(__file__)
@@ -38,17 +107,14 @@ class TD2020LearnAPI(TFPluginAPI):
 
     # expected api: storedModel and session, json inputs
     def onJsonInput(self, jsonInput):
-
+        clear_session()
         if self.recommended_act:
             act1 = self.recommended_act
             self.recommended_act = None
             return act1
 
-        """
-        this function is synced with game
-        :param jsonInput:
-        :return:
-        """
+        # this function is synced with game
+    
         # ue.print_string(jsonInput)
         # now parse this input:
         encoded_actors = jsonInput['data']
@@ -72,7 +138,7 @@ class TD2020LearnAPI(TFPluginAPI):
             )
 
         self.initial_board_config = initial_board_config
-        """
+
         print("printing initial board config")
 
         print(self.initial_board_config)
@@ -88,15 +154,12 @@ class TD2020LearnAPI(TFPluginAPI):
 
 
         return {"action": str(recommended_act)}
-        """
-        return ""
+
+        return ''
 
     # expected api: no params forwarded for training? TBC
     def onBeginTraining(self):
-        """
-        this function is Async
-        :return:
-        """
+        # this function is Async
         clear_session()
 
         t = time.time()
@@ -128,3 +191,7 @@ class TD2020LearnAPI(TFPluginAPI):
 # required function to get our api
 def getApi():
     return TD2020LearnAPI.getInstance()
+
+
+
+"""
