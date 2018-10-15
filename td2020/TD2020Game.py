@@ -71,8 +71,6 @@ class TD2020Game:
 
         remaining_time = None # when setting initial board, remaining time might be different
         for e in self.initial_board_config:
-            print("printing initial board conf",self.initial_board_config)
-
             b.pieces[e.x, e.y] = [e.player, e.a_type, e.health, e.carry, e.gold, e.timeout]
             remaining_time = e.timeout
         # remaining time is stored in all squares
