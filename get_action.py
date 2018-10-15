@@ -39,7 +39,11 @@ class TD2020LearnAPI(TFPluginAPI):
         b = g.getInitBoard()
 
         n1p = lambda x: np.argmax(mcts.getActionProb(x, temp=0))
-        canonicalBoard = g.getCanonicalForm(b, 1)
+
+        owning_player = jsonInput['player']
+        # canonicalBoard = g.getCanonicalForm(b, 1)
+        print("todo - check if this 'owning player' is ok")
+        canonicalBoard = g.getCanonicalForm(b, owning_player)
 
         # self.n1.nnet.model._make_predict_function()
 
