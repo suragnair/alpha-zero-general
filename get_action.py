@@ -1,9 +1,12 @@
+import gc
+import os
+
 import numpy as np
+import tensorflow as tf
 # noinspection PyUnresolvedReferences
 import unreal_engine as ue
 # noinspection PyUnresolvedReferences
 from TFPluginAPI import TFPluginAPI
-from tensorflow.python.keras.backend import clear_session
 
 from MCTS import MCTS
 from td2020.TD2020Game import TD2020Game
@@ -13,35 +16,27 @@ from utils import dotdict
 
 
 class TD2020LearnAPI(TFPluginAPI):
-
-    # expected api: setup your model for your use cases
-    def onSetup(self):
-        # setup or load your model and pass it into stored
-
-        # Usually store session, graph, and model if using keras
+    def __init__(self):
+        # gc.enable()
         self.recommended_act = None
+        self.owning_player = None
+        self.initial_board_config = None
 
-    # expected api: storedModel and session, json inputs
+    def onSetup(self):
+        pass
+
     def onJsonInput(self, jsonInput):
-        # this function is synced with game
-
-
         if self.recommended_act:
             act1 = self.recommended_act
             self.recommended_act = None
+            # collecting garbage - this causes stutter in game
+            # gc.collect()
+            # print("collecting garbage - this causes stutter in game - but it cleans the most")  # TODO
             return act1
 
-
-
-        # ue.print_string(jsonInput)
-        # now parse this input:
         encoded_actors = jsonInput['data']
-
-        # ue.print_string(encoded_actors)
-
         initial_board_config = []
         for encoded_actor in encoded_actors:
-            # ue.print_string(encoded_actor)
             initial_board_config.append(
                 dotdict({
                     'x': encoded_actor['x'],
@@ -57,51 +52,35 @@ class TD2020LearnAPI(TFPluginAPI):
         self.initial_board_config = initial_board_config
         self.owning_player = jsonInput['player']
 
-
-
-
-    # expected api: no params forwarded for training? TBC
     def onBeginTraining(self):
+        with tf.Session() as sess:
+            current_directory = os.path.join(os.path.dirname(__file__), 'temp/')
+            g = TD2020Game(8)
+            n1 = NNet(g)
+            n1.load_checkpoint(current_directory, 'temp.pth.tar')
+            args = dotdict({'numMCTSSims': 50, 'cpuct': 1.0})
+            mcts = MCTS(g, n1, args)
+            g.setInitBoard(self.initial_board_config)
+            b = g.getInitBoard()
+            n1p = lambda x: np.argmax(mcts.getActionProb(x, temp=0))
 
-        clear_session()
-        import os
-        dirname = os.path.dirname(__file__)
-        dirname = os.path.join(dirname, 'temp/')
+            print("todo - check if this 'owning player' is ok")
+            # canonical_board = g.getCanonicalForm(b, 1)
+            canonical_board = g.getCanonicalForm(b, self.owning_player)
 
-        g = TD2020Game(8)
+            recommended_act = n1p(canonical_board)
+            y, x, action_index = np.unravel_index(recommended_act, [b.shape[0], b.shape[0], NUM_ACTS])
 
-        # nnet players
-        n1 = NNet(g)
-        n1.load_checkpoint(dirname, 'temp.pth.tar')
-        # args = dotdict({'numMCTSSims': 500000, 'cpuct': 1.0})
-        args = dotdict({'numMCTSSims': 5000, 'cpuct': 1.0})
-        mcts = MCTS(g, n1, args)
-
-        g.setInitBoard(self.initial_board_config)
-        b = g.getInitBoard()
-
-        n1p = lambda x: np.argmax(mcts.getActionProb(x, temp=0))
-
-        # canonicalBoard = g.getCanonicalForm(b, 1)
-        print("todo - check if this 'owning player' is ok")
-        canonicalBoard = g.getCanonicalForm(b, self.owning_player)
-
-        # self.n1.nnet.model._make_predict_function()
-
-        recommended_act = n1p(canonicalBoard)
-
-        # return {"action": str(recommended_act)}
-
-        #recommended_act = n1p(g.getCanonicalForm(b, self.owning_player))
-
-        y, x, action_index = np.unravel_index(recommended_act, [b.shape[0], b.shape[0], NUM_ACTS])
-
-        # print("numpy action index", np.ravel_multi_index((y, x, action_index), (n, n, NUM_ACTS)))
-
-
-        self.recommended_act = {"x": str(x), "y": str(y), "action": ACTS_REV[action_index]}
-        print("PRINTING RECOMM ACT", self.recommended_act)
-        return "{}"
+            # gc.collect()  # TODO
+            act = {"x": str(x), "y": str(y), "action": ACTS_REV[action_index]}
+            # self.recommended_act = {"x": str(x), "y": str(y), "action": ACTS_REV[action_index]}
+            print("Printing recommended action", self.recommended_act)
+            sess.close()
+            # TODO
+            print("Todo There still are some memory problems")
+        # gc.collect()
+        self.recommended_act = act
+        return ""
 
     def run(self, args):
         pass
@@ -110,4 +89,3 @@ class TD2020LearnAPI(TFPluginAPI):
 # required function to get our api
 def getApi():
     return TD2020LearnAPI.getInstance()
-
