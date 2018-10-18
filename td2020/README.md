@@ -101,8 +101,23 @@ Instance of game is finished in following conditions:
 - When remaining time reaches 0
 #### Game end idea - Health decreasing
 ![Image that shows decreasing health function](https://i.imgur.com/weMuVvR.png)
+
 Decrease health of all units by some amount, retrieved by curves' formula.
 This decrease is executed every N ticks.
+
+**Implementation**
+
+![Modified curve representing damage and number of damage inflicts per round](https://i.imgur.com/jkXmjMw.png)
+
+Blue curve represents how much damage is dealt to specific unit in given game time.
+Red curve represents how many actors have been damaged in current time frame.
+
+We can see that Damage curve is far more strict and is beginning to rise quite early in the game.
+That's because we want to quickly eliminate non-working player instances and prioritize those that are collecting minerals and spawning new actors.
+We can also see y axis span from 0 to 64, which is maximum total of actors for one player, so at round ~8000, every actor on board will recieve fatal damage, so timeout is never reached.
+
+Actors can also heal each other using money, so they can prolong their life.
+
 ### Initial board configuration
 Board gets setup with a town hall for each player in the middle, with 2 patches of resource source actor - Minerals.
 Each mineral patch is assigned its player (-1,1), because value 0 game recognises as unpopulated area.
@@ -146,6 +161,7 @@ Type one of listed commands seperated by space and press Enter.
 ## Unreal Engine visual presentation
 - Used repository [JernejHabjan/TrumpDefense2020](https://github.com/JernejHabjan/TrumpDefense2020)
 - Python communication plugin:  [getnamo/tensorflow-ue4](https://github.com/getnamo/tensorflow-ue4)
+![Example of Unreal Engine 4 Visualization](https://i.imgur.com/n80RrwY.png)
 
 Unreal Engine handles visual presentation of playing custom RTS game agains computer opponent, which is querying actions via plugin to python prebuilt model.
 

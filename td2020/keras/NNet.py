@@ -1,15 +1,12 @@
 import os
-import sys
 import time
 
 import numpy as np
 
+from NeuralNet import NeuralNet
 from td2020.keras.TD2020NNet import TD2020NNet
 from td2020.src.config import encoder
-
-sys.path.append('../..')
 from utils import *
-from NeuralNet import NeuralNet
 
 """
 args = dotdict({
@@ -79,9 +76,5 @@ class NNetWrapper(NeuralNet):
         self.nnet.model.save_weights(filepath)
 
     def load_checkpoint(self, folder='checkpoint', filename='checkpoint.pth.tar'):
-        # https://github.com/pytorch/examples/blob/master/imagenet/main.py#L98
         filepath = os.path.join(folder, filename)
-        # TODO - COMMENTED PATH EXISTS
-        # if not os.path.exists(filepath):
-        #     raise ("No model in path {}".format(filepath))
         self.nnet.model.load_weights(filepath)

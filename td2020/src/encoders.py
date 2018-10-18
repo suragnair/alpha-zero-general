@@ -3,7 +3,6 @@ from typing import List
 import numpy as np
 
 
-
 class Encoder:
 
     def __init__(self):

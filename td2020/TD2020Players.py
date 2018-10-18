@@ -5,8 +5,8 @@ import numpy as np
 from pygame.rect import Rect
 
 from td2020.src.Board import Board
-from td2020.visualization.Graphics import init_visuals, update_graphics, message_display
 from td2020.src.config import NUM_ACTS, VERBOSE, P_NAME_IDX, A_TYPE_IDX, d_user_shortcuts, FPS, ACTS, d_a_type, ACTS_REV, d_user_shortcuts_rev, SHOW_PYGAME_WELCOME
+from td2020.visualization.Graphics import init_visuals, update_graphics, message_display
 from utils import dotdict
 
 if SHOW_PYGAME_WELCOME:
@@ -41,8 +41,6 @@ class HumanTD2020Player:
     def __init__(self, game) -> None:
         self.game = game
         self.USER_PLAYER = 1  # used by Human Player - this does not change if human pit player is 1 or -1
-
-
 
     def play(self, board: np.ndarray) -> int:
         n = board.shape[0]
@@ -85,7 +83,6 @@ class HumanTD2020Player:
                 y, x, action_index = np.unravel_index(i, [n, n, NUM_ACTS])
 
                 # print("numpy action index", np.ravel_multi_index((y, x, action_index), (n, n, NUM_ACTS)))
-
 
                 print(x, y, ACTS_REV[action_index])
                 # action_into_array_print(board, i)

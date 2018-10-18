@@ -1,15 +1,15 @@
 import os
 
-from td2020.src.encoders import OneHotEncoder
+from td2020.src.encoders import OneHotEncoder, NumericEncoder
 from utils import dotdict
 
-USE_TF_CPU = True
+USE_TF_CPU = False
 
 PATH: str = os.path.dirname(os.path.realpath(__file__))
 
 SHOW_TENSORFLOW_GPU: bool = True
 SHOW_PYGAME_WELCOME: bool = False
-VERBOSE: int = 0
+VERBOSE: int = 4
 FPS: int = 100  # only relevant when pygame
 
 #############################################
@@ -29,20 +29,19 @@ if EXCLUDE_IDLE and INITIAL_GOLD == 0:
     # let players have at least some gold so they have any valid moves
     INITIAL_GOLD = 1
 
-USE_TIMEOUT = True
-MAX_TIME = 8191 # this gets used by kill function that determines the end point
+USE_TIMEOUT = False
+MAX_TIME = 8191  # this gets used by kill function that determines the end point
 if USE_TIMEOUT:
     print("Using Timeout")
     TIMEOUT = 100  # how many turns until game end - this gets reduced when each turn is executed
 else:
     print("Using Kill Function")
-    print("TODO - REDUCE ALL ACTORS HEALTH BY SOME FORMULA ON SOME MILESTONES - ALL BUT MINERALS")
-    print("TODO - MAKE SURE YOU DONT KILL BOTH PLAYERS AT ONCE")
-
-    TIMEOUT = 0 # sets initial tick to 0 and then in getGameEnded it gets incremented unitl number 8191
+    TIMEOUT = 0  # sets initial tick to 0 and then in getGameEnded it gets incremented unitl number 8191
 
 print("TODO - check if heal cheker works and if heal executor works - for both sacrificial and non-sacrificial")
 
+# Time graph for damage dealt and destroyed figures per turn
+SHOW_TIME_GRAPH = False
 
 DAMAGE = 20  # how much damage is dealt to attacked actor
 DAMAGE_ANYWHERE = False  # allows infantry to attack any unit on grid
@@ -53,14 +52,15 @@ if DESTROY_ALL:
 
 ############################################
 #############################################
+USE_ONE_HOT_ENCODER = False
+if USE_ONE_HOT_ENCODER:
+    print("Using One hot encoder")
+    encoder = OneHotEncoder()
+else:
+    print("Using Numeric encoder")
+    encoder = NumericEncoder()
 
-# encoder = NumericEncoder()
-encoder = OneHotEncoder()
-
-print(" TODO - THIS DOESNT WORK BECAUSE THEN I WOULD HAVE TO REPLACE EVERYTHING IN GAME STATE WITH BITS -BUT REPLACE NUM_ENCODERS ONLY IN TD2020Net.py")
-# NUM_ENCODERS = encoder.num_encoders  # player_name, act_type, health, carrying, money, remaining_time
 NUM_ENCODERS = 6  # player_name, act_type, health, carrying, money, remaining_time
-
 P_NAME_IDX = 0
 A_TYPE_IDX = 1
 HEALTH_IDX = 2
@@ -142,7 +142,6 @@ ACTS = {
 }
 NUM_ACTS = len(ACTS)
 
-
 ACTS_REV = {
     0: "idle",
     1: "up",
@@ -191,7 +190,7 @@ d_user_shortcuts_rev = dotdict({
 })
 
 ######################################################
-################### PYGAME ###########################
+# ################# PYGAME ###########################
 ######################################################
 d_a_color = dotdict({
     1: (230, 0, 50),  # Gold

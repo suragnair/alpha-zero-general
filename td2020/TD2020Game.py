@@ -4,17 +4,12 @@ import numpy as np
 
 from td2020.src.Board import Board
 from td2020.src.config import NUM_ENCODERS, NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, HEALTH_IDX, TIME_IDX, VERBOSE, FPS, USE_TIMEOUT, MAX_TIME, d_a_type, a_m_health, INITIAL_GOLD, TIMEOUT
+from utils import dotdict
 
 
 class TD2020Game:
     def __init__(self, n) -> None:
         self.n = n
-
-        ###################################################
-        ################## LAZY OPTION ####################
-        ###################################################
-
-        from utils import dotdict
 
         self.initial_board_config = [
             dotdict({
@@ -62,22 +57,15 @@ class TD2020Game:
     def setInitBoard(self, board_config) -> None:
         self.initial_board_config = board_config
 
-    ###################################################
-    ###################################################
-
     def getInitBoard(self) -> np.ndarray:
         b = Board(self.n)
-        ###################################################
 
-        remaining_time = None # when setting initial board, remaining time might be different
+        remaining_time = None  # when setting initial board, remaining time might be different
         for e in self.initial_board_config:
             b.pieces[e.x, e.y] = [e.player, e.a_type, e.health, e.carry, e.gold, e.timeout]
             remaining_time = e.timeout
         # remaining time is stored in all squares
         b.pieces[:, :, TIME_IDX] = remaining_time
-
-        ###################################################
-
         return np.array(b.pieces)
 
     def getBoardSize(self) -> Tuple[int, int, int]:
@@ -99,7 +87,7 @@ class TD2020Game:
             b.pieces[:, :, TIME_IDX] -= 1
         else:
             b.pieces[:, :, TIME_IDX] += 1
-            b.time_killer()
+            b.time_killer(player)
 
         b.execute_move(move, player)
         return b.pieces, -player

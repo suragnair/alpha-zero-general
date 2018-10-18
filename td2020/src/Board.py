@@ -3,7 +3,7 @@ from typing import List, Any
 import numpy as np
 
 from td2020.src.config import d_a_type, a_m_health, d_acts, EXCLUDE_IDLE, A_TYPE_IDX, P_NAME_IDX, CARRY_IDX, MONEY_IDX, a_cost, NUM_ACTS, ACTS_REV, NUM_ENCODERS, MONEY_INC, HEALTH_IDX, TIMEOUT, TIME_IDX, INITIAL_GOLD, DAMAGE, DAMAGE_ANYWHERE, DESTROY_ALL, VERBOSE, MAX_GOLD, HEAL_AMOUNT, \
-    a_max_health, SACRIFICIAL_HEAL
+    a_max_health, SACRIFICIAL_HEAL, SHOW_TIME_GRAPH
 
 
 class Board:
@@ -105,7 +105,6 @@ class Board:
         for n_x, n_y in coordinates:
             if 0 <= n_x < self.n and 0 <= n_y < self.n:
                 if (self[n_x][n_y][P_NAME_IDX] == self[x][y][P_NAME_IDX]) and self[n_x][n_y][A_TYPE_IDX] != d_a_type['Gold'] and a_max_health[self[n_x][n_y][A_TYPE_IDX]] >= self[n_x][n_y][HEALTH_IDX] + HEAL_AMOUNT:
-
                     if SACRIFICIAL_HEAL:
                         self[x][x][HEALTH_IDX] -= HEAL_AMOUNT
                         if self[x][y][HEALTH_IDX] <= 0:
@@ -117,7 +116,7 @@ class Board:
                         self[n_x][n_y][HEALTH_IDX] += HEAL_AMOUNT
                         print("healed")
                         return
-                    elif self[n_x][n_y][MONEY_IDX] - a_cost[2] >= 0:
+                    elif self[n_x][n_y][MONEY_IDX] - HEAL_AMOUNT >= 0:
                         self[n_x][n_y][HEALTH_IDX] += HEAL_AMOUNT
                         self._update_money(self[n_x][n_y][P_NAME_IDX], -HEAL_AMOUNT)
                         print("healed")
@@ -274,10 +273,9 @@ class Board:
         for n_x, n_y in coordinates:
             if 0 <= n_x < self.n and 0 <= n_y < self.n:
                 if (self[n_x][n_y][P_NAME_IDX] == self[x][y][P_NAME_IDX]) and self[n_x][n_y][A_TYPE_IDX] != d_a_type['Gold'] and a_max_health[self[n_x][n_y][A_TYPE_IDX]] >= self[n_x][n_y][HEALTH_IDX] + HEAL_AMOUNT:
-
                     if SACRIFICIAL_HEAL:
                         return True
-                    elif self[n_x][n_y][MONEY_IDX] - a_cost[2] >= 0:
+                    elif self[n_x][n_y][MONEY_IDX] - HEAL_AMOUNT >= 0:
                         return True
         return False
 
@@ -316,28 +314,60 @@ class Board:
                         return True
         return False
 
-    def time_killer(self):
+    def time_killer(self, player):
+        # I can pass player through, because this board is canonical board that this action gets executed upon
 
         current_time = self[0][0][TIME_IDX]
 
-        # TODO - REDUCE ALL ACTORS HEALTH BY SOME FORMULA ON SOME MILESTONES - ALL BUT MINERALS
-        if current_time % 10 == 0:
-            print("killing every 10 turns")
+        def num_destroys(time):
+            return int((time / 1024) ** 2 + 1)
 
-            damage_amount = current_time ** 1.2
-            # damage_amount = np.exp(np.sqrt(current_time))
+        def damage(time):
+            return int((time / 2) ** 2.718 / (time * 4096) + 1)
 
-            # Todo - figure out right formula for damage per time
-            # print("damaging all actors in time", current_time, "by", damage_amount)
+        if SHOW_TIME_GRAPH:
+            import matplotlib.pyplot as plt
 
-            for y in range(self.n):
-                for x in range(self.n):
-                    if self[x][y][P_NAME_IDX] != 0 and self[x][y][A_TYPE_IDX] != 1:  # player actor and if not Gold
-                        self[x][y][HEALTH_IDX] -= damage_amount
+            all_damage_amounts = []
+            all_num_destoys_per_turn = []
+            for current_time_local in range(1, 8192):
+                all_num_destoys_per_turn.append(num_destroys(current_time_local))
+                all_damage_amounts.append(damage(current_time_local))
 
-                        if self[x][y][HEALTH_IDX] <= 0:
+            plt.plot(all_damage_amounts)
+            plt.plot(all_num_destoys_per_turn, 'r--')
+            plt.title("")
+            plt.xlabel('Game round')
+            plt.ylabel('Damaged actors / Damage per actors')
+            plt.axis([0, 8000, 0, 64])  # 64 as in max actors on field
+            plt.annotate('Destroyed figures', xy=(5500, num_destroys(5500)), xytext=(6000, 20), arrowprops=dict(facecolor='black', shrink=0.1), )
+            plt.annotate('Damage dealt', xy=(3000, damage(3000)), xytext=(1000, 40), arrowprops=dict(facecolor='black', shrink=0.1), )
+            plt.show()
+
+        destroys_per_round = num_destroys(current_time)
+        damage_amount = damage(current_time)
+
+        print("neki sm se spovnu - da je ta heal preveč rough -> rabš plačat 5 coinsu za 5 lajfa- toj preveč - recmo 1 coin za 10 lajfa right? - oziroma vč.. "
+              "pa spremen tko da ga heala do maxa če nima povhnga lajfa && sum(current_life, heal_amount) > max_life - pač nared clamp max life pa checki "
+              "če ga slučajn nima že tko max - drgač nemore healat")
+
+        def damage_single_actor(board: Board, damage_amount: int):
+            for y in range(board.n):
+                for x in range(board.n):
+                    if board[x][y][P_NAME_IDX] == player and board[x][y][A_TYPE_IDX] != 1:  # for current player and not gold
+                        board[x][y][HEALTH_IDX] -= damage_amount
+
+                        if board[x][y][HEALTH_IDX] <= 0:
                             if VERBOSE:
-                                print("actor died because of timer kill function", self[x][y][A_TYPE_IDX])
+                                print("actor died because of timer kill function", board[x][y][A_TYPE_IDX], "for player", player, "in round", board[0][0][TIME_IDX])
 
-                            self[x][y] = [0] * NUM_ENCODERS
-                            self[x][y][TIME_IDX] = self[x][y][TIME_IDX]  # set time back to empty tile just in case
+                            board[x][y] = [0] * NUM_ENCODERS
+                            board[x][y][TIME_IDX] = board[x][y][TIME_IDX]  # set time back to empty tile just in case
+                        return
+        print("DUBU SM IDEJO - DESTROYS_PER_ROUND JE KOK ACTORJU JE DAMAGANIH VSAKO RUNDO- ČE JIH JE VČ KOKR JIH PLAYER IMA, NIMA UČINKA VEČ")
+        # I have to figure out pattern which actor will be damaged,
+        #  and so not the same actor is damaged multiple times if there are more destroys per round
+        # for now i am damaging first actor that I found
+        # Todo
+        for i in range(destroys_per_round):
+            damage_single_actor(self, damage_amount)

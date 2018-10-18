@@ -1,3 +1,4 @@
+# noinspection PyUnresolvedReferences
 import gc
 import os
 
@@ -13,6 +14,16 @@ from td2020.TD2020Game import TD2020Game
 from td2020.keras.NNet import NNetWrapper as NNet
 from td2020.src.config import ACTS_REV, NUM_ACTS
 from utils import dotdict
+
+"""
+Get Action:
+This classes intended use is connecting to ue4 tensorflow plugin as client and execute predict on given board, that has been setted up as json board input
+
+Todo:
+    Garbage collection
+        gc.collect()
+        del self.n1p.model
+"""
 
 
 class TD2020LearnAPI(TFPluginAPI):
@@ -31,7 +42,6 @@ class TD2020LearnAPI(TFPluginAPI):
             self.recommended_act = None
             # collecting garbage - this causes stutter in game
             # gc.collect()
-            # print("collecting garbage - this causes stutter in game - but it cleans the most")  # TODO
             return act1
 
         encoded_actors = jsonInput['data']
@@ -64,20 +74,15 @@ class TD2020LearnAPI(TFPluginAPI):
             b = g.getInitBoard()
             n1p = lambda x: np.argmax(mcts.getActionProb(x, temp=0))
 
-            print("todo - check if this 'owning player' is ok")
-            # canonical_board = g.getCanonicalForm(b, 1)
             canonical_board = g.getCanonicalForm(b, self.owning_player)
 
             recommended_act = n1p(canonical_board)
             y, x, action_index = np.unravel_index(recommended_act, [b.shape[0], b.shape[0], NUM_ACTS])
 
-            # gc.collect()  # TODO
+            # gc.collect()
             act = {"x": str(x), "y": str(y), "action": ACTS_REV[action_index]}
-            # self.recommended_act = {"x": str(x), "y": str(y), "action": ACTS_REV[action_index]}
             print("Printing recommended action", self.recommended_act)
             sess.close()
-            # TODO
-            print("Todo There still are some memory problems")
         # gc.collect()
         self.recommended_act = act
         return ""
