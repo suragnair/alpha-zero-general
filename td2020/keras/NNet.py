@@ -21,7 +21,7 @@ args = dotdict({
 args = dotdict({
     'lr': 0.001,
     'dropout': 0.3,
-    'epochs': 2,
+    'epochs': 100,
     'batch_size': 512,
     'cuda': True,
     'num_channels': 512,

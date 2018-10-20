@@ -1,5 +1,6 @@
 import ctypes
 from math import sqrt
+from typing import List
 
 import numpy as np
 from pygame.rect import Rect
@@ -42,7 +43,7 @@ class HumanTD2020Player:
         self.game = game
         self.USER_PLAYER = 1  # used by Human Player - this does not change if human pit player is 1 or -1
 
-    def play(self, board: np.ndarray) -> int:
+    def play(self, board: np.ndarray) -> List:
         n = board.shape[0]
         valid = self.game.getValidMoves(board, 1)
         self.display_valid_moves(board, valid)
@@ -79,56 +80,40 @@ class HumanTD2020Player:
         print("----------")
         for i in range(len(valid)):
             if valid[i]:
-                # print("printing i", i)
                 y, x, action_index = np.unravel_index(i, [n, n, NUM_ACTS])
-
-                # print("numpy action index", np.ravel_multi_index((y, x, action_index), (n, n, NUM_ACTS)))
-
                 print(x, y, ACTS_REV[action_index])
-                # action_into_array_print(board, i)
                 print("----------")
 
     @staticmethod
     def select_object(board: np.ndarray, click_location: tuple) -> dotdict:
 
         n = board.shape[0]
-        CANVAS_SCALE: int = int(ctypes.windll.user32.GetSystemMetrics(1) * (16 / 30) / n)  # for drawing - it takes 2 thirds of screen height
+        canvas_scale: int = int(ctypes.windll.user32.GetSystemMetrics(1) * (16 / 30) / n)  # for drawing - it takes 2 thirds of screen height
 
         # select object by clicking on it - you can select only your objects
 
         for y in range(n):
-
             for x in range(n):
-
-                actor_location = (int(x * CANVAS_SCALE + CANVAS_SCALE / 2 + CANVAS_SCALE), int(y * CANVAS_SCALE + CANVAS_SCALE / 2) + CANVAS_SCALE)
+                actor_location = (int(x * canvas_scale + canvas_scale / 2 + canvas_scale), int(y * canvas_scale + canvas_scale / 2) + canvas_scale)
                 actor_x, actor_y = actor_location
-                actor_size = int(CANVAS_SCALE / 3)
+                actor_size = int(canvas_scale / 3)
 
                 click_x, click_y = click_location
 
-                # check if actor is within click bounds
-
                 dist = sqrt((actor_x - click_x) ** 2 + (actor_y - click_y) ** 2)
                 if dist <= actor_size:
-                    return dotdict({
-                        "x": x,
-                        "y": y
-                    })
-        return None
-        # return [actor, actor_location, actor_size], [1, x, y, actor_index]  # has to have prefix number 1
+                    return dotdict({"x": x, "y": y})
+        return dotdict({"x": -1, "y": -1})
 
     def _manage_input(self, board: np.ndarray) -> list:
-        # returns array like this [1, 7, 7, 0, "idle")
         n = board.shape[0]
 
         game_display, clock = init_visuals(n, n, VERBOSE)
         update_graphics(board, game_display, clock, FPS)
 
-        CANVAS_SCALE: int = int(ctypes.windll.user32.GetSystemMetrics(1) * (16 / 30) / n)  # for drawing - it takes 2 thirds of screen height
-
-        # from td2020.src.Actors import MyActor
+        canvas_scale: int = int(ctypes.windll.user32.GetSystemMetrics(1) * (16 / 30) / n)
         clicked_actor = None
-        clicked_actor_index_arr = []  # index on which this actor is located - x,y,actor_index
+        clicked_actor_index_arr = []
         while True:
             for event in pygame.event.get():
                 # print(event)
@@ -165,15 +150,14 @@ class HumanTD2020Player:
                             game_display, clock = init_visuals(n, n, VERBOSE)
                             update_graphics(board, game_display, clock, FPS)
 
-                            actor_size = int(CANVAS_SCALE / 3)
-                            actor_location = (int(clicked_actor.x * CANVAS_SCALE + CANVAS_SCALE / 2 + CANVAS_SCALE - actor_size), int(clicked_actor.y * CANVAS_SCALE + CANVAS_SCALE / 2 + CANVAS_SCALE - actor_size))
+                            actor_size = int(canvas_scale / 3)
+                            actor_location = (int(clicked_actor.x * canvas_scale + canvas_scale / 2 + canvas_scale - actor_size), int(clicked_actor.y * canvas_scale + canvas_scale / 2 + canvas_scale - actor_size))
                             rect = Rect(actor_location, (2 * actor_size, 2 * actor_size))
 
                             blue = (0, 0, 255)
-                            pygame.draw.rect(game_display, blue, rect, int(CANVAS_SCALE / 20))
+                            pygame.draw.rect(game_display, blue, rect, int(canvas_scale / 20))
 
                             # display valid actions on canvas
-
                             b = Board(n)
                             b.pieces = np.copy(board)
 
@@ -183,7 +167,7 @@ class HumanTD2020Player:
                             for i in range(len(valids_square)):
                                 if valids_square[i]:
                                     text_scale = int(actor_size * 0.5)
-                                    message_display(game_display, u"" + ACTS_REV[i] + " s: '" + d_user_shortcuts_rev[i] + "'", (n * CANVAS_SCALE + CANVAS_SCALE / 2, CANVAS_SCALE / 4 + printed_actions * text_scale), text_scale)
+                                    message_display(game_display, u"" + ACTS_REV[i] + " s: '" + d_user_shortcuts_rev[i] + "'", (n * canvas_scale + canvas_scale / 2, canvas_scale / 4 + printed_actions * text_scale), text_scale)
                                     printed_actions += 1
                             # update display
                             pygame.display.update()
@@ -207,7 +191,6 @@ class HumanTD2020Player:
                                 r_player = board[r_x][r_y][P_NAME_IDX]
 
                                 # this is actor of type MyActor
-
                                 if l_type == d_a_type['Work']:
                                     if r_player == self.USER_PLAYER:
                                         if r_type == d_a_type['Gold']:
@@ -220,12 +203,12 @@ class HumanTD2020Player:
                                         clicked_actor_index_arr.append(ACTS["attack"])
                             else:
 
-                                actor_size = int(CANVAS_SCALE / 3)
+                                actor_size = int(canvas_scale / 3)
 
                                 clicked_x, clicked_y = pos
 
-                                clicked_actors_world_x = int(l_x * CANVAS_SCALE + CANVAS_SCALE / 2 + CANVAS_SCALE - actor_size)
-                                clicked_actors_world_y = int(l_y * CANVAS_SCALE + CANVAS_SCALE / 2 + CANVAS_SCALE - actor_size)
+                                clicked_actors_world_x = int(l_x * canvas_scale + canvas_scale / 2 + canvas_scale - actor_size)
+                                clicked_actors_world_y = int(l_y * canvas_scale + canvas_scale / 2 + canvas_scale - actor_size)
                                 if abs(clicked_y - clicked_actors_world_y) > abs(clicked_x - clicked_actors_world_x):
                                     # we moved mouse more in y direction than x, so its vertical movement
                                     if clicked_y < clicked_actors_world_y:
@@ -264,8 +247,8 @@ class GreedyTD2020Player:
         for a in range(self.game.getActionSize()):
             if valids[a] == 0:
                 continue
-            nextBoard, _ = self.game.getNextState(board, 1, a)
-            score = self.game.getScore(nextBoard, 1)
+            next_board, _ = self.game.getNextState(board, 1, a)
+            score = self.game.getScore(next_board, 1)
             candidates += [(-score, a)]
         candidates.sort()
 

@@ -4,13 +4,13 @@ from td2020.keras.NNet import NNetWrapper as nn
 from utils import *
 
 args = dotdict({
-    'numIters': 2,
-    'numEps': 2,
+    'numIters': 10,
+    'numEps': 10,
     'tempThreshold': 15,
     'updateThreshold': 0.6,
     'maxlenOfQueue': 200000,
-    'numMCTSSims': 2,
-    'arenaCompare': 2,
+    'numMCTSSims': 30,
+    'arenaCompare': 10,
     'cpuct': 1,
 
     'checkpoint': '.\\..\\temp\\',

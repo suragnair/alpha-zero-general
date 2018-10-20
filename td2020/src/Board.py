@@ -2,8 +2,9 @@ from typing import List, Any
 
 import numpy as np
 
-from td2020.src.config import d_a_type, a_m_health, d_acts, EXCLUDE_IDLE, A_TYPE_IDX, P_NAME_IDX, CARRY_IDX, MONEY_IDX, a_cost, NUM_ACTS, ACTS_REV, NUM_ENCODERS, MONEY_INC, HEALTH_IDX, TIMEOUT, TIME_IDX, INITIAL_GOLD, DAMAGE, DAMAGE_ANYWHERE, DESTROY_ALL, VERBOSE, MAX_GOLD, HEAL_AMOUNT, \
-    a_max_health, SACRIFICIAL_HEAL, SHOW_TIME_GRAPH
+from td2020.src.Graph import num_destroys, damage
+from td2020.src.config import d_a_type, a_m_health, d_acts, EXCLUDE_IDLE, A_TYPE_IDX, P_NAME_IDX, CARRY_IDX, MONEY_IDX, a_cost, NUM_ACTS, ACTS_REV, NUM_ENCODERS, MONEY_INC, HEALTH_IDX, TIME_IDX, DAMAGE, DAMAGE_ANYWHERE, DESTROY_ALL, VERBOSE, MAX_GOLD, HEAL_AMOUNT, \
+    a_max_health, SACRIFICIAL_HEAL,  HEAL_COST
 
 
 class Board:
@@ -46,8 +47,8 @@ class Board:
             self[x][y][CARRY_IDX] = 1
             return
         if act == "return_resources":
-            if VERBOSE:
-                print("RETURNED RESOURCES - new money->", self[x][y][MONEY_IDX] + MONEY_INC)
+            # if VERBOSE:
+            #    print("RETURNED RESOURCES - new money->", self[x][y][MONEY_IDX] + MONEY_INC)
             self[x][y][CARRY_IDX] = 0
             self._update_money(player, MONEY_INC)
             return
@@ -62,20 +63,20 @@ class Board:
             self._spawn_nearby((x, y), 2)
             return
         if act == "barracks":
-            if VERBOSE:
-                print("spawned barracks")
+            #if VERBOSE:
+            print("spawned barracks")
             self._update_money(player, -a_cost[3])
             self._spawn_nearby((x, y), 3)
             return
         if act == "rifle_infantry":
-            if VERBOSE:
-                print("spawned rifle inf")
+            # if VERBOSE:
+            print("spawned rifle inf")
             self._update_money(player, -a_cost[4])
             self._spawn_nearby((x, y), 4)
             return
         if act == "town_hall":
-            if VERBOSE:
-                print("spawned town hall")
+            # if VERBOSE:
+            print("spawned town hall")
             self._update_money(player, -a_cost[5])
             self._spawn_nearby((x, y), 5)
             return
@@ -104,23 +105,25 @@ class Board:
                        (x + 1, y - 1)]
         for n_x, n_y in coordinates:
             if 0 <= n_x < self.n and 0 <= n_y < self.n:
-                if (self[n_x][n_y][P_NAME_IDX] == self[x][y][P_NAME_IDX]) and self[n_x][n_y][A_TYPE_IDX] != d_a_type['Gold'] and a_max_health[self[n_x][n_y][A_TYPE_IDX]] >= self[n_x][n_y][HEALTH_IDX] + HEAL_AMOUNT:
+                if (self[n_x][n_y][P_NAME_IDX] == self[x][y][P_NAME_IDX]) and self[n_x][n_y][A_TYPE_IDX] != d_a_type['Gold'] and self[n_x][n_y][HEALTH_IDX] < a_max_health[self[n_x][n_y][A_TYPE_IDX]]:
                     if SACRIFICIAL_HEAL:
-                        self[x][x][HEALTH_IDX] -= HEAL_AMOUNT
+                        self[x][x][HEALTH_IDX] -= HEAL_COST
                         if self[x][y][HEALTH_IDX] <= 0:
-                            if VERBOSE:
-                                print("unit sacrificed itself to heal other unit")
+                            # if VERBOSE:
+                            #     print("unit sacrificed itself to heal other unit")
                             self[x][y] = [0] * NUM_ENCODERS
-                            self[x][y][TIME_IDX] = self[x][y][TIME_IDX]  # set time back to empty tile just in case
-
-                        self[n_x][n_y][HEALTH_IDX] += HEAL_AMOUNT
-                        print("healed")
-                        return
+                            self[x][y][TIME_IDX] = self[x][y][TIME_IDX]
                     elif self[n_x][n_y][MONEY_IDX] - HEAL_AMOUNT >= 0:
                         self[n_x][n_y][HEALTH_IDX] += HEAL_AMOUNT
-                        self._update_money(self[n_x][n_y][P_NAME_IDX], -HEAL_AMOUNT)
-                        print("healed")
-                        return
+                        self._update_money(self[n_x][n_y][P_NAME_IDX], -HEAL_COST)
+
+                    # print("healed")
+
+                    # clamp value to max
+                    self[n_x][n_y][HEALTH_IDX] = self.clamp(self[n_x][n_y][HEALTH_IDX] + HEAL_AMOUNT, 0, a_max_health[self[n_x][n_y][A_TYPE_IDX]])
+                    # if VERBOSE:
+                    #     print("new health of this unit is ", self[n_x][n_y][HEALTH_IDX])
+                    return
 
     def _attack_nearby(self, square):
         (x, y) = square
@@ -236,9 +239,8 @@ class Board:
         if act == "town_hall":
             return a_cost[5] <= money and self._check_if_nearby_empty(square)
 
-        # noinspection PyChainedComparisons
-
     def _check_if_empty(self, new_x, new_y):
+        # noinspection PyChainedComparisons
         return 0 <= new_x < self.n and 0 <= new_y < self.n and self[new_x][new_y][P_NAME_IDX] == 0
 
     def _check_if_nearby_attack(self, square):
@@ -272,10 +274,10 @@ class Board:
                        (x + 1, y - 1)]
         for n_x, n_y in coordinates:
             if 0 <= n_x < self.n and 0 <= n_y < self.n:
-                if (self[n_x][n_y][P_NAME_IDX] == self[x][y][P_NAME_IDX]) and self[n_x][n_y][A_TYPE_IDX] != d_a_type['Gold'] and a_max_health[self[n_x][n_y][A_TYPE_IDX]] >= self[n_x][n_y][HEALTH_IDX] + HEAL_AMOUNT:
+                if (self[n_x][n_y][P_NAME_IDX] == self[x][y][P_NAME_IDX]) and self[n_x][n_y][A_TYPE_IDX] != d_a_type['Gold'] and self[n_x][n_y][HEALTH_IDX] < a_max_health[self[n_x][n_y][A_TYPE_IDX]]:
                     if SACRIFICIAL_HEAL:
                         return True
-                    elif self[n_x][n_y][MONEY_IDX] - HEAL_AMOUNT >= 0:
+                    elif self[n_x][n_y][MONEY_IDX] - HEAL_COST >= 0:
                         return True
         return False
 
@@ -319,55 +321,26 @@ class Board:
 
         current_time = self[0][0][TIME_IDX]
 
-        def num_destroys(time):
-            return int((time / 1024) ** 2 + 1)
-
-        def damage(time):
-            return int((time / 2) ** 2.718 / (time * 4096) + 1)
-
-        if SHOW_TIME_GRAPH:
-            import matplotlib.pyplot as plt
-
-            all_damage_amounts = []
-            all_num_destoys_per_turn = []
-            for current_time_local in range(1, 8192):
-                all_num_destoys_per_turn.append(num_destroys(current_time_local))
-                all_damage_amounts.append(damage(current_time_local))
-
-            plt.plot(all_damage_amounts)
-            plt.plot(all_num_destoys_per_turn, 'r--')
-            plt.title("")
-            plt.xlabel('Game round')
-            plt.ylabel('Damaged actors / Damage per actors')
-            plt.axis([0, 8000, 0, 64])  # 64 as in max actors on field
-            plt.annotate('Destroyed figures', xy=(5500, num_destroys(5500)), xytext=(6000, 20), arrowprops=dict(facecolor='black', shrink=0.1), )
-            plt.annotate('Damage dealt', xy=(3000, damage(3000)), xytext=(1000, 40), arrowprops=dict(facecolor='black', shrink=0.1), )
-            plt.show()
-
         destroys_per_round = num_destroys(current_time)
         damage_amount = damage(current_time)
 
-        print("neki sm se spovnu - da je ta heal preveč rough -> rabš plačat 5 coinsu za 5 lajfa- toj preveč - recmo 1 coin za 10 lajfa right? - oziroma vč.. "
-              "pa spremen tko da ga heala do maxa če nima povhnga lajfa && sum(current_life, heal_amount) > max_life - pač nared clamp max life pa checki "
-              "če ga slučajn nima že tko max - drgač nemore healat")
-
-        def damage_single_actor(board: Board, damage_amount: int):
-            for y in range(board.n):
-                for x in range(board.n):
-                    if board[x][y][P_NAME_IDX] == player and board[x][y][A_TYPE_IDX] != 1:  # for current player and not gold
-                        board[x][y][HEALTH_IDX] -= damage_amount
-
-                        if board[x][y][HEALTH_IDX] <= 0:
-                            if VERBOSE:
-                                print("actor died because of timer kill function", board[x][y][A_TYPE_IDX], "for player", player, "in round", board[0][0][TIME_IDX])
-
-                            board[x][y] = [0] * NUM_ENCODERS
-                            board[x][y][TIME_IDX] = board[x][y][TIME_IDX]  # set time back to empty tile just in case
+        # Damage as many actors as "damage_amount" parameter provides
+        currently_damaged_actors = 0
+        for y in range(self.n):
+            for x in range(self.n):
+                if self[x][y][P_NAME_IDX] == player and self[x][y][A_TYPE_IDX] != 1:  # for current player and not gold
+                    if currently_damaged_actors >= destroys_per_round:
                         return
-        print("DUBU SM IDEJO - DESTROYS_PER_ROUND JE KOK ACTORJU JE DAMAGANIH VSAKO RUNDO- ČE JIH JE VČ KOKR JIH PLAYER IMA, NIMA UČINKA VEČ")
-        # I have to figure out pattern which actor will be damaged,
-        #  and so not the same actor is damaged multiple times if there are more destroys per round
-        # for now i am damaging first actor that I found
-        # Todo
-        for i in range(destroys_per_round):
-            damage_single_actor(self, damage_amount)
+                    self[x][y][HEALTH_IDX] -= damage_amount
+
+                    if self[x][y][HEALTH_IDX] <= 0:
+                        if VERBOSE:
+                            print("actor died because of timer kill function", self[x][y][A_TYPE_IDX], "for player", player, "in round", self[0][0][TIME_IDX])
+                        time = self[x][y][TIME_IDX]
+                        self[x][y] = [0] * NUM_ENCODERS
+                        self[x][y][TIME_IDX] = time
+                    currently_damaged_actors += 1
+
+    @staticmethod
+    def clamp(num, min_value, max_value):
+        return max(min(num, max_value), min_value)

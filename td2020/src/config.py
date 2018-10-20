@@ -17,13 +17,14 @@ FPS: int = 100  # only relevant when pygame
 
 
 EXCLUDE_IDLE = True  # exclude idle action from all actions
-MONEY_INC = 1  # how much money is returned when returned resources
+MONEY_INC = 10  # how much money is returned when returned resources
 
 INITIAL_GOLD = 0  # how much initial gold do players get at game begining
 MAX_GOLD = 31  # to encode with onehot encoder in 5 bits
 
 SACRIFICIAL_HEAL = False
-HEAL_AMOUNT = 5
+HEAL_AMOUNT = 20
+HEAL_COST = 5
 
 if EXCLUDE_IDLE and INITIAL_GOLD == 0:
     # let players have at least some gold so they have any valid moves
@@ -39,9 +40,6 @@ else:
     TIMEOUT = 0  # sets initial tick to 0 and then in getGameEnded it gets incremented unitl number 8191
 
 print("TODO - check if heal cheker works and if heal executor works - for both sacrificial and non-sacrificial")
-
-# Time graph for damage dealt and destroyed figures per turn
-SHOW_TIME_GRAPH = False
 
 DAMAGE = 20  # how much damage is dealt to attacked actor
 DAMAGE_ANYWHERE = False  # allows infantry to attack any unit on grid

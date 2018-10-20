@@ -7,6 +7,7 @@ from td2020.src.config import NUM_ENCODERS, NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, HE
 from utils import dotdict
 
 
+# noinspection PyPep8Naming,PyMethodMayBeStatic
 class TD2020Game:
     def __init__(self, n) -> None:
         self.n = n
@@ -82,6 +83,9 @@ class TD2020Game:
         y, x, action_index = np.unravel_index(action, [self.n, self.n, NUM_ACTS])
         move = (x, y, action_index)
 
+        # first execute move, then run time function to destroy any actors if needed
+        b.execute_move(move, player)
+
         # update timer on every tile:
         if USE_TIMEOUT:
             b.pieces[:, :, TIME_IDX] -= 1
@@ -89,7 +93,6 @@ class TD2020Game:
             b.pieces[:, :, TIME_IDX] += 1
             b.time_killer(player)
 
-        b.execute_move(move, player)
         return b.pieces, -player
 
     def getValidMoves(self, board: np.ndarray, player: int):
@@ -107,15 +110,14 @@ class TD2020Game:
 
         return np.array(valids)
 
+    # noinspection PyUnusedLocal
     def getGameEnded(self, board: np.ndarray, player) -> float:
-
         # return 0 if not ended, 1 if player 1 won, -1 if player 1 lost
         # player = 1
 
         n = board.shape[0]
 
         # detect timeout
-
         if USE_TIMEOUT:
             if board[0, 0, TIME_IDX] < 1:
                 if VERBOSE:
@@ -124,7 +126,7 @@ class TD2020Game:
         else:
             if board[0, 0, TIME_IDX] >= MAX_TIME:
                 print("######################################## ERROR ####################################")
-                print("################ YOU HAVE TIMEOUTED BECAUSE NO PLAYER HAS LOST YET#################")
+                print("################ YOU HAVE TIMEOUTED BECAUSE NO PLAYER HAS LOST YET #################")
                 print("###################################### END ERROR ##################################")
                 return 0.001
 
@@ -173,16 +175,19 @@ class TD2020Game:
         # detect no valid actions - possible tie by overpopulating on non-attacking units and buildings - all fields are full or one player is surrounded:
         if sum(self.getValidMoves(board, 1)) == 0:
             if VERBOSE:
-                print("no valid moves for player", 1)
-            # return -0.1
+                print("#############################################################")
+                print("game end player +1,tick", board[0, 0, TIME_IDX])
+                print("No valid moves for player", 1)
+                print("#############################################################")
             return -1
 
         if sum(self.getValidMoves(board, -1)) == 0:
             if VERBOSE:
-                print("no valid moves for player", -1)
-            # return 0.1
+                print("#############################################################")
+                print("game end player +1,tick", board[0, 0, TIME_IDX])
+                print("No valid moves for player", -1)
+                print("#############################################################")
             return 1
-
         # continue game
         return 0
 
@@ -199,7 +204,7 @@ class TD2020Game:
         # mirror, rotational
         assert (len(pi) == self.n * self.n * NUM_ACTS + 1)  # 1 for pass
         pi_board = np.reshape(pi[:-1], (self.n, self.n, NUM_ACTS))
-        l = []
+        return_list = []
         for i in range(1, 5):
             for j in [True, False]:
                 newB = np.rot90(board, i)
@@ -207,8 +212,8 @@ class TD2020Game:
                 if j:
                     newB = np.fliplr(newB)
                     newPi = np.fliplr(newPi)
-                l += [(newB, list(newPi.ravel()) + [pi[-1]])]
-        return l
+                return_list += [(newB, list(newPi.ravel()) + [pi[-1]])]
+        return return_list
 
     def stringRepresentation(self, board: np.ndarray):
         return board.tostring()
