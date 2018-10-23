@@ -4,7 +4,8 @@ import numpy as np
 
 from td2020.src.Graph import num_destroys, damage
 from td2020.src.config import d_a_type, a_m_health, d_acts, EXCLUDE_IDLE, A_TYPE_IDX, P_NAME_IDX, CARRY_IDX, MONEY_IDX, a_cost, NUM_ACTS, ACTS_REV, NUM_ENCODERS, MONEY_INC, HEALTH_IDX, TIME_IDX, DAMAGE, DAMAGE_ANYWHERE, DESTROY_ALL, VERBOSE, MAX_GOLD, HEAL_AMOUNT, \
-    a_max_health, SACRIFICIAL_HEAL,  HEAL_COST
+    a_max_health, SACRIFICIAL_HEAL, HEAL_COST
+from td2020.stats.files import Stats
 
 
 class Board:
@@ -25,6 +26,8 @@ class Board:
     def execute_move(self, move, player) -> None:
         x, y, action_index = move
         act = ACTS_REV[action_index]
+        Stats.action(self[x][y][TIME_IDX], act)
+        Stats.sum(self[x][y][TIME_IDX], self, player)
         if act == "idle":
             pass
         if act == "up":
@@ -63,7 +66,7 @@ class Board:
             self._spawn_nearby((x, y), 2)
             return
         if act == "barracks":
-            #if VERBOSE:
+            # if VERBOSE:
             print("spawned barracks")
             self._update_money(player, -a_cost[3])
             self._spawn_nearby((x, y), 3)
@@ -145,6 +148,8 @@ class Board:
                     self[n_x][n_y][HEALTH_IDX] -= DAMAGE
 
                     if self[n_x][n_y][HEALTH_IDX] <= 0:
+                        Stats.killed_by(self[n_x][n_x][TIME_IDX], self[n_x][n_x][A_TYPE_IDX], "attack")
+
                         if VERBOSE:
                             print("destroyed unit type", self[n_x][n_y][A_TYPE_IDX], "on", n_x, n_y, "and destroyer of type", self[x][y][A_TYPE_IDX], "on", x, y)
 
@@ -334,6 +339,7 @@ class Board:
                     self[x][y][HEALTH_IDX] -= damage_amount
 
                     if self[x][y][HEALTH_IDX] <= 0:
+                        Stats.killed_by(self[x][y][TIME_IDX], self[x][y][A_TYPE_IDX], "time_function")
                         if VERBOSE:
                             print("actor died because of timer kill function", self[x][y][A_TYPE_IDX], "for player", player, "in round", self[0][0][TIME_IDX])
                         time = self[x][y][TIME_IDX]

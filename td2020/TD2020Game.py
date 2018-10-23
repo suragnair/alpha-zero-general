@@ -4,6 +4,7 @@ import numpy as np
 
 from td2020.src.Board import Board
 from td2020.src.config import NUM_ENCODERS, NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, HEALTH_IDX, TIME_IDX, VERBOSE, FPS, USE_TIMEOUT, MAX_TIME, d_a_type, a_m_health, INITIAL_GOLD, TIMEOUT
+from td2020.stats.files import Stats
 from utils import dotdict
 
 
@@ -122,12 +123,15 @@ class TD2020Game:
             if board[0, 0, TIME_IDX] < 1:
                 if VERBOSE:
                     print("timeout")
+                Stats.game_end(board[0, 0, TIME_IDX], 0, 'timeout')
                 return 0.001
         else:
             if board[0, 0, TIME_IDX] >= MAX_TIME:
                 print("######################################## ERROR ####################################")
                 print("################ YOU HAVE TIMEOUTED BECAUSE NO PLAYER HAS LOST YET #################")
                 print("###################################### END ERROR ##################################")
+
+                Stats.game_end(board[0, 0, TIME_IDX], 0, 'timeout')
                 return 0.001
 
         # detect win condition
@@ -163,13 +167,15 @@ class TD2020Game:
                 print("#############################################################")
                 print("game end player -1, tick", board[0, 0, TIME_IDX])
                 print("#############################################################")
-
+            Stats.game_end(board[0, 0, TIME_IDX], -1, 'no_actors')
             return -1
         if sum_p2 < 2:  # SUM IS 1 WHEN PLAYER ONLY HAS MINERALS LEFT
             if VERBOSE:
                 print("#############################################################")
                 print("game end player +1,tick", board[0, 0, TIME_IDX])
                 print("#############################################################")
+            Stats.game_end(board[0, 0, TIME_IDX], +1, 'no_actors')
+
             return +1
 
         # detect no valid actions - possible tie by overpopulating on non-attacking units and buildings - all fields are full or one player is surrounded:
@@ -179,6 +185,8 @@ class TD2020Game:
                 print("game end player +1,tick", board[0, 0, TIME_IDX])
                 print("No valid moves for player", 1)
                 print("#############################################################")
+            Stats.game_end(board[0, 0, TIME_IDX], -1, 'no_valids')
+
             return -1
 
         if sum(self.getValidMoves(board, -1)) == 0:
@@ -187,6 +195,7 @@ class TD2020Game:
                 print("game end player +1,tick", board[0, 0, TIME_IDX])
                 print("No valid moves for player", -1)
                 print("#############################################################")
+            Stats.game_end(board[0, 0, TIME_IDX], +1, 'no_valids')
             return 1
         # continue game
         return 0

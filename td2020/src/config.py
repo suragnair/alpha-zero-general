@@ -15,6 +15,7 @@ FPS: int = 100  # only relevant when pygame
 #############################################
 #############################################
 
+MAKE_STATS = True
 
 EXCLUDE_IDLE = True  # exclude idle action from all actions
 MONEY_INC = 10  # how much money is returned when returned resources

@@ -60,7 +60,7 @@ Each actor is encoded using following 6 properties:
 #### One Hot Tile Encoding:
 Now each actor is encoded with binary vector of length 30.
 - **Player Name**: [2] - 00(neutral), 01(1) or 10(-1),
-- **Actor Type**: [4] - 4 bit,
+- **Actor Type**: [3] - 3 bit,
 - **Health**: [5] - 5 bit. This much because of life decrease every milestone in getNextState
 - **Carry**: [1] - 1 bit,
 - **Money**: [5] - 5 bits (32 aka 4 town halls or 32 workers) [every unit has the same for player]

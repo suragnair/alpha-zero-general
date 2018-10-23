@@ -40,7 +40,7 @@ class OneHotEncoder(Encoder):
     def _build_indexes(self):
 
         self.P_NAME_IDX_INC_OH = 2  # playerName 2 bit - 00(neutral), 01(1) or 10(-1),
-        self.A_TYPE_IDX_INC_OH = 4  # actor type -> 4 bit,
+        self.A_TYPE_IDX_INC_OH = 3  # actor type -> 3 bit,
         self.HEALTH_IDX_INC_OH = 5  # health-> 5 bit,
         self.CARRY_IDX_INC_OH = 1  # carrying-> 1 bit,
         self.MONEY_IDX_INC_OH = 5  # money-> 5 bits (32 aka 4 town halls or 32 workers) [every unit has the same for player]

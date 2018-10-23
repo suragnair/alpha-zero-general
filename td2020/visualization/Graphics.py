@@ -22,7 +22,7 @@ else:
 
 
 def message_display(game_display, text, position, text_size, color=(0, 0, 0)) -> None:
-    large_text = pygame.font.Font(PATH + '\\..\\visualization\\Cyberbit.ttf', text_size)
+    large_text = pygame.font.SysFont('arial', text_size)
     text_surf = large_text.render(text, True, color)
     text_rect = text_surf.get_rect()
     text_rect.center = position

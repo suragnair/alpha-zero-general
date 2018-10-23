@@ -6,3 +6,11 @@
 /.pydevproject
 
 \.idea/
+
+td2020/stats/actionExecuted/
+
+td2020/stats/gameEndTurn/
+
+td2020/stats/sum/
+
+td2020/stats/unitKilledBy/
