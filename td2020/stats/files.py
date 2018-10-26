@@ -1,6 +1,8 @@
 import os
 
 import matplotlib.pyplot as plt
+import numpy as np
+from numpy.ma import count
 
 from td2020.src.config import PATH, MAKE_STATS
 
@@ -21,8 +23,8 @@ class Stats:
 
             from td2020.learn import args as learn_args
             from td2020.keras.NNet import args as nnet_args
-            from td2020.src.config import EXCLUDE_IDLE, MONEY_INC, USE_TIMEOUT, HEAL_AMOUNT, HEAL_COST, DAMAGE, USE_ONE_HOT_ENCODER
-            param_line = str(EXCLUDE_IDLE) + " " + str(MONEY_INC) + " " + str(USE_TIMEOUT) + " " + str(HEAL_AMOUNT) + " " + str(HEAL_COST) + " " + str(DAMAGE) + " " + str(USE_ONE_HOT_ENCODER) + " "
+            from td2020.src.config import MONEY_INC, USE_TIMEOUT, HEAL_AMOUNT, HEAL_COST, DAMAGE, USE_ONE_HOT_ENCODER
+            param_line = str(MONEY_INC) + " " + str(USE_TIMEOUT) + " " + str(HEAL_AMOUNT) + " " + str(HEAL_COST) + " " + str(DAMAGE) + " " + str(USE_ONE_HOT_ENCODER) + " "
             param_line += str(learn_args.numIters) + " " + str(learn_args.numEps) + " " + str(learn_args.numMCTSSims) + " " + str(learn_args.arenaCompare) + " " + str(learn_args.cpuct) + " "
             param_line += str(nnet_args.lr) + " " + str(nnet_args.epochs) + " " + str(nnet_args.batch_size)
             f.write(param_line + "\n")
@@ -53,24 +55,31 @@ class Stats:
             f.write(str(tick) + " " + action_name + "\n")
 
     @staticmethod
-    def sum(tick: int, board, player_name: int):
+    def sum(tick: int, board):
         if not MAKE_STATS:
             return
         from td2020.src.config import P_NAME_IDX, HEALTH_IDX, A_TYPE_IDX, MONEY_IDX
 
-        sum_health = 0
-        player_money = 0
+        sum_health_p1 = 0
+        player_money_p1 = 0
+        sum_health_p2 = 0
+        player_money_p2 = 0
         for y in range(board.n):
             for x in range(board.n):
-                if board[x][y][P_NAME_IDX] == player_name:
+                if board[x][y][P_NAME_IDX] == 1:
                     # add all actor health if not gold
                     if board[x][y][A_TYPE_IDX] != 1:
-                        sum_health += board[x][y][HEALTH_IDX]
-                    player_money = board[x][y][MONEY_IDX]
+                        sum_health_p1 += board[x][y][HEALTH_IDX]
+                    player_money_p1 = board[x][y][MONEY_IDX]
+                if board[x][y][P_NAME_IDX] == -1:
+                    # add all actor health if not gold
+                    if board[x][y][A_TYPE_IDX] != 1:
+                        sum_health_p2 += board[x][y][HEALTH_IDX]
+                    player_money_p2 = board[x][y][MONEY_IDX]
 
         file_count = len(os.listdir(PATH + "\\..\\stats\\" + "sum"))
         with open(PATH + "\\..\\stats\\" + "sum" + "\\file_" + str(file_count) + ".txt", "a") as f:
-            f.write(str(tick) + " " + str(sum_health) + " " + str(player_money) + " " + str(player_name) + "\n")
+            f.write(str(tick) + " " + str(sum_health_p1) + " " + str(player_money_p1) + " " + str(sum_health_p2) + " " + str(player_money_p2) + "\n")
 
     @staticmethod
     def plot_game_end():
@@ -90,10 +99,8 @@ class Stats:
                 reasons.append(reason)
                 all.append([int(tick), int(player_name), reason])
             plt.title("Game end " + params)
-            # plt.plot(ticks)
-            # plt.plot(player_names, 'r--')
-            # plt.plot(reasons, 'b--')
-            plt.plot(all)
+            plt.scatter(ticks, player_names, c=reasons)
+            plt.xlim((0, max(ticks)))
             plt.show()
 
     @staticmethod
@@ -116,9 +123,9 @@ class Stats:
                 kill_reasons.append(kill_reason)
                 all.append([int(tick), unit_type, kill_reason])
             plt.title("Killed by " + params)
-            # plt.plot(unit_types)
-            # plt.plot(kill_reasons, 'r--')
-            plt.plot(kill_reasons, 'ro')
+
+            # plt.hist(kill_reasons)  # use this one to display how many of what happened there
+            plt.plot(kill_reasons)  # ta pa za čez čas kok se je kj izbolšval bolj kot je prot vrhu, bolš je
             plt.show()
 
     @staticmethod
@@ -138,41 +145,61 @@ class Stats:
                 action_names.append(action_name)
 
                 all.append([int(tick), action_name])
-            plt.title("Actions " + params)
-            # plt.plot(ticks)
-            # plt.plot(action_names, 'r--')
-            plt.plot(ticks, action_names, 'ro')
+
+            # plt.plot(ticks, action_names, 'ro') # tale je zakon - pove pr kerih ticking se kšna stvar dela
+
+            # display prvih 10,000 in zadnih 10,000
+            """
+            fig, axs = plt.subplots(1, 2, figsize=(8, 4), sharey=True)
+            axs[0].plot(ticks[-10000:], action_names[-10000:], 'ro')  # tale je zakon - pove pr kerih ticking se kšna stvar dela
+            axs[1].plot(ticks[:10000], action_names[:10000], 'ro')  # tale je zakon - pove pr kerih ticking se kšna stvar dela
+            fig.suptitle("Actions " + params)
+            """
+
+            # plt.plot(action_names, 'ro') # to pa pove skoz iteracije kok se je česa kj delal skoz čas
+
             plt.show()
 
     @staticmethod
     def plot_sum():
+
+        print("NAROBE JE PLAYER KER JE VEČINA Z +1 KER JE BOARD CANONICAL K SE NARDI SUM")
+
         file_count = len(os.listdir(PATH + "\\..\\stats\\" + "sum"))
         with open(PATH + "\\..\\stats\\" + "sum" + "\\file_" + str(file_count) + ".txt", "r") as f:
             x = f.readlines()
             params = x[0]
             x = x[1:]
             ticks = []
-            sum_healths = []
-            player_moneys = []
-            player_names = []
-
+            sum_healths_p1 = []
+            player_moneys_p1 = []
+            sum_healths_p2 = []
+            player_moneys_p2 = []
             all = []
             for line in x:
-                tick, sum_health, player_money, player_name = line.split()
+                tick, sum_health_p1, player_money_p1, sum_health_p2, player_money_p2 = line.split()
                 ticks.append(int(tick))
-                sum_healths.append(int(sum_health))
-                player_moneys.append(int(player_money))
-                player_names.append(int(player_name))
+                sum_healths_p1.append(int(sum_health_p1))
+                player_moneys_p1.append(int(player_money_p1))
+                sum_healths_p2.append(int(sum_health_p2))
+                player_moneys_p2.append(int(player_money_p2))
 
-                all.append([int(tick), int(sum_health), int(player_money), int(player_name)])
+                all.append([int(tick), int(sum_health_p1), int(player_money_p1), int(sum_health_p2), int(player_money_p2)])
             plt.title("Summaries" + params)
-            # plt.plot(ticks)
-            # plt.plot(player_names, 'r--')
-            # plt.plot(sum_healths, 'b--')
-            # plt.plot(player_moneys, 'g--')
 
-            plt.plot(player_moneys, 'ro')
+            width = 1  # the width of the bars: can also be len(x) sequence
+            ind = np.arange(count(ticks))
+
+            """
+            compare health between 2 players
+            p1 = plt.bar(ind, sum_healths_p1, width)
+            p2 = plt.bar(ind, sum_healths_p2, width, bottom=sum_healths_p1)
+             plt.ylabel('Health')
+            plt.title("Healths " + params)
+            plt.legend((p1[0], p2[0]), ('Player1', 'Player-1'))
+
+            """
+
             plt.show()
 
-
-Stats.plot_killed_by()
+# Stats.plot_sum()

@@ -9,7 +9,7 @@ PATH: str = os.path.dirname(os.path.realpath(__file__))
 
 SHOW_TENSORFLOW_GPU: bool = True
 SHOW_PYGAME_WELCOME: bool = False
-VERBOSE: int = 4
+VERBOSE: int = 3
 FPS: int = 100  # only relevant when pygame
 
 #############################################
@@ -17,7 +17,6 @@ FPS: int = 100  # only relevant when pygame
 
 MAKE_STATS = True
 
-EXCLUDE_IDLE = True  # exclude idle action from all actions
 MONEY_INC = 10  # how much money is returned when returned resources
 
 INITIAL_GOLD = 0  # how much initial gold do players get at game begining
@@ -27,12 +26,8 @@ SACRIFICIAL_HEAL = False
 HEAL_AMOUNT = 20
 HEAL_COST = 5
 
-if EXCLUDE_IDLE and INITIAL_GOLD == 0:
-    # let players have at least some gold so they have any valid moves
-    INITIAL_GOLD = 1
-
-USE_TIMEOUT = False
-MAX_TIME = 8191  # this gets used by kill function that determines the end point
+USE_TIMEOUT = True
+MAX_TIME = 2048  # this gets used by kill function that determines the end point
 if USE_TIMEOUT:
     print("Using Timeout")
     TIMEOUT = 100  # how many turns until game end - this gets reduced when each turn is executed
@@ -123,6 +118,24 @@ a_cost = dotdict({
     4: 2,  # Rifl
     5: 7,  # Hall
 })
+
+
+acts_enabled = dotdict({
+    "idle": False,
+    "up": True,
+    "down": True,
+    "right": True,
+    "left": True,
+    "mine_resources": True,
+    "return_resources": True,
+    "attack": False,
+    "npc": False,
+    "rifle_infantry": False,
+    "barracks": False,
+    "town_hall": False,
+    "heal": False
+})
+
 
 ACTS = {
     "idle": 0,

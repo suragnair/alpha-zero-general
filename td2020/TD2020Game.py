@@ -124,7 +124,18 @@ class TD2020Game:
                 if VERBOSE:
                     print("timeout")
                 Stats.game_end(board[0, 0, TIME_IDX], 0, 'timeout')
-                return 0.001
+
+                score_player1 = self.getScore(board,player)
+                score_player2 = self.getScore(board,-player)
+
+                if score_player1 == score_player2:
+                    print("#################### TIMEOUT #######################")
+                    print("Tie")
+                    return 0.001
+                better_player = 1 if score_player1 > score_player2 else -1
+                print("#################### TIMEOUT #######################")
+                print("Higher score achieved", better_player)
+                return better_player
         else:
             if board[0, 0, TIME_IDX] >= MAX_TIME:
                 print("######################################## ERROR ####################################")
@@ -228,8 +239,12 @@ class TD2020Game:
         return board.tostring()
 
     def getScore(self, board: np.array, player: int):
-        n = board.shape[0]
-        return sum([board[x][y][HEALTH_IDX] for x in range(n) for y in range(n) if board[x][y][P_NAME_IDX] == player])
+        b = Board(self.n)
+        b.pieces = np.copy(board)
+
+        # return b.get_health_score(player)
+        return b.get_money_score(player)
+        # return b.get_combined_score(player)
 
 
 def display(board):

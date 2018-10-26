@@ -3,8 +3,8 @@ from typing import List, Any
 import numpy as np
 
 from td2020.src.Graph import num_destroys, damage
-from td2020.src.config import d_a_type, a_m_health, d_acts, EXCLUDE_IDLE, A_TYPE_IDX, P_NAME_IDX, CARRY_IDX, MONEY_IDX, a_cost, NUM_ACTS, ACTS_REV, NUM_ENCODERS, MONEY_INC, HEALTH_IDX, TIME_IDX, DAMAGE, DAMAGE_ANYWHERE, DESTROY_ALL, VERBOSE, MAX_GOLD, HEAL_AMOUNT, \
-    a_max_health, SACRIFICIAL_HEAL, HEAL_COST
+from td2020.src.config import d_a_type, a_m_health, d_acts,  A_TYPE_IDX, P_NAME_IDX, CARRY_IDX, MONEY_IDX, a_cost, NUM_ACTS, ACTS_REV, NUM_ENCODERS, MONEY_INC, HEALTH_IDX, TIME_IDX, DAMAGE, DAMAGE_ANYWHERE, DESTROY_ALL, VERBOSE, MAX_GOLD, HEAL_AMOUNT, \
+    a_max_health, SACRIFICIAL_HEAL, HEAL_COST, acts_enabled
 from td2020.stats.files import Stats
 
 
@@ -27,7 +27,7 @@ class Board:
         x, y, action_index = move
         act = ACTS_REV[action_index]
         Stats.action(self[x][y][TIME_IDX], act)
-        Stats.sum(self[x][y][TIME_IDX], self, player)
+        Stats.sum(self[x][y][TIME_IDX], self)
         if act == "idle":
             pass
         if act == "up":
@@ -214,35 +214,35 @@ class Board:
         (x, y) = square
         money = self[x][y][MONEY_IDX]
         if act == "idle":
-            return not EXCLUDE_IDLE
+            return not acts_enabled.idle
         if act == "up":
             new_x, new_y = x, y - 1
-            return self._check_if_empty(new_x, new_y)
+            return acts_enabled.up and self._check_if_empty(new_x, new_y)
         if act == "down":
             new_x, new_y = x, y + 1
-            return self._check_if_empty(new_x, new_y)
+            return acts_enabled.down and self._check_if_empty(new_x, new_y)
         if act == "right":
             new_x, new_y = x + 1, y
-            return self._check_if_empty(new_x, new_y)
+            return acts_enabled.right and self._check_if_empty(new_x, new_y)
         if act == "left":
             new_x, new_y = x - 1, y
-            return self._check_if_empty(new_x, new_y)
+            return acts_enabled.left and self._check_if_empty(new_x, new_y)
         if act == "mine_resources":
-            return self[x][y][CARRY_IDX] == 0 and self._check_if_nearby(square, d_a_type['Gold'])
+            return acts_enabled.mine_resources and self[x][y][CARRY_IDX] == 0 and self._check_if_nearby(square, d_a_type['Gold'])
         if act == "return_resources":
-            return self[x][y][CARRY_IDX] == 1 and self._check_if_nearby(square, d_a_type['Hall'], check_friendly=True) and (MAX_GOLD >= self[x][y][MONEY_IDX] + MONEY_INC)
+            return acts_enabled.return_resources and self[x][y][CARRY_IDX] == 1 and self._check_if_nearby(square, d_a_type['Hall'], check_friendly=True) and (MAX_GOLD >= self[x][y][MONEY_IDX] + MONEY_INC)
         if act == "attack":
-            return self._check_if_nearby_attack(square)
+            return acts_enabled.attack and self._check_if_nearby_attack(square)
         if act == "heal":
-            return self._check_if_nearby_heal(square)
+            return acts_enabled.heal and self._check_if_nearby_heal(square)
         if act == "npc":
-            return a_cost[2] <= money and self._check_if_nearby_empty(square)
+            return acts_enabled.npc and a_cost[2] <= money and self._check_if_nearby_empty(square)
         if act == "barracks":
-            return a_cost[3] <= money and self._check_if_nearby_empty(square)
+            return acts_enabled.barracks and a_cost[3] <= money and self._check_if_nearby_empty(square)
         if act == "rifle_infantry":
-            return a_cost[4] <= money and self._check_if_nearby_empty(square)
+            return acts_enabled.rifle_infantry and a_cost[4] <= money and self._check_if_nearby_empty(square)
         if act == "town_hall":
-            return a_cost[5] <= money and self._check_if_nearby_empty(square)
+            return acts_enabled.town_hall and a_cost[5] <= money and self._check_if_nearby_empty(square)
 
     def _check_if_empty(self, new_x, new_y):
         # noinspection PyChainedComparisons
@@ -350,3 +350,12 @@ class Board:
     @staticmethod
     def clamp(num, min_value, max_value):
         return max(min(num, max_value), min_value)
+
+    def get_money_score(self, player) -> int:
+        return sum([self[x][y][MONEY_IDX] for x in range(self.n) for y in range(self.n) if self[x][y][P_NAME_IDX] == player])
+
+    def get_health_score(self, player) -> int:
+        return sum([self[x][y][HEALTH_IDX] for x in range(self.n) for y in range(self.n) if self[x][y][P_NAME_IDX] == player])
+
+    def get_combined_score(self, player) -> int:
+        return sum([self[x][y][HEALTH_IDX] + self[x][y][MONEY_IDX] for x in range(self.n) for y in range(self.n) if self[x][y][P_NAME_IDX] == player])
