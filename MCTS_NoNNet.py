@@ -1,5 +1,11 @@
 import math
+import time
+
 import numpy as np
+
+from pytorch_classification.utils import AverageMeter
+from pytorch_classification.utils.progress.progress.bar import Bar
+
 EPS = 1e-8
 
 class MCTS_No_NNet():
@@ -28,10 +34,14 @@ class MCTS_No_NNet():
             probs: a policy vector where the probability of the ith action is
                    proportional to Nsa[(s,a)]**(1./temp)
         """
+        mcts_time = AverageMeter()
+        bar = Bar('MCTS', max=self.args.numMCTSSims)
+        end = time.time()
         for i in range(self.args.numMCTSSims):
-            #if i % (self.args.numMCTSSims/10) == 0:
-            #    print("MCTS", i)
-            print("MCTS", i)
+            mcts_time.update(time.time() - end)
+            end = time.time()
+            bar.suffix = '({eps}/{maxeps}) Eps Time: {et:.3f}s | Total: {total:} | ETA: {eta:}'.format(eps=i + 1, maxeps=self.args.numMCTSSims, et=mcts_time.avg, total=bar.elapsed_td, eta=bar.eta_td)
+            bar.next()
             self.search(canonicalBoard)
 
         s = self.game.stringRepresentation(canonicalBoard)
