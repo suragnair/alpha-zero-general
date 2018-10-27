@@ -161,7 +161,7 @@ class HumanTD2020Player:
                             b = Board(n)
                             b.pieces = np.copy(board)
 
-                            valids_square = b.get_moves_for_square((clicked_actor.x, clicked_actor.y))
+                            valids_square = b.get_moves_for_square(clicked_actor.x, clicked_actor.y)
 
                             printed_actions = 0
                             for i in range(len(valids_square)):

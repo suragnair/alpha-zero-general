@@ -50,33 +50,122 @@ class Board:
             self[x][y][CARRY_IDX] = 0
             self._update_money(player, MONEY_INC)
             return
-        if act == "attack":
-            self._attack_nearby((x, y))
+        if act == "attack_up":
+            self._attack(x, y, x, y - 1)
             return
-        if act == "heal":
-            self._heal_nearby((x, y))
+        if act == "attack_down":
+            self._attack(x, y, x, y + 1)
             return
-        if act == "npc":
+        if act == "attack_left":
+            self._attack(x, y, x - 1, y)
+            return
+        if act == "attack_right":
+            self._attack(x, y, x + 1, y)
+            return
+
+        if act == "heal_up":
+            self._heal(x, y, x, y - 1)
+            return
+        if act == "heal_down":
+            self._heal(x, y, x, y + 1)
+            return
+        if act == "heal_left":
+            self._heal(x, y, x - 1, y)
+            return
+        if act == "heal_right":
+            self._heal(x, y, x + 1, y)
+            return
+
+        if act == "npc_up":
             self._update_money(player, -a_cost[2])
-            self._spawn_nearby((x, y), 2)
+            self._spawn(x, y, x, y - 1, 2)
             return
-        if act == "barracks":
+        if act == "npc_down":
+            self._update_money(player, -a_cost[2])
+            self._spawn(x, y, x, y + 1, 2)
+            return
+        if act == "npc_left":
+            self._update_money(player, -a_cost[2])
+            self._spawn(x, y, x - 1, y, 2)
+            return
+        if act == "npc_right":
+            self._update_money(player, -a_cost[2])
+            self._spawn(x, y, x + 1, y, 2)
+            return
+
+        if act == "barracks_up":
             # if VERBOSE:
             # print("spawned barracks")
             self._update_money(player, -a_cost[3])
-            self._spawn_nearby((x, y), 3)
+            self._spawn(x, y, x, y - 1, 3)
             return
-        if act == "rifle_infantry":
+        if act == "barracks_down":
+            # if VERBOSE:
+            # print("spawned barracks")
+            self._update_money(player, -a_cost[3])
+            self._spawn(x, y, x, y + 1, 3)
+            return
+        if act == "barracks_left":
+            # if VERBOSE:
+            # print("spawned barracks")
+            self._update_money(player, -a_cost[3])
+            self._spawn(x, y, x - 1, y, 3)
+            return
+        if act == "barracks_right":
+            # if VERBOSE:
+            # print("spawned barracks")
+            self._update_money(player, -a_cost[3])
+            self._spawn(x, y, x + 1, y, 3)
+            return
+
+        if act == "rifle_infantry_up":
             # if VERBOSE:
             # print("spawned rifle inf")
             self._update_money(player, -a_cost[4])
-            self._spawn_nearby((x, y), 4)
+            self._spawn(x, y, x, y - 1, 4)
             return
-        if act == "town_hall":
+        if act == "rifle_infantry_down":
+            # if VERBOSE:
+            # print("spawned rifle inf")
+            self._update_money(player, -a_cost[4])
+            self._spawn(x, y, x, y + 1, 4)
+            return
+        if act == "rifle_infantry_left":
+            # if VERBOSE:
+            # print("spawned rifle inf")
+            self._update_money(player, -a_cost[4])
+            self._spawn(x, y, x - 1, y, 4)
+            return
+        if act == "rifle_infantry_right":
+            # if VERBOSE:
+            # print("spawned rifle inf")
+            self._update_money(player, -a_cost[4])
+            self._spawn(x, y, x + 1, y, 4)
+            return
+
+        if act == "town_hall_up":
             # if VERBOSE:
             # print("spawned town hall")
             self._update_money(player, -a_cost[5])
-            self._spawn_nearby((x, y), 5)
+            self._spawn(x, y, x, y - 1, 5)
+            return
+        if act == "town_hall_down":
+            # if VERBOSE:
+            # print("spawned town hall")
+            self._update_money(player, -a_cost[5])
+            self._spawn(x, y, x, y + 1, 5)
+            return
+        if act == "town_hall_left":
+            # if VERBOSE:
+            # print("spawned town hall")
+            self._update_money(player, -a_cost[5])
+            self._spawn(x, y, x - 1, y, 5)
+            return
+        if act == "town_hall_right":
+            # if VERBOSE:
+            # print("spawned town hall")
+            self._update_money(player, -a_cost[5])
+            self._spawn(x, y, x + 1, y, 5)
             return
 
     def _move(self, x, y, new_x, new_y):
@@ -91,8 +180,8 @@ class Board:
                     assert self[x][y][MONEY_IDX] + money_update >= 0
                     self[x][y][MONEY_IDX] = self[x][y][MONEY_IDX] + money_update
 
-    def _heal_nearby(self, square):
-        (x, y) = square
+    """
+    def _heal_nearby(self, x, y):
         coordinates = [(x - 1, y + 1),
                        (x, y + 1),
                        (x + 1, y + 1),
@@ -122,7 +211,43 @@ class Board:
                     # if VERBOSE:
                     #     print("new health of this unit is ", self[n_x][n_y][HEALTH_IDX])
                     return
+    """
 
+    def _attack(self, x, y, n_x, n_y):
+        print("TODO")
+        self[n_x][n_y][HEALTH_IDX] -= DAMAGE
+        if self[n_x][n_y][HEALTH_IDX] <= 0:
+            Stats.killed_by(self[n_x][n_x][TIME_IDX], self[n_x][n_x][A_TYPE_IDX], "attack")
+
+            if VERBOSE:
+                print("destroyed unit type", self[n_x][n_y][A_TYPE_IDX], "on", n_x, n_y, "and destroyer of type", self[x][y][A_TYPE_IDX], "on", x, y)
+
+            self[n_x][n_y] = [0] * NUM_ENCODERS
+            self[n_x][n_y][TIME_IDX] = self[x][y][TIME_IDX]  # set time back to empty tile just in case
+
+        if VERBOSE:
+            print("damaged unit type", self[n_x][n_y][A_TYPE_IDX], "on", n_x, n_y, "and damage initiator of type", self[x][y][A_TYPE_IDX], "on", x, y)
+
+    def _spawn(self, x, y, n_x, n_y, a_type):
+        print("todo")
+        self[n_x][n_y] = [self[x][y][P_NAME_IDX], a_type, a_m_health[a_type], 0, self[x][y][MONEY_IDX], self[x][y][TIME_IDX]]
+
+    def _heal(self, x, y, n_x, n_y):
+        print("todo")
+
+        if SACRIFICIAL_HEAL:
+            self[x][x][HEALTH_IDX] -= HEAL_COST
+            if self[x][y][HEALTH_IDX] <= 0:
+                self[x][y] = [0] * NUM_ENCODERS
+                self[x][y][TIME_IDX] = self[x][y][TIME_IDX]
+        elif self[n_x][n_y][MONEY_IDX] - HEAL_AMOUNT >= 0:
+            self[n_x][n_y][HEALTH_IDX] += HEAL_AMOUNT
+            self._update_money(self[n_x][n_y][P_NAME_IDX], -HEAL_COST)
+
+        # clamp value to max
+        self[n_x][n_y][HEALTH_IDX] = self.clamp(self[n_x][n_y][HEALTH_IDX] + HEAL_AMOUNT, 0, a_max_health[self[n_x][n_y][A_TYPE_IDX]])
+
+    """
     def _attack_nearby(self, square):
         (x, y) = square
 
@@ -154,10 +279,9 @@ class Board:
                         print("damaged unit type", self[n_x][n_y][A_TYPE_IDX], "on", n_x, n_y, "and damage initiator of type", self[x][y][A_TYPE_IDX], "on", x, y)
                     if not DESTROY_ALL:
                         return
-
-    def _spawn_nearby(self, square, a_type):
-        (x, y) = square
-
+    """
+    """
+    def _spawn_nearby(self, x, y, a_type):
         coordinates = [(x - 1, y + 1),
                        (x, y + 1),
                        (x + 1, y + 1),
@@ -178,9 +302,9 @@ class Board:
         ##############################################
         ##############################################
         ##############################################
+    """
 
-    def get_moves_for_square(self, square) -> Any:
-        (x, y) = square
+    def get_moves_for_square(self, x, y) -> Any:
 
         # determine the color of the piece.
         player = self[x][y][P_NAME_IDX]
@@ -195,52 +319,90 @@ class Board:
 
             if act in acts:
                 # a is now string action
-                move = self._valid_act(square, act) * 1
+                move = self._valid_act(x, y, act) * 1
                 if move:
                     moves[i] = move
         # return the generated move list
         return moves
 
-    def _valid_act(self, square, act):
-        (x, y) = square
+    def _valid_act(self, x, y, act):
         money = self[x][y][MONEY_IDX]
         if act == "idle":
             return acts_enabled.idle
         if act == "up":
-            new_x, new_y = x, y - 1
-            return acts_enabled.up and self._check_if_empty(new_x, new_y)
+            return acts_enabled.up and self._check_if_empty(x, y - 1)
         if act == "down":
-            new_x, new_y = x, y + 1
-            return acts_enabled.down and self._check_if_empty(new_x, new_y)
+            return acts_enabled.down and self._check_if_empty(x, y + 1)
         if act == "right":
-            new_x, new_y = x + 1, y
-            return acts_enabled.right and self._check_if_empty(new_x, new_y)
+            return acts_enabled.right and self._check_if_empty(x + 1, y)
         if act == "left":
-            new_x, new_y = x - 1, y
-            return acts_enabled.left and self._check_if_empty(new_x, new_y)
+            return acts_enabled.left and self._check_if_empty(x - 1, y)
+
         if act == "mine_resources":
-            return acts_enabled.mine_resources and self[x][y][CARRY_IDX] == 0 and self._check_if_nearby(square, d_a_type['Gold'])
+            return acts_enabled.mine_resources and self[x][y][CARRY_IDX] == 0 and self._check_if_nearby(x, y, d_a_type['Gold'])
         if act == "return_resources":
-            return acts_enabled.return_resources and self[x][y][CARRY_IDX] == 1 and self._check_if_nearby(square, d_a_type['Hall'], check_friendly=True) and (MAX_GOLD >= self[x][y][MONEY_IDX] + MONEY_INC)
+            return acts_enabled.return_resources and self[x][y][CARRY_IDX] == 1 and self._check_if_nearby(x, y, d_a_type['Hall'], check_friendly=True) and (MAX_GOLD >= self[x][y][MONEY_IDX] + MONEY_INC)
+
         if act == "attack":
-            return acts_enabled.attack and self._check_if_nearby_attack(square)
-        if act == "heal":
-            return acts_enabled.heal and self._check_if_nearby_heal(square)
-        if act == "npc":
-            return acts_enabled.npc and a_cost[2] <= money and self._check_if_nearby_empty(square)
-        if act == "barracks":
-            return acts_enabled.barracks and a_cost[3] <= money and self._check_if_nearby_empty(square)
-        if act == "rifle_infantry":
-            return acts_enabled.rifle_infantry and a_cost[4] <= money and self._check_if_nearby_empty(square)
-        if act == "town_hall":
-            return acts_enabled.town_hall and a_cost[5] <= money and self._check_if_nearby_empty(square)
+            return acts_enabled.attack and self._check_if_attack(x, y-1)
+        if act == "attack":
+            return acts_enabled.attack and self._check_if_attack(x, y+1)
+        if act == "attack":
+            return acts_enabled.attack and self._check_if_attack(x+1, y)
+        if act == "attack":
+            return acts_enabled.attack and self._check_if_attack(x-1, y)
 
-    def _check_if_empty(self, new_x, new_y):
+        if act == "heal_up":
+            return acts_enabled.heal and self._check_if_heal(x, y-1)
+        if act == "heal_down":
+            return acts_enabled.heal and self._check_if_heal(x, y+1)
+        if act == "heal_right":
+            return acts_enabled.heal and self._check_if_heal(x+1, y)
+        if act == "heal_left":
+            return acts_enabled.heal and self._check_if_heal(x-1, y)
+
+        if act == "npc_up":
+            return acts_enabled.npc and a_cost[2] <= money and self._check_if_empty(x, y-1)
+        if act == "npc_down":
+            return acts_enabled.npc and a_cost[2] <= money and self._check_if_empty(x, y+1)
+        if act == "npc_right":
+            return acts_enabled.npc and a_cost[2] <= money and self._check_if_empty(x+1, y)
+        if act == "npc_left":
+            return acts_enabled.npc and a_cost[2] <= money and self._check_if_empty(x-1, y)
+
+        if act == "barracks_up":
+            return acts_enabled.barracks and a_cost[3] <= money and self._check_if_empty(x, y-1)
+        if act == "barracks_down":
+            return acts_enabled.barracks and a_cost[3] <= money and self._check_if_empty(x, y+1)
+        if act == "barracks_right":
+            return acts_enabled.barracks and a_cost[3] <= money and self._check_if_empty(x+1, y)
+        if act == "barracks_left":
+            return acts_enabled.barracks and a_cost[3] <= money and self._check_if_empty(x-1, y)
+
+        if act == "rifle_infantry_up":
+            return acts_enabled.rifle_infantry and a_cost[4] <= money and self._check_if_empty(x, y-1)
+        if act == "rifle_infantry_down":
+            return acts_enabled.rifle_infantry and a_cost[4] <= money and self._check_if_empty(x, y+1)
+        if act == "rifle_infantry_right":
+            return acts_enabled.rifle_infantry and a_cost[4] <= money and self._check_if_empty(x+1, y)
+        if act == "rifle_infantry_left":
+            return acts_enabled.rifle_infantry and a_cost[4] <= money and self._check_if_empty(x-1, y)
+
+        if act == "town_hall_up":
+            return acts_enabled.town_hall and a_cost[5] <= money and self._check_if_empty(x, y-1)
+        if act == "town_hall_down":
+            return acts_enabled.town_hall and a_cost[5] <= money and self._check_if_empty(x, y+1)
+        if act == "town_hall_right":
+            return acts_enabled.town_hall and a_cost[5] <= money and self._check_if_empty(x+1, y)
+        if act == "town_hall_left":
+            return acts_enabled.town_hall and a_cost[5] <= money and self._check_if_empty(x-1, y)
+
+    def _check_if_empty(self, x, y):
         # noinspection PyChainedComparisons
-        return 0 <= new_x < self.n and 0 <= new_y < self.n and self[new_x][new_y][P_NAME_IDX] == 0
+        return 0 <= x < self.n and 0 <= y < self.n and self[x][y][P_NAME_IDX] == 0
 
-    def _check_if_nearby_attack(self, square):
-        (x, y) = square
+    """
+    def _check_if_nearby_attack(self, x, y):
         coordinates = [(x - 1, y + 1),
                        (x, y + 1),
                        (x + 1, y + 1),
@@ -251,12 +413,17 @@ class Board:
                        (x + 1, y - 1)]
         for n_x, n_y in coordinates:
             if 0 <= n_x < self.n and 0 <= n_y < self.n:
-                if (self[n_x][n_y][P_NAME_IDX] == -self[x][y][P_NAME_IDX]) and self[n_x][n_y][A_TYPE_IDX] != d_a_type['Gold']:
+                if self[n_x][n_y][P_NAME_IDX] == -self[x][y][P_NAME_IDX] and self[n_x][n_y][A_TYPE_IDX] != d_a_type['Gold']:
                     return True
         return False
+    """
 
-    def _check_if_nearby_heal(self, square):
-        (x, y) = square
+    def _check_if_attack(self, x,y):
+        print("todo check if it works")
+        return 0 <= x < self.n and 0 <= y < self.n and self[x][y][P_NAME_IDX] == -self[x][y][P_NAME_IDX] and self[x][y][A_TYPE_IDX] != d_a_type['Gold']
+
+    """
+    def _check_if_nearby_heal(self, x, y):
         coordinates = [(x - 1, y + 1),
                        (x, y + 1),
                        (x + 1, y + 1),
@@ -267,15 +434,20 @@ class Board:
                        (x + 1, y - 1)]
         for n_x, n_y in coordinates:
             if 0 <= n_x < self.n and 0 <= n_y < self.n:
-                if (self[n_x][n_y][P_NAME_IDX] == self[x][y][P_NAME_IDX]) and self[n_x][n_y][A_TYPE_IDX] != d_a_type['Gold'] and self[n_x][n_y][HEALTH_IDX] < a_max_health[self[n_x][n_y][A_TYPE_IDX]]:
+                if self[n_x][n_y][P_NAME_IDX] == self[x][y][P_NAME_IDX] and self[n_x][n_y][A_TYPE_IDX] != d_a_type['Gold'] and self[n_x][n_y][HEALTH_IDX] < a_max_health[self[n_x][n_y][A_TYPE_IDX]]:
                     if SACRIFICIAL_HEAL:
                         return True
                     elif self[n_x][n_y][MONEY_IDX] - HEAL_COST >= 0:
                         return True
         return False
+    """
 
-    def _check_if_nearby_empty(self, square):
-        (x, y) = square
+    def _check_if_heal(self, x, y):
+        print("todo")
+        return 0 <= x < self.n and 0 <= y < self.n and self[x][y][P_NAME_IDX] == self[x][y][P_NAME_IDX] and self[x][y][A_TYPE_IDX] != d_a_type['Gold'] and self[x][y][HEALTH_IDX] < a_max_health[self[x][y][A_TYPE_IDX]] and (SACRIFICIAL_HEAL or self[x][y][MONEY_IDX] - HEAL_COST >= 0)
+
+    """
+    def _check_if_nearby_empty(self, x, y):
         coordinates = [(x - 1, y + 1),
                        (x, y + 1),
                        (x + 1, y + 1),
@@ -289,9 +461,9 @@ class Board:
                 if self[n_x][n_y][P_NAME_IDX] == 0:
                     return True
         return False
+    """
 
-    def _check_if_nearby(self, square, a_type, check_friendly=False):
-        (x, y) = square
+    def _check_if_nearby(self, x, y, a_type, check_friendly=False):
         coordinates = [(x - 1, y + 1),
                        (x, y + 1),
                        (x + 1, y + 1),

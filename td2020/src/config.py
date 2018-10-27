@@ -69,18 +69,42 @@ d_a_type = dotdict({
 })
 d_acts = dotdict({
     1: [],  # Gold
-    2: ['idle', 'up', 'down', 'left', 'right', 'barracks', 'town_hall', 'mine_resources', 'return_resources', 'heal'],  # Work
-    3: ['idle', 'rifle_infantry', 'heal'],  # Barr
-    4: ['idle', 'up', 'down', 'left', 'right', 'attack', 'heal'],  # Rifl
-    5: ['idle', 'npc', 'heal'],  # Hall
+    2: ['idle',
+        'up', 'down', 'left', 'right',
+        'mine_resources', 'return_resources',
+        'barracks_up', 'barracks_down', 'barracks_right', 'barracks_left',
+        'town_hall_up', 'town_hall_down', 'town_hall_right', 'town_hall_left',
+        'heal_up', 'heal_down', 'heal_right', 'heal_left'],  # Work
+    3: ['idle',
+        'rifle_infantry_up', 'rifle_infantry_down', 'rifle_infantry_right', 'rifle_infantry_left',
+        'heal_up', 'heal_down', 'heal_right', 'heal_left'],  # Barr
+    4: ['idle',
+        'up', 'down', 'left', 'right',
+        'attack_up', 'attack_down', 'attack_right', 'attack_left',
+        'heal_up', 'heal_down', 'heal_right', 'heal_left'],  # Rifl
+    5: ['idle',
+        'npc_up', 'npc_down', 'npc_right', 'npc_left',
+        'heal_up', 'heal_down', 'heal_right', 'heal_left'],  # Hall
 })
 
 d_acts_int = dotdict({
     1: [],  # Gold
-    2: [0, 1, 2, 3, 4, 5, 6, 10, 11, 12],  # Work
-    3: [0, 9, 12],  # Barr
-    4: [0, 1, 2, 3, 4, 7, 12],  # Rifl
-    5: [0, 8, 12],  # Hall
+    2: [0,
+        1, 2, 3, 4,
+        5, 6,
+        19, 20, 21, 22,
+        23, 24, 25, 26,
+        27, 28, 29, 30],  # Work
+    3: [0,
+        15, 16, 17, 18,
+        27, 28, 29, 30],  # Barr
+    4: [0,
+        1, 2, 3, 4,
+        7, 8, 9, 10,
+        27, 28, 29, 30],  # Rifl
+    5: [0,
+        11, 12, 13, 14,
+        27, 28, 29, 30],  # Hall
 })
 
 d_type_rev = dotdict({
@@ -114,24 +138,6 @@ a_cost = dotdict({
     5: 7,  # Hall
 })
 
-"""
-acts_enabled = dotdict({
-    "idle": False,
-    "up": True,
-    "down": True,
-    "right": True,
-    "left": True,
-    "mine_resources": True,
-    "return_resources": True,
-    "attack": False,
-    "npc": False,
-    "rifle_infantry": False,
-    "barracks": False,
-    "town_hall": False,
-    "heal": False
-})
-"""
-
 acts_enabled = dotdict({  # mine and return resources only
     "idle": False,
     "up": True,
@@ -150,35 +156,88 @@ acts_enabled = dotdict({  # mine and return resources only
 
 ACTS = {
     "idle": 0,
+
     "up": 1,
     "down": 2,
     "right": 3,
     "left": 4,
+
     "mine_resources": 5,
     "return_resources": 6,
-    "attack": 7,
-    "npc": 8,
-    "rifle_infantry": 9,
-    "barracks": 10,
-    "town_hall": 11,
-    "heal": 12
+
+    "attack_up": 7,
+    "attack_down": 8,
+    "attack_right": 9,
+    "attack_left": 10,
+
+    "npc_up": 11,
+    "npc_down": 12,
+    "npc_right": 13,
+    "npc_left": 14,
+
+    "rifle_infantry_up": 15,
+    "rifle_infantry_down": 16,
+    "rifle_infantry_right": 17,
+    "rifle_infantry_left": 18,
+
+    "barracks_up": 19,
+    "barracks_down": 20,
+    "barracks_right": 21,
+    "barracks_left": 22,
+
+    "town_hall_up": 23,
+    "town_hall_down": 24,
+    "town_hall_right": 25,
+    "town_hall_left": 26,
+
+    "heal_up": 27,
+    "heal_down": 28,
+    "heal_right": 29,
+    "heal_left": 30
+
 }
 NUM_ACTS = len(ACTS)
 
 ACTS_REV = {
     0: "idle",
+
     1: "up",
     2: "down",
     3: "right",
     4: "left",
+
     5: "mine_resources",
     6: "return_resources",
-    7: "attack",
-    8: "npc",
-    9: "rifle_infantry",
-    10: "barracks",
-    11: "town_hall",
-    12: "heal"
+
+    7: "attack_up",
+    8: "attack_down",
+    9: "attack_right",
+    10: "attack_left",
+
+    11: "npc_up",
+    12: "npc_down",
+    13: "npc_right",
+    14: "npc_left",
+
+    15: "rifle_infantry_up",
+    16: "rifle_infantry_down",
+    17: "rifle_infantry_right",
+    18: "rifle_infantry_left",
+
+    19: "barracks_up",
+    20: "barracks_down",
+    21: "barracks_right",
+    22: "barracks_left",
+
+    23: "town_hall_up",
+    24: "town_hall_down",
+    25: "town_hall_right",
+    26: "town_hall_left",
+
+    27: "heal_up",
+    28: "heal_down",
+    29: "heal_right",
+    30: "heal_left"
 }
 
 d_user_shortcuts = dotdict({

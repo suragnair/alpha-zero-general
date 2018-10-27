@@ -128,7 +128,7 @@ class TD2020Game:
         for y in range(self.n):
             for x in range(self.n):
                 if b[x][y][P_NAME_IDX] == player and b[x][y][A_TYPE_IDX] != 1:  # for this player and not Gold
-                    valids.extend(b.get_moves_for_square((x, y)))
+                    valids.extend(b.get_moves_for_square(x, y))
                 else:
                     valids.extend([0] * NUM_ACTS)
         valids.append(0)  # because of that +1 in action Size
