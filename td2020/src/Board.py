@@ -205,7 +205,7 @@ class Board:
         (x, y) = square
         money = self[x][y][MONEY_IDX]
         if act == "idle":
-            return not acts_enabled.idle
+            return acts_enabled.idle
         if act == "up":
             new_x, new_y = x, y - 1
             return acts_enabled.up and self._check_if_empty(new_x, new_y)

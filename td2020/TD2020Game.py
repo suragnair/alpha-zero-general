@@ -28,7 +28,7 @@ class TD2020Game:
             }),
             dotdict({
                 'x': int(self.n / 2),
-                'y': int(self.n / 2) - 1,
+                'y': int(self.n / 2),
                 'player': -1,
                 'a_type': d_a_type['Gold'],
                 'health': a_m_health[d_a_type['Gold']],
@@ -48,7 +48,7 @@ class TD2020Game:
             }),
             dotdict({
                 'x': int(self.n / 2),
-                'y': int(self.n / 2),
+                'y': int(self.n / 2) - 1,
                 'player': -1,
                 'a_type': d_a_type['Hall'],
                 'health': a_m_health[d_a_type['Hall']],
@@ -56,10 +56,9 @@ class TD2020Game:
                 'gold': INITIAL_GOLD,
                 'timeout': TIMEOUT
             }),
-            """
             dotdict({
-                'x': int(self.n / 2) - 2,
-                'y': int(self.n / 2),
+                'x': int(self.n / 2) - 1,
+                'y': int(self.n / 2) - 2,
                 'player': 1,
                 'a_type': d_a_type['Work'],
                 'health': a_m_health[d_a_type['Work']],
@@ -68,8 +67,8 @@ class TD2020Game:
                 'timeout': TIMEOUT
             }),
             dotdict({
-                'x': int(self.n / 2) + 1,
-                'y': int(self.n / 2) - 1,
+                'x': int(self.n / 2),
+                'y': int(self.n / 2) - 2,
                 'player': -1,
                 'a_type': d_a_type['Work'],
                 'health': a_m_health[d_a_type['Work']],
@@ -78,27 +77,6 @@ class TD2020Game:
                 'timeout': TIMEOUT
             }),
 
-            dotdict({
-                'x': int(self.n / 2) - 3,
-                'y': int(self.n / 2),
-                'player': 1,
-                'a_type': d_a_type['Rifl'],
-                'health': a_m_health[d_a_type['Rifl']],
-                'carry': 0,
-                'gold': INITIAL_GOLD,
-                'timeout': TIMEOUT
-            }),
-            dotdict({
-                'x': int(self.n / 2) + 2,
-                'y': int(self.n / 2) - 1,
-                'player': -1,
-                'a_type': d_a_type['Rifl'],
-                'health': a_m_health[d_a_type['Rifl']],
-                'carry': 0,
-                'gold': INITIAL_GOLD,
-                'timeout': TIMEOUT
-            }),
-            """
         ]
 
     def setInitBoard(self, board_config) -> None:
@@ -106,7 +84,6 @@ class TD2020Game:
 
     def getInitBoard(self) -> np.ndarray:
         b = Board(self.n)
-
         remaining_time = None  # when setting initial board, remaining time might be different
         for e in self.initial_board_config:
             b.pieces[e.x, e.y] = [e.player, e.a_type, e.health, e.carry, e.gold, e.timeout]
