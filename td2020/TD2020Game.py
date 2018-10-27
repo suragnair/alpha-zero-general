@@ -265,8 +265,8 @@ class TD2020Game:
         b.pieces = np.copy(board)
 
         # return b.get_health_score(player)
-        # return b.get_money_score(player)
-        return b.get_combined_score(player)
+        return b.get_money_score(player)
+        # return b.get_combined_score(player)
 
 
 def display(board):

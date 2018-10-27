@@ -19,7 +19,7 @@ MAKE_STATS = False
 MONEY_INC = 5  # how much money is returned when returned resources
 
 INITIAL_GOLD = 1  # how much initial gold do players get at game begining
-MAX_GOLD = 31  # to encode with onehot encoder in 5 bits
+MAX_GOLD = 255  # to encode with onehot encoder in 8 bits
 
 SACRIFICIAL_HEAL = False
 HEAL_AMOUNT = 20
@@ -33,7 +33,6 @@ if USE_TIMEOUT:
 else:
     print("Using Kill Function")
     TIMEOUT = 0  # sets initial tick to 0 and then in getGameEnded it gets incremented unitl number 8191
-
 
 DAMAGE = 20  # how much damage is dealt to attacked actor
 DESTROY_ALL = False  # when attacking, all enemy units are destroyed, resulting in victory for the attacking player
@@ -133,7 +132,7 @@ acts_enabled = dotdict({
 })
 """
 
-acts_enabled = dotdict({
+acts_enabled = dotdict({  # mine and return resources only
     "idle": False,
     "up": True,
     "down": True,
@@ -141,14 +140,13 @@ acts_enabled = dotdict({
     "left": True,
     "mine_resources": True,
     "return_resources": True,
-    "attack": True,
-    "npc": True,
-    "rifle_infantry": True,
-    "barracks": True,
-    "town_hall": True,
+    "attack": False,
+    "npc": False,
+    "rifle_infantry": False,
+    "barracks": False,
+    "town_hall": False,
     "heal": False
 })
-
 
 ACTS = {
     "idle": 0,

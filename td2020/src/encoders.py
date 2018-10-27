@@ -43,8 +43,8 @@ class OneHotEncoder(Encoder):
         self.A_TYPE_IDX_INC_OH = 3  # actor type -> 3 bit,
         self.HEALTH_IDX_INC_OH = 5  # health-> 5 bit,
         self.CARRY_IDX_INC_OH = 1  # carrying-> 1 bit,
-        self.MONEY_IDX_INC_OH = 5  # money-> 5 bits (32 aka 4 town halls or 32 workers) [every unit has the same for player]
-        self.REMAIN_IDX_INC_OH = 13  # 2^13 8192(za total annihilation)
+        self.MONEY_IDX_INC_OH = 8  # money-> 8 bits (255) [every unit has the same for player]
+        self.REMAIN_IDX_INC_OH = 11  # 2^11 2048(za total annihilation)
 
         # builds indexes for character encoding - if not using one hot encoding, max indexes are incremented by 1 from previous index, but for one hot encoding, its incremented by num bits
         self.P_NAME_IDX_OH = 0
@@ -84,8 +84,10 @@ class OneHotEncoder(Encoder):
             return [int(i) for i in '{0:04b}'.format(num)]
         if length == 5:
             return [int(i) for i in '{0:05b}'.format(num)]
-        if length == 13:
-            return [int(i) for i in '{0:013b}'.format(num)]
+        if length == 8:
+            return [int(i) for i in '{0:08b}'.format(num)]
+        if length == 11:
+            return [int(i) for i in '{0:011b}'.format(num)]
         raise TypeError("Length not supported:", length)
 
     def encode_multiple(self, boards: np.ndarray) -> np.ndarray:

@@ -12,7 +12,7 @@ args = dotdict({
     'updateThreshold': 0.6,
     'maxlenOfQueue': 32000,  # 2.5 gig of ram is 8k training samples - so in total 10 gig of ram
     'numMCTSSims': 30,
-    'arenaCompare': 10,
+    'arenaCompare': 20,
     'cpuct': 1,
 
     'checkpoint': '.\\..\\temp\\',
