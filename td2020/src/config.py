@@ -5,20 +5,20 @@ from utils import dotdict
 
 USE_TF_CPU = False
 
-PATH: str = os.path.dirname(os.path.realpath(__file__))
+PATH = os.path.dirname(os.path.realpath(__file__))
 
-SHOW_TENSORFLOW_GPU: bool = True
-SHOW_PYGAME_WELCOME: bool = False
-VERBOSE: int = 4
-FPS: int = 100  # only relevant when pygame
+SHOW_TENSORFLOW_GPU = True
+SHOW_PYGAME_WELCOME = False
+VERBOSE = 4
+FPS = 10  # only relevant when pygame
 
 #############################################
 #############################################
 
 MAKE_STATS = False
-MONEY_INC = 10  # how much money is returned when returned resources
+MONEY_INC = 5  # how much money is returned when returned resources
 
-INITIAL_GOLD = 20  # how much initial gold do players get at game begining
+INITIAL_GOLD = 1  # how much initial gold do players get at game begining
 MAX_GOLD = 31  # to encode with onehot encoder in 5 bits
 
 SACRIFICIAL_HEAL = False
@@ -34,7 +34,6 @@ else:
     print("Using Kill Function")
     TIMEOUT = 0  # sets initial tick to 0 and then in getGameEnded it gets incremented unitl number 8191
 
-print("TODO - check if heal cheker works and if heal executor works - for both sacrificial and non-sacrificial")
 
 DAMAGE = 20  # how much damage is dealt to attacked actor
 DESTROY_ALL = False  # when attacking, all enemy units are destroyed, resulting in victory for the attacking player
@@ -135,7 +134,7 @@ acts_enabled = dotdict({
 """
 
 acts_enabled = dotdict({
-    "idle": True,
+    "idle": False,
     "up": True,
     "down": True,
     "right": True,
@@ -147,7 +146,7 @@ acts_enabled = dotdict({
     "rifle_infantry": True,
     "barracks": True,
     "town_hall": True,
-    "heal": True
+    "heal": False
 })
 
 

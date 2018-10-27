@@ -56,6 +56,7 @@ class TD2020Game:
                 'gold': INITIAL_GOLD,
                 'timeout': TIMEOUT
             }),
+            """
             dotdict({
                 'x': int(self.n / 2) - 2,
                 'y': int(self.n / 2),
@@ -97,7 +98,7 @@ class TD2020Game:
                 'gold': INITIAL_GOLD,
                 'timeout': TIMEOUT
             }),
-
+            """
         ]
 
     def setInitBoard(self, board_config) -> None:
@@ -176,10 +177,12 @@ class TD2020Game:
                 score_player2 = self.getScore(board, -player)
 
                 if score_player1 == score_player2:
-                    print("#################### TIMEOUT Tie #######################")
+                    if VERBOSE:
+                        print("#################### TIMEOUT Tie #######################")
                     return 0.001
                 better_player = 1 if score_player1 > score_player2 else -1
-                print("#################### TIMEOUT", better_player, score_player1, score_player2, "#######################")
+                if VERBOSE:
+                    print("#################### TIMEOUT", better_player, score_player1, score_player2, "#######################")
                 return better_player
         else:
             if board[0, 0, TIME_IDX] >= MAX_TIME:
@@ -262,8 +265,8 @@ class TD2020Game:
         b.pieces = np.copy(board)
 
         # return b.get_health_score(player)
-        return b.get_money_score(player)
-        # return b.get_combined_score(player)
+        # return b.get_money_score(player)
+        return b.get_combined_score(player)
 
 
 def display(board):

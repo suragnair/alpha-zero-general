@@ -347,4 +347,5 @@ class Board:
         return sum([self[x][y][HEALTH_IDX] for x in range(self.n) for y in range(self.n) if self[x][y][P_NAME_IDX] == player])
 
     def get_combined_score(self, player) -> int:
+        # money is not worth more than 1hp because this forces players to spend money in order to create new units
         return sum([self[x][y][HEALTH_IDX] + self[x][y][MONEY_IDX] for x in range(self.n) for y in range(self.n) if self[x][y][P_NAME_IDX] == player])
