@@ -1,9 +1,10 @@
+import time
 from typing import Tuple
 
 import numpy as np
 
 from td2020.src.Board import Board
-from td2020.src.config import NUM_ENCODERS, NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, HEALTH_IDX, TIME_IDX, VERBOSE, FPS, USE_TIMEOUT, MAX_TIME, d_a_type, a_m_health, INITIAL_GOLD, TIMEOUT
+from td2020.src.config import NUM_ENCODERS, NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, TIME_IDX, VERBOSE, FPS, USE_TIMEOUT, MAX_TIME, d_a_type, a_m_health, INITIAL_GOLD, TIMEOUT, MAKE_STATS
 from td2020.stats.files import Stats
 from utils import dotdict
 
@@ -11,6 +12,7 @@ from utils import dotdict
 # noinspection PyPep8Naming,PyMethodMayBeStatic
 class TD2020Game:
     def __init__(self, n) -> None:
+
         self.n = n
 
         self.initial_board_config = [
@@ -54,6 +56,48 @@ class TD2020Game:
                 'gold': INITIAL_GOLD,
                 'timeout': TIMEOUT
             }),
+            dotdict({
+                'x': int(self.n / 2) - 2,
+                'y': int(self.n / 2),
+                'player': 1,
+                'a_type': d_a_type['Work'],
+                'health': a_m_health[d_a_type['Work']],
+                'carry': 0,
+                'gold': INITIAL_GOLD,
+                'timeout': TIMEOUT
+            }),
+            dotdict({
+                'x': int(self.n / 2) + 1,
+                'y': int(self.n / 2) - 1,
+                'player': -1,
+                'a_type': d_a_type['Work'],
+                'health': a_m_health[d_a_type['Work']],
+                'carry': 0,
+                'gold': INITIAL_GOLD,
+                'timeout': TIMEOUT
+            }),
+
+            dotdict({
+                'x': int(self.n / 2) - 3,
+                'y': int(self.n / 2),
+                'player': 1,
+                'a_type': d_a_type['Rifl'],
+                'health': a_m_health[d_a_type['Rifl']],
+                'carry': 0,
+                'gold': INITIAL_GOLD,
+                'timeout': TIMEOUT
+            }),
+            dotdict({
+                'x': int(self.n / 2) + 2,
+                'y': int(self.n / 2) - 1,
+                'player': -1,
+                'a_type': d_a_type['Rifl'],
+                'health': a_m_health[d_a_type['Rifl']],
+                'carry': 0,
+                'gold': INITIAL_GOLD,
+                'timeout': TIMEOUT
+            }),
+
         ]
 
     def setInitBoard(self, board_config) -> None:
@@ -78,6 +122,7 @@ class TD2020Game:
         return self.n * self.n * NUM_ACTS + 1
 
     def getNextState(self, board: np.ndarray, player: int, action: int) -> Tuple[np.ndarray, int]:
+
         b = Board(self.n)
         b.pieces = np.copy(board)
 
@@ -97,6 +142,7 @@ class TD2020Game:
         return b.pieces, -player
 
     def getValidMoves(self, board: np.ndarray, player: int):
+
         valids = []
         b = Board(self.n)
         b.pieces = np.copy(board)
@@ -113,6 +159,7 @@ class TD2020Game:
 
     # noinspection PyUnusedLocal
     def getGameEnded(self, board: np.ndarray, player) -> float:
+
         # return 0 if not ended, 1 if player 1 won, -1 if player 1 lost
         # player = 1
 
@@ -121,28 +168,26 @@ class TD2020Game:
         # detect timeout
         if USE_TIMEOUT:
             if board[0, 0, TIME_IDX] < 1:
-                if VERBOSE:
-                    print("timeout")
-                Stats.game_end(board[0, 0, TIME_IDX], 0, 'timeout')
 
-                score_player1 = self.getScore(board,player)
-                score_player2 = self.getScore(board,-player)
+                if MAKE_STATS:
+                    Stats.game_end(board[0, 0, TIME_IDX], 0, 'timeout')
+
+                score_player1 = self.getScore(board, player)
+                score_player2 = self.getScore(board, -player)
 
                 if score_player1 == score_player2:
-                    print("#################### TIMEOUT #######################")
-                    print("Tie")
+                    print("#################### TIMEOUT Tie #######################")
                     return 0.001
                 better_player = 1 if score_player1 > score_player2 else -1
-                print("#################### TIMEOUT #######################")
-                print("Higher score achieved", better_player)
+                print("#################### TIMEOUT", better_player, score_player1, score_player2, "#######################")
                 return better_player
         else:
             if board[0, 0, TIME_IDX] >= MAX_TIME:
                 print("######################################## ERROR ####################################")
                 print("################ YOU HAVE TIMEOUTED BECAUSE NO PLAYER HAS LOST YET #################")
                 print("###################################### END ERROR ##################################")
-
-                Stats.game_end(board[0, 0, TIME_IDX], 0, 'timeout')
+                if MAKE_STATS:
+                    Stats.game_end(board[0, 0, TIME_IDX], 0, 'timeout')
                 return 0.001
 
         # detect win condition
@@ -154,70 +199,44 @@ class TD2020Game:
                     sum_p1 += 1
                 if board[x][y][P_NAME_IDX] == -1:
                     sum_p2 += 1
-        """
-        if sum_p1 > 3:
-            if VERBOSE:
-                print("#############################################################")
-                print("game end player +1, tick", board[0, 0, TIME_IDX])
-                print("#############################################################")
-
-            return 1
-        if sum_p2 > 3:
-            if VERBOSE:
-                print("#############################################################")
-                print("game end player -1,tick", board[0, 0, TIME_IDX])
-                print("#############################################################")
-
-            return -1
-        """
-
-        # print("sump", sum_p1,sum_p2)
 
         if sum_p1 < 2:  # SUM IS 1 WHEN PLAYER ONLY HAS MINERALS LEFT
             if VERBOSE:
-                print("#############################################################")
-                print("game end player -1, tick", board[0, 0, TIME_IDX])
-                print("#############################################################")
-            Stats.game_end(board[0, 0, TIME_IDX], -1, 'no_actors')
+                print("################ game end player -1, tick", board[0, 0, TIME_IDX], "################")
+            if MAKE_STATS:
+                Stats.game_end(board[0, 0, TIME_IDX], -1, 'no_actors')
             return -1
         if sum_p2 < 2:  # SUM IS 1 WHEN PLAYER ONLY HAS MINERALS LEFT
             if VERBOSE:
-                print("#############################################################")
-                print("game end player +1,tick", board[0, 0, TIME_IDX])
-                print("#############################################################")
-            Stats.game_end(board[0, 0, TIME_IDX], +1, 'no_actors')
+                print("################ game end player +1,tick", board[0, 0, TIME_IDX], "################")
+            if MAKE_STATS:
+                Stats.game_end(board[0, 0, TIME_IDX], +1, 'no_actors')
 
             return +1
 
         # detect no valid actions - possible tie by overpopulating on non-attacking units and buildings - all fields are full or one player is surrounded:
         if sum(self.getValidMoves(board, 1)) == 0:
             if VERBOSE:
-                print("#############################################################")
-                print("game end player +1,tick", board[0, 0, TIME_IDX])
-                print("No valid moves for player", 1)
-                print("#############################################################")
-            Stats.game_end(board[0, 0, TIME_IDX], -1, 'no_valids')
+                print("################ game end player +1,tick", board[0, 0, TIME_IDX], "No valid moves for player", 1, "################")
+            if MAKE_STATS:
+                Stats.game_end(board[0, 0, TIME_IDX], -1, 'no_valids')
 
             return -1
 
         if sum(self.getValidMoves(board, -1)) == 0:
             if VERBOSE:
-                print("#############################################################")
-                print("game end player +1,tick", board[0, 0, TIME_IDX])
-                print("No valid moves for player", -1)
-                print("#############################################################")
-            Stats.game_end(board[0, 0, TIME_IDX], +1, 'no_valids')
+                print("################ game end player +1,tick", board[0, 0, TIME_IDX], "No valid moves for player", - 1, "################")
+            if MAKE_STATS:
+                Stats.game_end(board[0, 0, TIME_IDX], +1, 'no_valids')
             return 1
         # continue game
         return 0
 
     def getCanonicalForm(self, board: np.ndarray, player: int):
+
         b = np.copy(board)
-        n = b.shape[0]
-        for y in range(n):
-            for x in range(n):
-                act_encode = b[x][y]
-                act_encode[P_NAME_IDX] = act_encode[P_NAME_IDX] * player
+        b[:, :, P_NAME_IDX] = b[:, :, P_NAME_IDX] * player
+
         return b
 
     def getSymmetries(self, board: np.ndarray, pi):
@@ -259,7 +278,7 @@ def display(board):
         update_graphics(board, game_display, clock, FPS)
     else:
         for y in range(n):
-            print('-' * (n * 6 + 1))
+            print('-' * (n * 8 + 1))
             for x in range(n):
                 a_player = board[x][y][P_NAME_IDX]
                 if a_player == 1:
@@ -270,4 +289,4 @@ def display(board):
                     a_player = ' 0'
                 print("|" + a_player + " " + str(board[x][y][A_TYPE_IDX]) + " ", end="")
             print("|")
-        print('-' * (n * 6 + 1))
+        print('-' * (n * 8 + 1 ))

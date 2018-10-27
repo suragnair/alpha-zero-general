@@ -3,8 +3,8 @@ from typing import List, Any
 import numpy as np
 
 from td2020.src.Graph import num_destroys, damage
-from td2020.src.config import d_a_type, a_m_health, d_acts,  A_TYPE_IDX, P_NAME_IDX, CARRY_IDX, MONEY_IDX, a_cost, NUM_ACTS, ACTS_REV, NUM_ENCODERS, MONEY_INC, HEALTH_IDX, TIME_IDX, DAMAGE, DAMAGE_ANYWHERE, DESTROY_ALL, VERBOSE, MAX_GOLD, HEAL_AMOUNT, \
-    a_max_health, SACRIFICIAL_HEAL, HEAL_COST, acts_enabled
+from td2020.src.config import d_a_type, a_m_health, d_acts, A_TYPE_IDX, P_NAME_IDX, CARRY_IDX, MONEY_IDX, a_cost, NUM_ACTS, ACTS_REV, NUM_ENCODERS, MONEY_INC, HEALTH_IDX, TIME_IDX, DAMAGE, DESTROY_ALL, VERBOSE, MAX_GOLD, HEAL_AMOUNT, \
+    a_max_health, SACRIFICIAL_HEAL, HEAL_COST, acts_enabled, MAKE_STATS
 from td2020.stats.files import Stats
 
 
@@ -12,24 +12,19 @@ class Board:
 
     def __init__(self, n) -> None:
         self.n = n
-        self.pieces = []
-        for i in range(self.n):
-            rows = []
-            for j in range(self.n):
-                rows.append([0] * NUM_ENCODERS)
-            self.pieces.append(rows)
-        self.pieces = np.array(self.pieces)
+        self.pieces = np.zeros((self.n, self.n, NUM_ENCODERS))
 
-    def __getitem__(self, index: int) -> List[List[int]]:
+    def __getitem__(self, index: int) -> np.array:
         return self.pieces[index]
 
     def execute_move(self, move, player) -> None:
         x, y, action_index = move
         act = ACTS_REV[action_index]
-        Stats.action(self[x][y][TIME_IDX], act)
-        Stats.sum(self[x][y][TIME_IDX], self)
+        if MAKE_STATS:
+            Stats.action(self[x][y][TIME_IDX], act)
+            Stats.sum(self[x][y][TIME_IDX], self)
         if act == "idle":
-            pass
+            return
         if act == "up":
             new_x, new_y = x, y - 1
             self._move(x, y, new_x, new_y)
@@ -67,19 +62,19 @@ class Board:
             return
         if act == "barracks":
             # if VERBOSE:
-            print("spawned barracks")
+            # print("spawned barracks")
             self._update_money(player, -a_cost[3])
             self._spawn_nearby((x, y), 3)
             return
         if act == "rifle_infantry":
             # if VERBOSE:
-            print("spawned rifle inf")
+            # print("spawned rifle inf")
             self._update_money(player, -a_cost[4])
             self._spawn_nearby((x, y), 4)
             return
         if act == "town_hall":
             # if VERBOSE:
-            print("spawned town hall")
+            # print("spawned town hall")
             self._update_money(player, -a_cost[5])
             self._spawn_nearby((x, y), 5)
             return
@@ -131,17 +126,14 @@ class Board:
     def _attack_nearby(self, square):
         (x, y) = square
 
-        if DAMAGE_ANYWHERE:
-            coordinates = [(n_x, n_y) for n_x in range(self.n) for n_y in range(self.n) if (n_x, n_y) != (x, y)]
-        else:
-            coordinates = [(x - 1, y + 1),
-                           (x, y + 1),
-                           (x + 1, y + 1),
-                           (x - 1, y),
-                           (x + 1, y),
-                           (x - 1, y - 1),
-                           (x, y - 1),
-                           (x + 1, y - 1)]
+        coordinates = [(x - 1, y + 1),
+                       (x, y + 1),
+                       (x + 1, y + 1),
+                       (x - 1, y),
+                       (x + 1, y),
+                       (x - 1, y - 1),
+                       (x, y - 1),
+                       (x + 1, y - 1)]
         for n_x, n_y in coordinates:
             if 0 <= n_x < self.n and 0 <= n_y < self.n:
                 if (self[n_x][n_y][P_NAME_IDX] == -self[x][y][P_NAME_IDX]) and self[n_x][n_y][A_TYPE_IDX] != d_a_type['Gold']:
@@ -204,7 +196,6 @@ class Board:
             if act in acts:
                 # a is now string action
                 move = self._valid_act(square, act) * 1
-
                 if move:
                     moves[i] = move
         # return the generated move list
@@ -250,17 +241,14 @@ class Board:
 
     def _check_if_nearby_attack(self, square):
         (x, y) = square
-        if DAMAGE_ANYWHERE:
-            coordinates = [(n_x, n_y) for n_x in range(self.n) for n_y in range(self.n) if (n_x, n_y) != (x, y)]
-        else:
-            coordinates = [(x - 1, y + 1),
-                           (x, y + 1),
-                           (x + 1, y + 1),
-                           (x - 1, y),
-                           (x + 1, y),
-                           (x - 1, y - 1),
-                           (x, y - 1),
-                           (x + 1, y - 1)]
+        coordinates = [(x - 1, y + 1),
+                       (x, y + 1),
+                       (x + 1, y + 1),
+                       (x - 1, y),
+                       (x + 1, y),
+                       (x - 1, y - 1),
+                       (x, y - 1),
+                       (x + 1, y - 1)]
         for n_x, n_y in coordinates:
             if 0 <= n_x < self.n and 0 <= n_y < self.n:
                 if (self[n_x][n_y][P_NAME_IDX] == -self[x][y][P_NAME_IDX]) and self[n_x][n_y][A_TYPE_IDX] != d_a_type['Gold']:
@@ -339,7 +327,8 @@ class Board:
                     self[x][y][HEALTH_IDX] -= damage_amount
 
                     if self[x][y][HEALTH_IDX] <= 0:
-                        Stats.killed_by(self[x][y][TIME_IDX], self[x][y][A_TYPE_IDX], "time_function")
+                        if MAKE_STATS:
+                            Stats.killed_by(self[x][y][TIME_IDX], self[x][y][A_TYPE_IDX], "time_function")
                         if VERBOSE:
                             print("actor died because of timer kill function", self[x][y][A_TYPE_IDX], "for player", player, "in round", self[0][0][TIME_IDX])
                         time = self[x][y][TIME_IDX]

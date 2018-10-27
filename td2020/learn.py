@@ -1,6 +1,7 @@
 from Coach import Coach
 from td2020.TD2020Game import TD2020Game as Game
 from td2020.keras.NNet import NNetWrapper as nn
+from td2020.src.config import MAKE_STATS
 from td2020.stats.files import Stats
 from utils import *
 
@@ -25,7 +26,8 @@ if __name__ == "__main__":
     g = Game(8)
     nnet = nn(g)
 
-    Stats.clear()
+    if MAKE_STATS:
+        Stats.clear()
 
     if args.load_model:
         nnet.load_checkpoint(args.load_folder_file[0], args.load_folder_file[1])

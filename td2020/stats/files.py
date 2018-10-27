@@ -4,14 +4,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numpy.ma import count
 
-from td2020.src.config import PATH, MAKE_STATS
+from td2020.src.config import PATH
 
 
 class Stats:
     @staticmethod
     def clear():
-        if not MAKE_STATS:
-            return
         files = ["gameEndTurn",
                  "unitKilledBy",
                  "actionExecuted",
@@ -32,32 +30,24 @@ class Stats:
 
     @staticmethod
     def game_end(tick: int, player_name: int, reason: str):
-        if not MAKE_STATS:
-            return
         file_count = len(os.listdir(PATH + "\\..\\stats\\" + "gameEndTurn"))
         with open(PATH + "\\..\\stats\\" + "gameEndTurn" + "\\file_" + str(file_count) + ".txt", "a") as f:
             f.write(str(tick) + " " + str(player_name) + " " + reason + "\n")
 
     @staticmethod
     def killed_by(tick: int, unit_type: int, kill_reason: str):
-        if not MAKE_STATS:
-            return
         file_count = len(os.listdir(PATH + "\\..\\stats\\" + "unitKilledBy"))
         with open(PATH + "\\..\\stats\\" + "unitKilledBy" + "\\file_" + str(file_count) + ".txt", "a") as f:
             f.write(str(tick) + " " + str(unit_type) + " " + kill_reason + "\n")
 
     @staticmethod
     def action(tick: int, action_name: str):
-        if not MAKE_STATS:
-            return
         file_count = len(os.listdir(PATH + "\\..\\stats\\" + "actionExecuted"))
         with open(PATH + "\\..\\stats\\" + "actionExecuted" + "\\file_" + str(file_count) + ".txt", "a") as f:
             f.write(str(tick) + " " + action_name + "\n")
 
     @staticmethod
     def sum(tick: int, board):
-        if not MAKE_STATS:
-            return
         from td2020.src.config import P_NAME_IDX, HEALTH_IDX, A_TYPE_IDX, MONEY_IDX
 
         sum_health_p1 = 0

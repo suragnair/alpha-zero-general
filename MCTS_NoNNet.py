@@ -38,11 +38,15 @@ class MCTS_No_NNet():
         bar = Bar('MCTS', max=self.args.numMCTSSims)
         end = time.time()
         for i in range(self.args.numMCTSSims):
-            mcts_time.update(time.time() - end)
-            end = time.time()
-            bar.suffix = '({eps}/{maxeps}) Eps Time: {et:.3f}s | Total: {total:} | ETA: {eta:}'.format(eps=i + 1, maxeps=self.args.numMCTSSims, et=mcts_time.avg, total=bar.elapsed_td, eta=bar.eta_td)
-            bar.next()
-            self.search(canonicalBoard)
+            self.search(canonicalBoard, 0)
+
+            if i % (self.args.numMCTSSims/10) == 0:
+                mcts_time.update(time.time() - end)
+                end = time.time()
+                bar.suffix = '({eps}/{maxeps}) Eps Time: {et:.3f}s | Total: {total:} | ETA: {eta:}'.format(eps=i, maxeps=self.args.numMCTSSims, et=mcts_time.avg, total=bar.elapsed_td * 10, eta=bar.eta_td)
+
+                bar.next()
+            bar.index+=1
 
         s = self.game.stringRepresentation(canonicalBoard)
         counts = [self.Nsa[(s,a)] if (s,a) in self.Nsa else 0 for a in range(self.game.getActionSize())]
@@ -58,7 +62,7 @@ class MCTS_No_NNet():
         return probs
 
 
-    def search(self, canonicalBoard):
+    def search(self, canonicalBoard, i):
         """
         This function performs one iteration of MCTS. It is recursively called
         till a leaf node is found. The action chosen at each node is one that
@@ -78,6 +82,7 @@ class MCTS_No_NNet():
             v: the negative of the value of the current canonicalBoard
         """
 
+        # print(i)
         s = self.game.stringRepresentation(canonicalBoard)
 
         if s not in self.Es:
@@ -128,7 +133,7 @@ class MCTS_No_NNet():
         next_s, next_player = self.game.getNextState(canonicalBoard, 1, a)
         next_s = self.game.getCanonicalForm(next_s, next_player)
 
-        v = self.search(next_s)
+        v = self.search(next_s, i+1)
 
         if (s,a) in self.Qsa:
             self.Qsa[(s,a)] = (self.Nsa[(s,a)]*self.Qsa[(s,a)] + v)/(self.Nsa[(s,a)]+1)
