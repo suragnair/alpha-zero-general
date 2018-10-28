@@ -1,6 +1,5 @@
 import os
 
-import matplotlib.pyplot as plt
 import numpy as np
 from numpy.ma import count
 
@@ -73,6 +72,8 @@ class Stats:
 
     @staticmethod
     def plot_game_end():
+        import matplotlib.pyplot as plt
+
         file_count = len(os.listdir(PATH + "\\..\\stats\\" + "gameEndTurn"))
         with open(PATH + "\\..\\stats\\" + "gameEndTurn" + "\\file_" + str(file_count) + ".txt", "r") as f:
             x = f.readlines()
@@ -95,6 +96,8 @@ class Stats:
 
     @staticmethod
     def plot_killed_by():
+        import matplotlib.pyplot as plt
+
         file_count = len(os.listdir(PATH + "\\..\\stats\\" + "unitKilledBy"))
         with open(PATH + "\\..\\stats\\" + "unitKilledBy" + "\\file_" + str(file_count) + ".txt", "r") as f:
             x = f.readlines()
@@ -120,6 +123,8 @@ class Stats:
 
     @staticmethod
     def plot_action():
+        import matplotlib.pyplot as plt
+
         file_count = len(os.listdir(PATH + "\\..\\stats\\" + "actionExecuted"))
         with open(PATH + "\\..\\stats\\" + "actionExecuted" + "\\file_" + str(file_count) + ".txt", "r") as f:
             x = f.readlines()
@@ -152,6 +157,7 @@ class Stats:
 
     @staticmethod
     def plot_sum():
+        import matplotlib.pyplot as plt
 
         print("NAROBE JE PLAYER KER JE VEČINA Z +1 KER JE BOARD CANONICAL K SE NARDI SUM")
 

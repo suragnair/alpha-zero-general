@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 
 
 def num_destroys(time):
@@ -10,6 +9,8 @@ def damage(time):
 
 
 if __name__ == "__main__":
+    import matplotlib.pyplot as plt
+
     all_damage_amounts = []
     all_num_destoys_per_turn = []
     for current_time_local in range(1, 2048):
