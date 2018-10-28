@@ -5,23 +5,10 @@ import numpy as np
 
 from td2020.src.config import P_NAME_IDX, A_TYPE_IDX, d_a_color, d_type_rev, PATH, SHOW_PYGAME_WELCOME, MONEY_IDX, TIME_IDX, CARRY_IDX, HEALTH_IDX
 
-if SHOW_PYGAME_WELCOME:
-    import pygame
-else:
-    import os
-    import sys
-
-    with open(os.devnull, 'w') as f:
-        # disable stdout
-        old_std_out = sys.stdout
-        sys.stdout = f
-        import pygame
-
-        # enable stdout
-        sys.stdout = old_std_out
-
 
 def message_display(game_display, text, position, text_size, color=(0, 0, 0)) -> None:
+    import pygame
+
     large_text = pygame.font.SysFont('arial', text_size)
     text_surf = large_text.render(text, True, color)
     text_rect = text_surf.get_rect()
@@ -31,6 +18,8 @@ def message_display(game_display, text, position, text_size, color=(0, 0, 0)) ->
 
 def init_visuals(world_width: int, world_height: int, verbose=True) -> Optional[Tuple[Any, Any]]:
     if verbose:
+        import pygame
+
         pygame.init()
         canvas_scale = int(ctypes.windll.user32.GetSystemMetrics(1) * (2 / 3) / world_height)  # for drawing - it takes 2 thirds of screen height
 
@@ -47,6 +36,8 @@ def init_visuals(world_width: int, world_height: int, verbose=True) -> Optional[
 
 
 def update_graphics(board: np.ndarray, game_display, clock, fps: int = 1) -> None:
+    import pygame
+
     n = board.shape[0]
 
     canvas_scale = int(ctypes.windll.user32.GetSystemMetrics(1) * (16 / 30) / n)  # for drawing - it takes 2 thirds of screen height

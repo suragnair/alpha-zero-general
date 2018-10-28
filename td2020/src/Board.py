@@ -4,8 +4,8 @@ from typing import List, Any
 import numpy as np
 
 from td2020.src.Graph import num_destroys, damage
-from td2020.src.config import d_a_type, a_m_health, d_acts, A_TYPE_IDX, P_NAME_IDX, CARRY_IDX, MONEY_IDX, a_cost, NUM_ACTS, ACTS_REV, NUM_ENCODERS, MONEY_INC, HEALTH_IDX, TIME_IDX, DAMAGE, DESTROY_ALL, VERBOSE, MAX_GOLD, HEAL_AMOUNT, \
-    a_max_health, SACRIFICIAL_HEAL, HEAL_COST, acts_enabled, MAKE_STATS
+from td2020.src.config import d_a_type, a_m_health, d_acts, A_TYPE_IDX, P_NAME_IDX, CARRY_IDX, MONEY_IDX, a_cost, NUM_ACTS, ACTS_REV, NUM_ENCODERS, MONEY_INC, HEALTH_IDX, TIME_IDX, DAMAGE, MAX_GOLD, HEAL_AMOUNT, \
+    a_max_health, SACRIFICIAL_HEAL, HEAL_COST, acts_enabled, MAKE_STATS, visibility
 from td2020.stats.files import Stats
 
 
@@ -159,13 +159,13 @@ class Board:
         self[n_x][n_y][HEALTH_IDX] -= DAMAGE
         if self[n_x][n_y][HEALTH_IDX] <= 0:
             Stats.killed_by(self[n_x][n_x][TIME_IDX], self[n_x][n_x][A_TYPE_IDX], "attack")
-            if VERBOSE:
+            if visibility.verbose:
                 print("destroyed unit type", self[n_x][n_y][A_TYPE_IDX], "on", n_x, n_y, "and destroyer of type", self[x][y][A_TYPE_IDX], "on", x, y)
 
             self[n_x][n_y] = [0] * NUM_ENCODERS
             self[n_x][n_y][TIME_IDX] = self[x][y][TIME_IDX]  # set time back to empty tile just in case
 
-        if VERBOSE:
+        if visibility.verbose:
             print("damaged unit type", self[n_x][n_y][A_TYPE_IDX], "on", n_x, n_y, "and damage initiator of type", self[x][y][A_TYPE_IDX], "on", x, y)
 
     def _spawn(self, x, y, n_x, n_y, a_type):
@@ -225,70 +225,71 @@ class Board:
             return acts_enabled.return_resources and self[x][y][CARRY_IDX] == 1 and self._check_if_nearby(x, y, d_a_type['Hall'], check_friendly=True) and (MAX_GOLD >= self[x][y][MONEY_IDX] + MONEY_INC)
 
         if act == "attack_up":
-            return acts_enabled.attack and self._check_if_attack(x,y,x, y-1)
+            return acts_enabled.attack and self._check_if_attack(x, y, x, y - 1)
         if act == "attack_down":
-            return acts_enabled.attack and self._check_if_attack(x,y,x, y+1)
+            return acts_enabled.attack and self._check_if_attack(x, y, x, y + 1)
         if act == "attack_right":
-            return acts_enabled.attack and self._check_if_attack(x,y,x+1, y)
+            return acts_enabled.attack and self._check_if_attack(x, y, x + 1, y)
         if act == "attack_left":
-            return acts_enabled.attack and self._check_if_attack(x,y,x-1, y)
+            return acts_enabled.attack and self._check_if_attack(x, y, x - 1, y)
 
         if act == "heal_up":
-            return acts_enabled.heal and self._check_if_heal(x, y-1)
+            return acts_enabled.heal and self._check_if_heal(x, y - 1)
         if act == "heal_down":
-            return acts_enabled.heal and self._check_if_heal(x, y+1)
+            return acts_enabled.heal and self._check_if_heal(x, y + 1)
         if act == "heal_right":
-            return acts_enabled.heal and self._check_if_heal(x+1, y)
+            return acts_enabled.heal and self._check_if_heal(x + 1, y)
         if act == "heal_left":
-            return acts_enabled.heal and self._check_if_heal(x-1, y)
+            return acts_enabled.heal and self._check_if_heal(x - 1, y)
 
         if act == "npc_up":
-            return acts_enabled.npc and a_cost[2] <= money and self._check_if_empty(x, y-1)
+            return acts_enabled.npc and a_cost[2] <= money and self._check_if_empty(x, y - 1)
         if act == "npc_down":
-            return acts_enabled.npc and a_cost[2] <= money and self._check_if_empty(x, y+1)
+            return acts_enabled.npc and a_cost[2] <= money and self._check_if_empty(x, y + 1)
         if act == "npc_right":
-            return acts_enabled.npc and a_cost[2] <= money and self._check_if_empty(x+1, y)
+            return acts_enabled.npc and a_cost[2] <= money and self._check_if_empty(x + 1, y)
         if act == "npc_left":
-            return acts_enabled.npc and a_cost[2] <= money and self._check_if_empty(x-1, y)
+            return acts_enabled.npc and a_cost[2] <= money and self._check_if_empty(x - 1, y)
 
         if act == "barracks_up":
-            return acts_enabled.barracks and a_cost[3] <= money and self._check_if_empty(x, y-1)
+            return acts_enabled.barracks and a_cost[3] <= money and self._check_if_empty(x, y - 1)
         if act == "barracks_down":
-            return acts_enabled.barracks and a_cost[3] <= money and self._check_if_empty(x, y+1)
+            return acts_enabled.barracks and a_cost[3] <= money and self._check_if_empty(x, y + 1)
         if act == "barracks_right":
-            return acts_enabled.barracks and a_cost[3] <= money and self._check_if_empty(x+1, y)
+            return acts_enabled.barracks and a_cost[3] <= money and self._check_if_empty(x + 1, y)
         if act == "barracks_left":
-            return acts_enabled.barracks and a_cost[3] <= money and self._check_if_empty(x-1, y)
+            return acts_enabled.barracks and a_cost[3] <= money and self._check_if_empty(x - 1, y)
 
         if act == "rifle_infantry_up":
-            return acts_enabled.rifle_infantry and a_cost[4] <= money and self._check_if_empty(x, y-1)
+            return acts_enabled.rifle_infantry and a_cost[4] <= money and self._check_if_empty(x, y - 1)
         if act == "rifle_infantry_down":
-            return acts_enabled.rifle_infantry and a_cost[4] <= money and self._check_if_empty(x, y+1)
+            return acts_enabled.rifle_infantry and a_cost[4] <= money and self._check_if_empty(x, y + 1)
         if act == "rifle_infantry_right":
-            return acts_enabled.rifle_infantry and a_cost[4] <= money and self._check_if_empty(x+1, y)
+            return acts_enabled.rifle_infantry and a_cost[4] <= money and self._check_if_empty(x + 1, y)
         if act == "rifle_infantry_left":
-            return acts_enabled.rifle_infantry and a_cost[4] <= money and self._check_if_empty(x-1, y)
+            return acts_enabled.rifle_infantry and a_cost[4] <= money and self._check_if_empty(x - 1, y)
 
         if act == "town_hall_up":
-            return acts_enabled.town_hall and a_cost[5] <= money and self._check_if_empty(x, y-1)
+            return acts_enabled.town_hall and a_cost[5] <= money and self._check_if_empty(x, y - 1)
         if act == "town_hall_down":
-            return acts_enabled.town_hall and a_cost[5] <= money and self._check_if_empty(x, y+1)
+            return acts_enabled.town_hall and a_cost[5] <= money and self._check_if_empty(x, y + 1)
         if act == "town_hall_right":
-            return acts_enabled.town_hall and a_cost[5] <= money and self._check_if_empty(x+1, y)
+            return acts_enabled.town_hall and a_cost[5] <= money and self._check_if_empty(x + 1, y)
         if act == "town_hall_left":
-            return acts_enabled.town_hall and a_cost[5] <= money and self._check_if_empty(x-1, y)
-        print("Unrecognised action",act)
+            return acts_enabled.town_hall and a_cost[5] <= money and self._check_if_empty(x - 1, y)
+        print("Unrecognised action", act)
         sys.exit(0)
 
     def _check_if_empty(self, x, y):
-        return self.n > x >= 0 == self[x][y][P_NAME_IDX] and 0 <= y < self.n
+        # noinspection PyChainedComparisons
+        return self.n > x >= 0 and 0 <= y < self.n and self[x][y][P_NAME_IDX] == 0
 
-
-    def _check_if_attack(self, x,y, n_x,n_y):
+    def _check_if_attack(self, x, y, n_x, n_y):
         return 0 <= n_x < self.n and 0 <= n_y < self.n and self[x][y][P_NAME_IDX] == -self[n_x][n_y][P_NAME_IDX] and self[n_x][n_y][A_TYPE_IDX] != d_a_type['Gold']
 
     def _check_if_heal(self, x, y):
-        return 0 <= x < self.n and 0 <= y < self.n and self[x][y][P_NAME_IDX] == self[x][y][P_NAME_IDX] and self[x][y][A_TYPE_IDX] != d_a_type['Gold'] and self[x][y][A_TYPE_IDX] > 0 and self[x][y][HEALTH_IDX] < a_max_health[self[x][y][A_TYPE_IDX]] and (SACRIFICIAL_HEAL or self[x][y][MONEY_IDX] - HEAL_COST >= 0)
+        return 0 <= x < self.n and 0 <= y < self.n and self[x][y][P_NAME_IDX] == self[x][y][P_NAME_IDX] and self[x][y][A_TYPE_IDX] != d_a_type['Gold'] and self[x][y][A_TYPE_IDX] > 0 and self[x][y][HEALTH_IDX] < a_max_health[self[x][y][A_TYPE_IDX]] and (
+                    SACRIFICIAL_HEAL or self[x][y][MONEY_IDX] - HEAL_COST >= 0)
 
     def _check_if_nearby(self, x, y, a_type, check_friendly=False):
         coordinates = [(x - 1, y + 1),
@@ -328,7 +329,7 @@ class Board:
                     if self[x][y][HEALTH_IDX] <= 0:
                         if MAKE_STATS:
                             Stats.killed_by(self[x][y][TIME_IDX], self[x][y][A_TYPE_IDX], "time_function")
-                        if VERBOSE:
+                        if visibility.verbose:
                             print("actor died because of timer kill function", self[x][y][A_TYPE_IDX], "for player", player, "in round", self[0][0][TIME_IDX])
                         time = self[x][y][TIME_IDX]
                         self[x][y] = [0] * NUM_ENCODERS

@@ -1,4 +1,5 @@
 import ctypes
+import os
 from math import sqrt
 from typing import List
 
@@ -6,24 +7,11 @@ import numpy as np
 from pygame.rect import Rect
 
 from td2020.src.Board import Board
-from td2020.src.config import NUM_ACTS, VERBOSE, P_NAME_IDX, A_TYPE_IDX, d_user_shortcuts, FPS, ACTS, d_a_type, ACTS_REV, d_user_shortcuts_rev, SHOW_PYGAME_WELCOME
+from td2020.src.config import NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, d_user_shortcuts, FPS, ACTS, d_a_type, ACTS_REV, d_user_shortcuts_rev, SHOW_PYGAME_WELCOME, visibility
 from td2020.visualization.Graphics import init_visuals, update_graphics, message_display
 from utils import dotdict
 
-if SHOW_PYGAME_WELCOME:
-    import pygame
-else:
-    import os
-    import sys
-
-    with open(os.devnull, 'w') as f:
-        # disable stdout
-        old_std_out = sys.stdout
-        sys.stdout = f
-        import pygame
-
-        # enable stdout
-        sys.stdout = old_std_out
+import pygame
 
 
 class RandomPlayer:
@@ -49,7 +37,7 @@ class HumanTD2020Player:
         self.display_valid_moves(board, valid)
         while True:
 
-            if VERBOSE > 3:
+            if visibility.verbose > 3:
                 a = self._manage_input(board)
                 x, y, action_index = a
 
@@ -88,7 +76,7 @@ class HumanTD2020Player:
     def select_object(board: np.ndarray, click_location: tuple) -> dotdict:
 
         n = board.shape[0]
-        canvas_scale: int = int(ctypes.windll.user32.GetSystemMetrics(1) * (16 / 30) / n)  # for drawing - it takes 2 thirds of screen height
+        canvas_scale = int(ctypes.windll.user32.GetSystemMetrics(1) * (16 / 30) / n)  # for drawing - it takes 2 thirds of screen height
 
         # select object by clicking on it - you can select only your objects
 
@@ -108,7 +96,7 @@ class HumanTD2020Player:
     def _manage_input(self, board: np.ndarray) -> list:
         n = board.shape[0]
 
-        game_display, clock = init_visuals(n, n, VERBOSE)
+        game_display, clock = init_visuals(n, n, visibility.verbose)
         update_graphics(board, game_display, clock, FPS)
 
         canvas_scale: int = int(ctypes.windll.user32.GetSystemMetrics(1) * (16 / 30) / n)
@@ -147,7 +135,7 @@ class HumanTD2020Player:
                             clicked_actor_index_arr = [clicked_actor.x, clicked_actor.y]
 
                             # draw selected bounding box
-                            game_display, clock = init_visuals(n, n, VERBOSE)
+                            game_display, clock = init_visuals(n, n, visibility.verbose)
                             update_graphics(board, game_display, clock, FPS)
 
                             actor_size = int(canvas_scale / 3)

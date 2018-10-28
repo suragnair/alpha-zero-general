@@ -10,14 +10,16 @@ import unreal_engine as ue
 from TFPluginAPI import TFPluginAPI
 
 from MCTS import MCTS
-from td2020.TD2020Game import TD2020Game
+from td2020.TD2020Game import TD2020Game, display
 from td2020.keras.NNet import NNetWrapper as NNet
-from td2020.src.config import ACTS_REV, NUM_ACTS
+from td2020.src.config import ACTS_REV, NUM_ACTS, visibility
 from utils import dotdict
 
 """
 Get Action:
 This classes intended use is connecting to ue4 tensorflow plugin as client and execute predict on given board, that has been setted up as json board input
+
+# IMPORTANT - Dont use "display" which might want to import pygame
 
 Todo:
     Garbage collection
@@ -59,6 +61,7 @@ class TD2020LearnAPI(TFPluginAPI):
                     'timeout': encoded_actor['remaining']
                 })
             )
+
         self.initial_board_config = initial_board_config
         self.owning_player = jsonInput['player']
 
@@ -73,7 +76,6 @@ class TD2020LearnAPI(TFPluginAPI):
             g.setInitBoard(self.initial_board_config)
             b = g.getInitBoard()
             n1p = lambda x: np.argmax(mcts.getActionProb(x, temp=0))
-
             canonical_board = g.getCanonicalForm(b, self.owning_player)
 
             recommended_act = n1p(canonical_board)
@@ -81,7 +83,7 @@ class TD2020LearnAPI(TFPluginAPI):
 
             # gc.collect()
             act = {"x": str(x), "y": str(y), "action": ACTS_REV[action_index]}
-            print("Printing recommended action", self.recommended_act)
+            print("Printing recommended action >>>>>>>>>>>>>>>>>>>>>>>>" + str(self.recommended_act))
             sess.close()
         # gc.collect()
         self.recommended_act = act

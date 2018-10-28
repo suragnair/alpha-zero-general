@@ -9,7 +9,9 @@ PATH = os.path.dirname(os.path.realpath(__file__))
 
 SHOW_TENSORFLOW_GPU = True
 SHOW_PYGAME_WELCOME = False
-VERBOSE = 4
+visibility = dotdict({
+    'verbose': 3
+})
 FPS = 10  # only relevant when pygame
 
 #############################################
@@ -240,37 +242,37 @@ ACTS_REV = {
     30: "heal_left"
 }
 d_user_shortcuts = dotdict({
-     ' ':0,  # idle
-     'w':1,  # up
-     's':2,  # down
-     'd':3,  # right
-     'a':4,  # left
-     'q':5,  # mine_resources
-     'e':6,  # return_resources
-     '1':7,  # attack_up
-     '2':8,  # attack_down
-     '3':9,  # attack_right
-     '4':10,  # attack_left
-     '6':11,  # npc_up
-     '7':12,  # npc_down
-     '8':13,  # npc_right
-     '9':14,  # npc_left
-     't':15,  # rifle_infantry_up
-     'z':16,  # rifle_infantry_down
-     'u':17,  # rifle_infantry_right
-     'i':18,  # rifle_infantry_left
-     'f':19,  # barracks_up
-     'g':20,  # barracks_down
-     'h':21,  # barracks_right
-     'j':22,  # barracks_left
-     'y':23,  # town_hall_up
-     'x':24,  # town_hall_down
-     'c':25,  # town_hall_right
-     'v':26,  # town_hall_left
-     'b':27,  # heal_up
-     'n':28,  # heal_down
-     'm':29,  # heal_right
-     ',':30,  # heal_left
+    ' ': 0,  # idle
+    'w': 1,  # up
+    's': 2,  # down
+    'd': 3,  # right
+    'a': 4,  # left
+    'q': 5,  # mine_resources
+    'e': 6,  # return_resources
+    '1': 7,  # attack_up
+    '2': 8,  # attack_down
+    '3': 9,  # attack_right
+    '4': 10,  # attack_left
+    '6': 11,  # npc_up
+    '7': 12,  # npc_down
+    '8': 13,  # npc_right
+    '9': 14,  # npc_left
+    't': 15,  # rifle_infantry_up
+    'z': 16,  # rifle_infantry_down
+    'u': 17,  # rifle_infantry_right
+    'i': 18,  # rifle_infantry_left
+    'f': 19,  # barracks_up
+    'g': 20,  # barracks_down
+    'h': 21,  # barracks_right
+    'j': 22,  # barracks_left
+    'y': 23,  # town_hall_up
+    'x': 24,  # town_hall_down
+    'c': 25,  # town_hall_right
+    'v': 26,  # town_hall_left
+    'b': 27,  # heal_up
+    'n': 28,  # heal_down
+    'm': 29,  # heal_right
+    ',': 30,  # heal_left
 })
 d_user_shortcuts_rev = dotdict({
     0: ' ',  # idle

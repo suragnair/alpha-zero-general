@@ -4,7 +4,7 @@ from typing import Tuple
 import numpy as np
 
 from td2020.src.Board import Board
-from td2020.src.config import NUM_ENCODERS, NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, TIME_IDX, VERBOSE, FPS, USE_TIMEOUT, MAX_TIME, d_a_type, a_m_health, INITIAL_GOLD, TIMEOUT, MAKE_STATS
+from td2020.src.config import NUM_ENCODERS, NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, TIME_IDX, FPS, USE_TIMEOUT, MAX_TIME, d_a_type, a_m_health, INITIAL_GOLD, TIMEOUT, MAKE_STATS, visibility
 from td2020.stats.files import Stats
 from utils import dotdict
 
@@ -154,11 +154,11 @@ class TD2020Game:
                 score_player2 = self.getScore(board, -player)
 
                 if score_player1 == score_player2:
-                    if VERBOSE:
+                    if visibility.verbose:
                         print("#################### TIMEOUT Tie #######################")
                     return 0.001
                 better_player = 1 if score_player1 > score_player2 else -1
-                if VERBOSE:
+                if visibility.verbose:
                     print("#################### TIMEOUT", better_player, score_player1, score_player2, "#######################")
                 return better_player
         else:
@@ -181,13 +181,13 @@ class TD2020Game:
                     sum_p2 += 1
 
         if sum_p1 < 2:  # SUM IS 1 WHEN PLAYER ONLY HAS MINERALS LEFT
-            if VERBOSE:
+            if visibility.verbose:
                 print("################ game end player -1, tick", board[0, 0, TIME_IDX], "################")
             if MAKE_STATS:
                 Stats.game_end(board[0, 0, TIME_IDX], -1, 'no_actors')
             return -1
         if sum_p2 < 2:  # SUM IS 1 WHEN PLAYER ONLY HAS MINERALS LEFT
-            if VERBOSE:
+            if visibility.verbose:
                 print("################ game end player +1,tick", board[0, 0, TIME_IDX], "################")
             if MAKE_STATS:
                 Stats.game_end(board[0, 0, TIME_IDX], +1, 'no_actors')
@@ -196,7 +196,7 @@ class TD2020Game:
 
         # detect no valid actions - possible tie by overpopulating on non-attacking units and buildings - all fields are full or one player is surrounded:
         if sum(self.getValidMoves(board, 1)) == 0:
-            if VERBOSE:
+            if visibility.verbose:
                 print("################ game end player +1,tick", board[0, 0, TIME_IDX], "No valid moves for player", 1, "################")
             if MAKE_STATS:
                 Stats.game_end(board[0, 0, TIME_IDX], -1, 'no_valids')
@@ -204,7 +204,7 @@ class TD2020Game:
             return -1
 
         if sum(self.getValidMoves(board, -1)) == 0:
-            if VERBOSE:
+            if visibility.verbose:
                 print("################ game end player +1,tick", board[0, 0, TIME_IDX], "No valid moves for player", - 1, "################")
             if MAKE_STATS:
                 Stats.game_end(board[0, 0, TIME_IDX], +1, 'no_valids')
@@ -249,12 +249,12 @@ class TD2020Game:
 def display(board):
     from td2020.visualization.Graphics import init_visuals, update_graphics
 
-    if not VERBOSE:
+    if not visibility.verbose:
         return
 
     n = board.shape[0]
-    if VERBOSE > 3:
-        game_display, clock = init_visuals(n, n, VERBOSE)
+    if visibility.verbose > 3:
+        game_display, clock = init_visuals(n, n, visibility.verbose)
         update_graphics(board, game_display, clock, FPS)
     else:
         for y in range(n):
