@@ -18,7 +18,7 @@ FPS = 10  # only relevant when pygame
 MAKE_STATS = False
 MONEY_INC = 5  # how much money is returned when returned resources
 
-INITIAL_GOLD = 1  # how much initial gold do players get at game begining
+INITIAL_GOLD = 100  # how much initial gold do players get at game begining
 MAX_GOLD = 255  # to encode with onehot encoder in 8 bits
 
 SACRIFICIAL_HEAL = False
@@ -239,36 +239,79 @@ ACTS_REV = {
     29: "heal_right",
     30: "heal_left"
 }
-
 d_user_shortcuts = dotdict({
-    ' ': 0,  # idle
-    'w': 1,  # up
-    's': 2,  # down
-    'd': 3,  # right
-    'a': 4,  # left
-    'g': 5,  # mine_resources
-    'r': 6,  # return_resources
-    'q': 7,  # attack
-    'x': 8,  # npc
-    'c': 9,  # rifle_infantry
-    'v': 10,  # barracks
-    'b': 11,  # town_hall
-    'e': 12  # heal
+     ' ':0,  # idle
+     'w':1,  # up
+     's':2,  # down
+     'd':3,  # right
+     'a':4,  # left
+     'q':5,  # mine_resources
+     'e':6,  # return_resources
+     '1':7,  # attack_up
+     '2':8,  # attack_down
+     '3':9,  # attack_right
+     '4':10,  # attack_left
+     '6':11,  # npc_up
+     '7':12,  # npc_down
+     '8':13,  # npc_right
+     '9':14,  # npc_left
+     't':15,  # rifle_infantry_up
+     'z':16,  # rifle_infantry_down
+     'u':17,  # rifle_infantry_right
+     'i':18,  # rifle_infantry_left
+     'f':19,  # barracks_up
+     'g':20,  # barracks_down
+     'h':21,  # barracks_right
+     'j':22,  # barracks_left
+     'y':23,  # town_hall_up
+     'x':24,  # town_hall_down
+     'c':25,  # town_hall_right
+     'v':26,  # town_hall_left
+     'b':27,  # heal_up
+     'n':28,  # heal_down
+     'm':29,  # heal_right
+     ',':30,  # heal_left
 })
 d_user_shortcuts_rev = dotdict({
     0: ' ',  # idle
+
     1: 'w',  # up
     2: 's',  # down
     3: 'd',  # right
     4: 'a',  # left
-    5: 'g',  # mine_resources
-    6: 'r',  # return_resources
-    7: 'q',  # attack
-    8: 'x',  # npc
-    9: 'c',  # rifle_infantry
-    10: 'v',  # barracks
-    11: 'b',  # town_hall
-    12: 'e'  # heal
+
+    5: 'q',  # mine_resources
+    6: 'e',  # return_resources
+
+    7: '1',  # attack_up
+    8: '2',  # attack_down
+    9: '3',  # attack_right
+    10: '4',  # attack_left
+
+    11: '6',  # npc_up
+    12: '7',  # npc_down
+    13: '8',  # npc_right
+    14: '9',  # npc_left
+
+    15: 't',  # rifle_infantry_up
+    16: 'z',  # rifle_infantry_down
+    17: 'u',  # rifle_infantry_right
+    18: 'i',  # rifle_infantry_left
+
+    19: 'f',  # barracks_up
+    20: 'g',  # barracks_down
+    21: 'h',  # barracks_right
+    22: 'j',  # barracks_left
+
+    23: 'y',  # town_hall_up
+    24: 'x',  # town_hall_down
+    25: 'c',  # town_hall_right
+    26: 'v',  # town_hall_left
+
+    27: 'b',  # heal_up
+    28: 'n',  # heal_down
+    29: 'm',  # heal_right
+    30: ',',  # heal_left
 })
 
 ######################################################

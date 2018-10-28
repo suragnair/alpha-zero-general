@@ -167,7 +167,7 @@ class HumanTD2020Player:
                             for i in range(len(valids_square)):
                                 if valids_square[i]:
                                     text_scale = int(actor_size * 0.5)
-                                    message_display(game_display, u"" + ACTS_REV[i] + " s: '" + d_user_shortcuts_rev[i] + "'", (n * canvas_scale + canvas_scale / 2, canvas_scale / 4 + printed_actions * text_scale), text_scale)
+                                    message_display(game_display, u"" + ACTS_REV[i] + " s: '" + d_user_shortcuts_rev[i] + "'", ( 3*canvas_scale + int(printed_actions%3)*canvas_scale*2, (n+1) * canvas_scale+ text_scale/2 + int(printed_actions/3) * text_scale + int(text_scale/4)), text_scale)
                                     printed_actions += 1
                             # update display
                             pygame.display.update()

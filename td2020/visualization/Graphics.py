@@ -32,14 +32,15 @@ def message_display(game_display, text, position, text_size, color=(0, 0, 0)) ->
 def init_visuals(world_width: int, world_height: int, verbose=True) -> Optional[Tuple[Any, Any]]:
     if verbose:
         pygame.init()
-        canvas_scale: int = int(ctypes.windll.user32.GetSystemMetrics(1) * (2 / 3) / world_height)  # for drawing - it takes 2 thirds of screen height
+        canvas_scale = int(ctypes.windll.user32.GetSystemMetrics(1) * (2 / 3) / world_height)  # for drawing - it takes 2 thirds of screen height
 
         # square
 
         display_width, display_height = world_width * canvas_scale, world_height * canvas_scale  # for example 800
 
         game_display = pygame.display.set_mode((display_width, display_height))
-        pygame.display.set_caption('TD2020 Python game')
+        pygame.display.set_caption('RTS visualization Python game')
+
         clock = pygame.time.Clock()
 
         return game_display, clock
@@ -48,15 +49,17 @@ def init_visuals(world_width: int, world_height: int, verbose=True) -> Optional[
 def update_graphics(board: np.ndarray, game_display, clock, fps: int = 1) -> None:
     n = board.shape[0]
 
-    canvas_scale: int = int(ctypes.windll.user32.GetSystemMetrics(1) * (16 / 30) / n)  # for drawing - it takes 2 thirds of screen height
+    canvas_scale = int(ctypes.windll.user32.GetSystemMetrics(1) * (16 / 30) / n)  # for drawing - it takes 2 thirds of screen height
 
     # clear display
     game_display.fill((255, 255, 255))
     # self.display_img(game_display, x,y)
 
+    # title
+    # message_display(game_display, u"" + ' ' + str(gold_p1), (int((n / 8) * canvas_scale), (n+1) * canvas_scale + int(int(canvas_scale / 12) + canvas_scale * (0 / 4) + int(canvas_scale * (1 / 8)))), int(canvas_scale / 6))
+
     # draw grid:
     for y in range(canvas_scale, (n + 2) * canvas_scale, canvas_scale):
-
         pygame.draw.line(game_display, (0, 0, 0), [y, canvas_scale], [y, (n + 1) * canvas_scale])
         for x in range(canvas_scale, (n + 2) * canvas_scale, canvas_scale):
             pygame.draw.line(game_display, (0, 0, 0), [canvas_scale, x], [(n + 1) * canvas_scale, x])
@@ -67,12 +70,11 @@ def update_graphics(board: np.ndarray, game_display, clock, fps: int = 1) -> Non
     gold_p1 = board[int(n / 2) - 1][int(n / 2)][MONEY_IDX]
     gold_p2 = board[int(n / 2)][int(n / 2) - 1][MONEY_IDX]
 
-    message_display(game_display, u"" + 'Gold Player +1: ' + str(gold_p1), (int((n / 4) * canvas_scale), int(0 + canvas_scale / 6)), int(canvas_scale / 3))
-    message_display(game_display, u"" + 'Gold Player -1: ' + str(gold_p2), (int((n / 4) * canvas_scale), int(0 + canvas_scale * (2 / 3))), int(canvas_scale / 3))
+    message_display(game_display, u"" + 'Gold Player +1: ' + str(gold_p1), (int((n / 8) * canvas_scale), (n + 1) * canvas_scale + int(int(canvas_scale / 12) + canvas_scale * (0 / 4) + int(canvas_scale * (1 / 8)))), int(canvas_scale / 6))
+    message_display(game_display, u"" + 'Gold Player -1: ' + str(gold_p2), (int((n / 8) * canvas_scale), (n + 1) * canvas_scale + int(int(canvas_scale / 12) + canvas_scale * (1 / 4) + int(canvas_scale * (1 / 8)))), int(canvas_scale / 6))
 
     time_remaining = board[0][0][TIME_IDX]
-
-    message_display(game_display, u"" + 'Remaining ' + str(time_remaining), (int((n * (3 / 4)) * canvas_scale), int(0 + canvas_scale / 6)), int(canvas_scale / 3))
+    message_display(game_display, u"" + 'Remaining ' + str(time_remaining), (int((n / 8) * canvas_scale), (n + 1) * canvas_scale + int(int(canvas_scale / 12) + canvas_scale * (2 / 4) + int(canvas_scale * (1 / 8)))), int(canvas_scale / 6))
 
     for y in range(n):
         for x in range(n):
