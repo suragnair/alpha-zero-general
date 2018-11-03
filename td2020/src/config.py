@@ -10,9 +10,9 @@ PATH = os.path.dirname(os.path.realpath(__file__))
 SHOW_TENSORFLOW_GPU = True
 SHOW_PYGAME_WELCOME = False
 visibility = dotdict({
-    'verbose': 3
+    'verbose': 4
 })
-FPS = 10  # only relevant when pygame
+FPS = 100  # only relevant when pygame
 
 #############################################
 #############################################

@@ -1,4 +1,4 @@
-from Coach import Coach
+from td2020.Coach_Fixed import Coach
 from td2020.TD2020Game import TD2020Game as Game
 from td2020.keras.NNet import NNetWrapper as nn
 from td2020.src.config import MAKE_STATS
@@ -17,8 +17,8 @@ args = dotdict({
 
     'checkpoint': '.\\..\\temp\\',
     'load_model': False,
-    'load_folder_file': ('/dev/models/8x100x50', 'best.pth.tar'),
-    'numItersForTrainExamplesHistory': 20,
+    'load_folder_file': ('.\\..\\temp\\', 'checkpoint_3.pth.tar'),
+    'numItersForTrainExamplesHistory': 3,
 
 })
 

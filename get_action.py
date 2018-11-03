@@ -30,8 +30,6 @@ Todo:
 
 class TD2020LearnAPI(TFPluginAPI):
     def __init__(self):
-        # gc.enable()
-        self.recommended_act = None
         self.owning_player = None
         self.initial_board_config = None
 
@@ -39,13 +37,6 @@ class TD2020LearnAPI(TFPluginAPI):
         pass
 
     def onJsonInput(self, jsonInput):
-        if self.recommended_act:
-            act1 = self.recommended_act
-            self.recommended_act = None
-            # collecting garbage - this causes stutter in game
-            # gc.collect()
-            return act1
-
         encoded_actors = jsonInput['data']
         initial_board_config = []
         for encoded_actor in encoded_actors:
@@ -64,14 +55,12 @@ class TD2020LearnAPI(TFPluginAPI):
 
         self.initial_board_config = initial_board_config
         self.owning_player = jsonInput['player']
-
-    def onBeginTraining(self):
         with tf.Session() as sess:
             current_directory = os.path.join(os.path.dirname(__file__), 'temp/')
             g = TD2020Game(8)
             n1 = NNet(g)
-            n1.load_checkpoint(current_directory, 'temp.pth.tar')
-            args = dotdict({'numMCTSSims': 50, 'cpuct': 1.0})
+            n1.load_checkpoint(current_directory, 'best.pth.tar')
+            args = dotdict({'numMCTSSims': 10, 'cpuct': 1.0})
             mcts = MCTS(g, n1, args)
             g.setInitBoard(self.initial_board_config)
             b = g.getInitBoard()
@@ -83,11 +72,16 @@ class TD2020LearnAPI(TFPluginAPI):
 
             # gc.collect()
             act = {"x": str(x), "y": str(y), "action": ACTS_REV[action_index]}
-            print("Printing recommended action >>>>>>>>>>>>>>>>>>>>>>>>" + str(self.recommended_act))
+            print("Printing recommended action >>>>>>>>>>>>>>>>>>>>>>>>" + str(act))
             sess.close()
         # gc.collect()
-        self.recommended_act = act
-        return ""
+        # self.recommended_act = act
+        return act
+
+
+
+    def onBeginTraining(self):
+       pass
 
     def run(self, args):
         pass
