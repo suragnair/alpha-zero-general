@@ -100,7 +100,8 @@ class TD2020LearnAPI(TFPluginAPI):
     # noinspection PyUnusedLocal
     def close(self, args):
         print("Closing Get Action")
-        self.session_var.close()
+        if self.session_var:
+            self.session_var.close()
         self.owning_player = None
         self.initial_board_config = None
         self.setup = False

@@ -6,18 +6,18 @@ from td2020.stats.files import Stats
 from utils import *
 
 args = dotdict({
-    'numIters': 10,
+    'numIters': 40,
     'numEps': 10,
     'tempThreshold': 15,
     'updateThreshold': 0.6,
     'maxlenOfQueue': 32000,  # 2.5 gig of ram is 8k training samples - so in total 10 gig of ram
-    'numMCTSSims': 30,
+    'numMCTSSims': 100,
     'arenaCompare': 20,
     'cpuct': 1,
 
     'checkpoint': '.\\..\\temp\\',
     'load_model': False,
-    'load_folder_file': ('.\\..\\temp\\', 'checkpoint_3.pth.tar'),
+    'load_folder_file': ('.\\..\\temp\\', 'checkpoint_4.pth.tar'),
     'numItersForTrainExamplesHistory': 3,
 
 })

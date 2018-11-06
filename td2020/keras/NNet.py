@@ -5,19 +5,9 @@ import numpy as np
 
 from NeuralNet import NeuralNet
 from td2020.keras.TD2020NNet import TD2020NNet
-from td2020.src.config import encoder
+from td2020.src.config import encoder, visibility
 from utils import *
 
-"""
-args = dotdict({
-    'lr': 0.001,
-    'dropout': 0.3,
-    'epochs': 2,
-    'batch_size': 64,
-    'cuda': False,
-    'num_channels': 512,
-})
-"""
 args = dotdict({
     'lr': 0.001,
     'dropout': 0.3,
@@ -46,7 +36,7 @@ class NNetWrapper(NeuralNet):
 
         input_boards = encoder.encode_multiple(input_boards)
 
-        self.nnet.model.fit(x=input_boards, y=[target_pis, target_vs], batch_size=args.batch_size, epochs=args.epochs)
+        self.nnet.model.fit(x=input_boards, y=[target_pis, target_vs], batch_size=args.batch_size, epochs=args.epochs, visibility=visibility.verbose_learn)
 
     def predict(self, board):
         """
