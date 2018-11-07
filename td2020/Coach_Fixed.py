@@ -139,8 +139,13 @@ class Coach():
         if not os.path.exists(folder):
             os.makedirs(folder)
         filename = os.path.join(folder, self.getCheckpointFile(iteration)+".examples")
-        with open(filename, "wb+") as f:
-            Pickler(f).dump(self.trainExamplesHistory)
+        try:
+            with open(filename, "wb+") as f:
+                Pickler(f).dump(self.trainExamplesHistory)
+        except MemoryError as memory_error:
+            print("REMOVING TRAIN EXAMPLES BECAUSE OF ERROR WHEN PICKLE DUMPING", "in iteration", iteration, memory_error)
+            self.trainExamplesHistory.pop(0)
+            self.saveTrainExamples(iteration)
         f.closed
 
     def loadTrainExamples(self):

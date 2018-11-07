@@ -10,7 +10,7 @@ args = dotdict({
     'numEps': 10,
     'tempThreshold': 15,
     'updateThreshold': 0.6,
-    'maxlenOfQueue': 32000,  # 2.5 gig of ram is 8k training samples - so in total 10 gig of ram
+    'maxlenOfQueue': 8000,  # THIS SHOULD BE NUM_EPS * 800
     'numMCTSSims': 100,
     'arenaCompare': 20,
     'cpuct': 1,
@@ -18,7 +18,7 @@ args = dotdict({
     'checkpoint': '.\\..\\temp\\',
     'load_model': False,
     'load_folder_file': ('.\\..\\temp\\', 'checkpoint_4.pth.tar'),
-    'numItersForTrainExamplesHistory': 3,
+    'numItersForTrainExamplesHistory': 99999, # This can be unlimited, as i am removing train examples on dump crash
 
 })
 
