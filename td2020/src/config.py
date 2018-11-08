@@ -7,6 +7,9 @@ USE_TF_CPU = False
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 
+learn_file = ".\\..\\temp\\learning.txt"
+
+
 SHOW_TENSORFLOW_GPU = True
 SHOW_PYGAME_WELCOME = False
 visibility = dotdict({
@@ -21,7 +24,7 @@ FPS = 100  # only relevant when pygame
 MAKE_STATS = False
 MONEY_INC = 5  # how much money is returned when returned resources
 
-INITIAL_GOLD = 100  # how much initial gold do players get at game begining
+INITIAL_GOLD = 20  # how much initial gold do players get at game begining
 MAX_GOLD = 255  # to encode with onehot encoder in 8 bits
 
 SACRIFICIAL_HEAL = False
@@ -149,12 +152,12 @@ acts_enabled = dotdict({  # mine and return resources only
     "left": True,
     "mine_resources": True,
     "return_resources": True,
-    "attack": False,
-    "npc": False,
-    "rifle_infantry": False,
-    "barracks": False,
-    "town_hall": False,
-    "heal": False
+    "attack": True,
+    "npc": True,
+    "rifle_infantry": True,
+    "barracks": True,
+    "town_hall": True,
+    "heal": True
 })
 
 ACTS = {

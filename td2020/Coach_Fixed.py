@@ -1,3 +1,6 @@
+import datetime
+
+import psutil
 from collections import deque
 from Arena import Arena
 from MCTS import MCTS
@@ -6,6 +9,8 @@ from pytorch_classification.utils import Bar, AverageMeter
 import time, os, sys
 from pickle import Pickler, Unpickler
 from random import shuffle
+
+from td2020.src.config import learn_file
 
 
 class Coach():
@@ -72,19 +77,21 @@ class Coach():
 
         for i in range(1, self.args.numIters+1):
             # bookkeeping
+            with open(learn_file, "a") as f:
+                f.write('------ITER ' + str(i) + '------' +  str(datetime.datetime.now())+ '\n')
             print('------ITER ' + str(i) + '------')
             # examples of the iteration
             if not self.skipFirstSelfPlay or i>1:
                 iterationTrainExamples = deque([], maxlen=self.args.maxlenOfQueue)
-    
+
                 eps_time = AverageMeter()
                 bar = Bar('Self Play', max=self.args.numEps)
                 end = time.time()
-    
+
                 for eps in range(self.args.numEps):
                     self.mcts = MCTS(self.game, self.nnet, self.args)   # reset search tree
                     iterationTrainExamples += self.executeEpisode()
-    
+
                     # bookkeeping + plot progress
                     eps_time.update(time.time() - end)
                     end = time.time()
@@ -95,14 +102,16 @@ class Coach():
 
                 # save the iteration examples to the history 
                 self.trainExamplesHistory.append(iterationTrainExamples)
-                
+            with open(learn_file, "a") as f:
+                f.write("len(trainExamplesHistory) ="+ str(len(self.trainExamplesHistory))+"\n")
+                f.write("Free memory: "+ str(psutil.virtual_memory().available / 1000000000 )+ "Gig\n" )
             if len(self.trainExamplesHistory) > self.args.numItersForTrainExamplesHistory:
                 print("len(trainExamplesHistory) =", len(self.trainExamplesHistory), " => remove the oldest trainExamples")
                 self.trainExamplesHistory.pop(0)
             # backup history to a file
             # NB! the examples were collected using the model from the previous iteration, so (i-1)  
             self.saveTrainExamples(i-1)
-            
+
             # shuffle examlpes before training
             trainExamples = []
             for e in self.trainExamplesHistory:
@@ -113,7 +122,7 @@ class Coach():
             self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
             self.pnet.load_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
             pmcts = MCTS(self.game, self.pnet, self.args)
-            
+
             self.nnet.train(trainExamples)
             nmcts = MCTS(self.game, self.nnet, self.args)
 
@@ -129,12 +138,13 @@ class Coach():
             else:
                 print('ACCEPTING NEW MODEL')
                 self.nnet.save_checkpoint(folder=self.args.checkpoint, filename=self.getCheckpointFile(i))
-                self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')                
+                self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')
 
     def getCheckpointFile(self, iteration):
         return 'checkpoint_' + str(iteration) + '.pth.tar'
 
     def saveTrainExamples(self, iteration):
+        return
         folder = self.args.checkpoint
         if not os.path.exists(folder):
             os.makedirs(folder)
@@ -149,6 +159,7 @@ class Coach():
         f.closed
 
     def loadTrainExamples(self):
+        return
         modelFile = os.path.join(self.args.load_folder_file[0], self.args.load_folder_file[1])
         examplesFile = modelFile+".examples"
         if not os.path.isfile(examplesFile):

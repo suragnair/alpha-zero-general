@@ -56,27 +56,6 @@ class TD2020Game:
                 'gold': INITIAL_GOLD,
                 'timeout': TIMEOUT
             }),
-            dotdict({
-                'x': int(self.n / 2) - 1,
-                'y': int(self.n / 2) - 2,
-                'player': 1,
-                'a_type': d_a_type['Work'],
-                'health': a_m_health[d_a_type['Work']],
-                'carry': 0,
-                'gold': INITIAL_GOLD,
-                'timeout': TIMEOUT
-            }),
-            dotdict({
-                'x': int(self.n / 2),
-                'y': int(self.n / 2) - 2,
-                'player': -1,
-                'a_type': d_a_type['Work'],
-                'health': a_m_health[d_a_type['Work']],
-                'carry': 0,
-                'gold': INITIAL_GOLD,
-                'timeout': TIMEOUT
-            }),
-
         ]
 
     def setInitBoard(self, board_config) -> None:
@@ -242,8 +221,8 @@ class TD2020Game:
         b.pieces = np.copy(board)
 
         # return b.get_health_score(player)
-        return b.get_money_score(player)
-        # return b.get_combined_score(player)
+        # return b.get_money_score(player)
+        return b.get_combined_score(player)
 
 
 def display(board):
