@@ -1,25 +1,24 @@
 from td2020.Coach_Fixed import Coach
 from td2020.TD2020Game import TD2020Game as Game
 from td2020.keras.NNet import NNetWrapper as nn
-from td2020.src.config import MAKE_STATS, USE_ONE_HOT_ENCODER, INITIAL_GOLD, USE_TIMEOUT, HEAL_COST, HEAL_AMOUNT, MONEY_INC, DAMAGE, acts_enabled, learn_file
+from td2020.src.config import MAKE_STATS, USE_ONE_HOT_ENCODER, INITIAL_GOLD, USE_TIMEOUT, HEAL_COST, HEAL_AMOUNT, MONEY_INC, DAMAGE, acts_enabled, learn_file, TIMEOUT
 from td2020.stats.files import Stats
 from utils import *
 import datetime
 
-
 args = dotdict({
-    'numIters': 40,
+    'numIters': 30,
     'numEps': 8,
     'tempThreshold': 15,
     'updateThreshold': 0.6,
     'maxlenOfQueue': 6400,  # THIS SHOULD BE NUM_EPS * 800
-    'numMCTSSims': 50,
-    'arenaCompare': 20,
+    'numMCTSSims': 30,
+    'arenaCompare': 10,
     'cpuct': 1,
 
     'checkpoint': '.\\..\\temp\\',
     'load_model': False,
-    'load_folder_file': ('.\\..\\temp\\', 'checkpoint_4.pth.tar'),
+    'load_folder_file': ('.\\..\\temp\\', 'checkpoint_13.pth.tar'),
     'numItersForTrainExamplesHistory': 8,
 })
 from td2020.keras.NNet import args as nnet_args
@@ -50,6 +49,7 @@ if __name__ == "__main__":
                 + "HEAL_AMOUNT: " + str(HEAL_AMOUNT) + "\n"
                 + "HEAL_COST: " + str(HEAL_COST) + "\n"
                 + "USE_TIMEOUT: " + str("Using timeout" if USE_TIMEOUT else "Using Kill function") + "\n"
+                + "timeout: " + str(TIMEOUT) + "\n"
                 + "\n"
                 + "Actions\n"
                 + "idle: " + str(acts_enabled.idle) + "\n"
@@ -69,7 +69,7 @@ if __name__ == "__main__":
                 + "\n"
                 + "\n"
                 )
-        f.write("Learning started " + str(datetime.datetime.now())+ "\n")
+        f.write("Learning started " + str(datetime.datetime.now()) + "\n")
 
     g = Game(8)
     nnet = nn(g)

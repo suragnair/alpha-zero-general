@@ -9,33 +9,32 @@ PATH = os.path.dirname(os.path.realpath(__file__))
 
 learn_file = ".\\..\\temp\\learning.txt"
 
-
 SHOW_TENSORFLOW_GPU = True
 SHOW_PYGAME_WELCOME = False
 visibility = dotdict({
-    'verbose': 0,
+    'verbose': 4,
     'verbose_learn': 0
 })
-FPS = 100  # only relevant when pygame
+FPS = 1000  # only relevant when pygame
 
 #############################################
 #############################################
 
 MAKE_STATS = False
-MONEY_INC = 5  # how much money is returned when returned resources
+MONEY_INC = 1  # how much money is returned when returned resources
 
-INITIAL_GOLD = 20  # how much initial gold do players get at game begining
+INITIAL_GOLD = 1  # how much initial gold do players get at game begining
 MAX_GOLD = 255  # to encode with onehot encoder in 8 bits
 
 SACRIFICIAL_HEAL = False
-HEAL_AMOUNT = 20
-HEAL_COST = 5
+HEAL_AMOUNT = 5
+HEAL_COST = 1
 
 USE_TIMEOUT = True
 MAX_TIME = 2048  # this gets used by kill function that determines the end point
 if USE_TIMEOUT:
     print("Using Timeout")
-    TIMEOUT = 100  # how many turns until game end - this gets reduced when each turn is executed
+    TIMEOUT = 200  # how many turns until game end - this gets reduced when each turn is executed
 else:
     print("Using Kill Function")
     TIMEOUT = 0  # sets initial tick to 0 and then in getGameEnded it gets incremented unitl number 8191
@@ -47,7 +46,7 @@ if DESTROY_ALL:
 
 ############################################
 #############################################
-USE_ONE_HOT_ENCODER = False
+USE_ONE_HOT_ENCODER = True
 if USE_ONE_HOT_ENCODER:
     print("Using One hot encoder")
     encoder = OneHotEncoder()
@@ -72,6 +71,13 @@ d_a_type = dotdict({
     'Barr': 3,
     'Rifl': 4,
     'Hall': 5,
+})
+d_type_rev = dotdict({
+    1: 'Gold',
+    2: 'Work',
+    3: 'Barr',
+    4: 'Rifl',
+    5: 'Hall',
 })
 d_acts = dotdict({
     1: [],  # Gold
@@ -111,14 +117,6 @@ d_acts_int = dotdict({
     5: [0,
         11, 12, 13, 14,
         27, 28, 29, 30],  # Hall
-})
-
-d_type_rev = dotdict({
-    1: 'Gold',
-    2: 'Work',
-    3: 'Barr',
-    4: 'Rifl',
-    5: 'Hall',
 })
 
 a_max_health = dotdict({  # MAX HEALTH THAT UNIT CAN HAVE - this gets in use when ill be implementing healing

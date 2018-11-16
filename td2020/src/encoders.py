@@ -76,10 +76,13 @@ class OneHotEncoder(Encoder):
 
     @staticmethod
     def itb(num: int, length: int) -> List[int]:
+        num = int(num)
         if length == 1:
             return [int(i) for i in '{0:01b}'.format(num)]
         if length == 2:
             return [int(i) for i in '{0:02b}'.format(num)]
+        if length == 3:
+            return [int(i) for i in '{0:03b}'.format(num)]
         if length == 4:
             return [int(i) for i in '{0:04b}'.format(num)]
         if length == 5:

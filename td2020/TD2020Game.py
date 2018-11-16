@@ -17,7 +17,7 @@ class TD2020Game:
 
         self.initial_board_config = [
             dotdict({
-                'x': int(self.n / 2) - 1,
+                'x': self.n - 1,
                 'y': int(self.n / 2),
                 'player': 1,
                 'a_type': d_a_type['Gold'],
@@ -27,7 +27,7 @@ class TD2020Game:
                 'timeout': TIMEOUT
             }),
             dotdict({
-                'x': int(self.n / 2),
+                'x': 0,
                 'y': int(self.n / 2),
                 'player': -1,
                 'a_type': d_a_type['Gold'],
@@ -248,4 +248,4 @@ def display(board):
                     a_player = ' 0'
                 print("|" + a_player + " " + str(board[x][y][A_TYPE_IDX]) + " ", end="")
             print("|")
-        print('-' * (n * 8 + 1 ))
+        print('-' * (n * 8 + 1))
