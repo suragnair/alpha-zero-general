@@ -7,7 +7,7 @@ from utils import *
 import datetime
 
 args = dotdict({
-    'numIters': 30,
+    'numIters': 60,
     'numEps': 8,
     'tempThreshold': 15,
     'updateThreshold': 0.6,
@@ -24,6 +24,7 @@ args = dotdict({
 from td2020.keras.NNet import args as nnet_args
 
 if __name__ == "__main__":
+    grid_size = 8
 
     print(datetime.datetime.now())
     with open(learn_file, "w") as f:
@@ -50,6 +51,7 @@ if __name__ == "__main__":
                 + "HEAL_COST: " + str(HEAL_COST) + "\n"
                 + "USE_TIMEOUT: " + str("Using timeout" if USE_TIMEOUT else "Using Kill function") + "\n"
                 + "timeout: " + str(TIMEOUT) + "\n"
+                + "grid_size: " + str(grid_size) + "\n"
                 + "\n"
                 + "Actions\n"
                 + "idle: " + str(acts_enabled.idle) + "\n"
@@ -71,7 +73,7 @@ if __name__ == "__main__":
                 )
         f.write("Learning started " + str(datetime.datetime.now()) + "\n")
 
-    g = Game(8)
+    g = Game(grid_size)
     nnet = nn(g)
 
     if MAKE_STATS:

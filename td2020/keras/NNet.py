@@ -2,6 +2,8 @@ import os
 import time
 
 import numpy as np
+from tensorflow.python.keras.callbacks import TensorBoard
+from tensorflow.python.keras.utils import plot_model
 
 from NeuralNet import NeuralNet
 from td2020.keras.TD2020NNet import TD2020NNet
@@ -25,6 +27,9 @@ class NNetWrapper(NeuralNet):
         self.board_x, self.board_y, num_encoders = game.getBoardSize()
         self.action_size = game.getActionSize()
 
+        self.tensorboard = TensorBoard(log_dir='C:\\TrumpDefense2020\\TD2020\\Content\\Scripts\\td2020\\models\\logs' + type(self.nnet).__name__, histogram_freq=0, write_graph=True, write_images=True)
+        plot_model(self.nnet.model, to_file='C:\\TrumpDefense2020\\TD2020\\Content\\Scripts\\td2020\\models\\' + type(self.nnet).__name__ + '_model_plot.png', show_shapes=True, show_layer_names=True)
+
     def train(self, examples):
         """
         examples: list of examples, each example is of form (board, pi, v)
@@ -36,7 +41,7 @@ class NNetWrapper(NeuralNet):
 
         input_boards = encoder.encode_multiple(input_boards)
 
-        self.nnet.model.fit(x=input_boards, y=[target_pis, target_vs], batch_size=args.batch_size, epochs=args.epochs, verbose=visibility.verbose_learn)
+        self.nnet.model.fit(x=input_boards, y=[target_pis, target_vs], batch_size=args.batch_size, epochs=args.epochs, verbose=visibility.verbose_learn, callbacks=[self.tensorboard])
 
     def predict(self, board):
         """
