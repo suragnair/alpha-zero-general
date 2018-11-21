@@ -3,7 +3,6 @@ from MCTS import MCTS
 from othello.OthelloGame import OthelloGame, display
 from othello.OthelloPlayers import *
 from othello.tensorflow.NNet import NNetWrapper as NNet
-#from othello.pytorch.NNet import NNetWrapper as NNet
 import os
 import numpy as np
 import tensorflow as tf
@@ -62,8 +61,7 @@ def Async_Play(game,args,iter_num,bar):
 
 if __name__=="__main__":
     """
-    Before using multiprocessing to reduce total time.
-    Please check 2 things before use this script.
+    Before using multiprocessing, please check 2 things before use this script.
     1. The number of PlayPool should not over your CPU's core number.
     2. Make sure all Neural Network which each process created can store in VRAM at same time. Check your NN size before use this.
     """
