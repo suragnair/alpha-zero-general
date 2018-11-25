@@ -3,6 +3,7 @@ from MCTS import MCTS
 from td2020.TD2020Game import TD2020Game, display
 from td2020.TD2020Players import *
 from td2020.keras.NNet import NNetWrapper as NNet
+from td2020.src.config import grid_size
 from utils import *
 
 """
@@ -10,7 +11,7 @@ use this script to play any two agents against each other, or play manually with
 any agent.
 """
 
-g = TD2020Game(8)
+g = TD2020Game(grid_size)
 
 # all players
 rp = RandomPlayer(g).play

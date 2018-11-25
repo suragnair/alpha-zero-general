@@ -12,16 +12,18 @@ learn_file = ".\\..\\temp\\learning.txt"
 SHOW_TENSORFLOW_GPU = True
 SHOW_PYGAME_WELCOME = False
 visibility = dotdict({
-    'verbose': 4,
+    'verbose': 0,
     'verbose_learn': 0
 })
 FPS = 1000  # only relevant when pygame
 
 #############################################
 #############################################
+grid_size = 8
+
 
 MAKE_STATS = False
-MONEY_INC = 1  # how much money is returned when returned resources
+MONEY_INC = 3  # how much money is returned when returned resources
 
 INITIAL_GOLD = 1  # how much initial gold do players get at game begining
 MAX_GOLD = 255  # to encode with onehot encoder in 8 bits
@@ -81,42 +83,34 @@ d_type_rev = dotdict({
 })
 d_acts = dotdict({
     1: [],  # Gold
-    2: ['idle',
-        'up', 'down', 'left', 'right',
+    2: ['up', 'down', 'left', 'right',
         'mine_resources', 'return_resources',
         'barracks_up', 'barracks_down', 'barracks_right', 'barracks_left',
         'town_hall_up', 'town_hall_down', 'town_hall_right', 'town_hall_left',
-        'heal_up', 'heal_down', 'heal_right', 'heal_left'],  # Work
-    3: ['idle',
-        'rifle_infantry_up', 'rifle_infantry_down', 'rifle_infantry_right', 'rifle_infantry_left',
-        'heal_up', 'heal_down', 'heal_right', 'heal_left'],  # Barr
-    4: ['idle',
-        'up', 'down', 'left', 'right',
+        ],  # Work #'idle','heal_up', 'heal_down', 'heal_right', 'heal_left'
+    3: ['rifle_infantry_up', 'rifle_infantry_down', 'rifle_infantry_right', 'rifle_infantry_left',
+        ],  # Barr #'idle','heal_up', 'heal_down', 'heal_right', 'heal_left'
+    4: ['up', 'down', 'left', 'right',
         'attack_up', 'attack_down', 'attack_right', 'attack_left',
-        'heal_up', 'heal_down', 'heal_right', 'heal_left'],  # Rifl
-    5: ['idle',
-        'npc_up', 'npc_down', 'npc_right', 'npc_left',
-        'heal_up', 'heal_down', 'heal_right', 'heal_left'],  # Hall
+       ],  # Rifl # 'idle','heal_up', 'heal_down', 'heal_right', 'heal_left'
+    5: ['npc_up', 'npc_down', 'npc_right', 'npc_left',
+        ],  # Hall #'idle','heal_up', 'heal_down', 'heal_right', 'heal_left'
 })
 
 d_acts_int = dotdict({
     1: [],  # Gold
-    2: [0,
-        1, 2, 3, 4,
+    2: [1, 2, 3, 4,
         5, 6,
         19, 20, 21, 22,
         23, 24, 25, 26,
-        27, 28, 29, 30],  # Work
-    3: [0,
-        15, 16, 17, 18,
-        27, 28, 29, 30],  # Barr
-    4: [0,
-        1, 2, 3, 4,
+        ],  # Work #0, 27, 28, 29, 30
+    3: [15, 16, 17, 18,
+        ],  # Barr #0, 27, 28, 29, 30
+    4: [1, 2, 3, 4,
         7, 8, 9, 10,
-        27, 28, 29, 30],  # Rifl
-    5: [0,
-        11, 12, 13, 14,
-        27, 28, 29, 30],  # Hall
+        ],  # Rifl #0, 27, 28, 29, 30
+    5: [11, 12, 13, 14,
+        ],  # Hall #0, 27, 28, 29, 30
 })
 
 a_max_health = dotdict({  # MAX HEALTH THAT UNIT CAN HAVE - this gets in use when ill be implementing healing

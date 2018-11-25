@@ -1,13 +1,13 @@
 from td2020.Coach_Fixed import Coach
 from td2020.TD2020Game import TD2020Game as Game
 from td2020.keras.NNet import NNetWrapper as nn
-from td2020.src.config import MAKE_STATS, USE_ONE_HOT_ENCODER, INITIAL_GOLD, USE_TIMEOUT, HEAL_COST, HEAL_AMOUNT, MONEY_INC, DAMAGE, acts_enabled, learn_file, TIMEOUT
+from td2020.src.config import MAKE_STATS, USE_ONE_HOT_ENCODER, INITIAL_GOLD, USE_TIMEOUT, HEAL_COST, HEAL_AMOUNT, MONEY_INC, DAMAGE, acts_enabled, learn_file, TIMEOUT, grid_size
 from td2020.stats.files import Stats
 from utils import *
 import datetime
 
 args = dotdict({
-    'numIters': 60,
+    'numIters': 100,
     'numEps': 8,
     'tempThreshold': 15,
     'updateThreshold': 0.6,
@@ -24,7 +24,6 @@ args = dotdict({
 from td2020.keras.NNet import args as nnet_args
 
 if __name__ == "__main__":
-    grid_size = 8
 
     print(datetime.datetime.now())
     with open(learn_file, "w") as f:
