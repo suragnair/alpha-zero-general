@@ -3,16 +3,18 @@ import time
 
 import chainer
 import chainer.functions as F
-from chainer import optimizers, cuda, serializers
+from chainer import optimizers, cuda, serializers, training
 
 import numpy as np
 import sys
+
+from chainer.dataset import concat_examples
+from chainer.iterators import SerialIterator
+from chainer.training import extensions
+
 sys.path.append('../../')
 from utils import dotdict
-from pytorch_classification.utils import Bar, AverageMeter
 from NeuralNet import NeuralNet
-
-
 from .OthelloNNet import OthelloNNet as onnet
 
 args = dotdict({
@@ -20,10 +22,19 @@ args = dotdict({
     'dropout': 0.3,
     'epochs': 10,
     'batch_size': 64,
-    # 'cuda': torch.cuda.is_available(),
-    'device': 1,  # GPU device id for training model, -1 indicates to use CPU.
+    'device': 0,  # GPU device id for training model, -1 indicates to use CPU.
     'num_channels': 512,
+    'out': 'result_chainer',  # Output directory for chainer
+    'train_mode': 'trainer'  # 'trainer' or 'custom_loop' supported.
 })
+
+
+def converter(batch, device=None):
+    """Convert arrays to float32"""
+    batch_list = concat_examples(batch, device=device)
+    xp = cuda.get_array_module(batch_list[0])
+    batch = tuple([xp.asarray(elem, dtype=xp.float32) for elem in batch_list])
+    return batch
 
 
 class NNetWrapper(NeuralNet):
@@ -41,9 +52,48 @@ class NNetWrapper(NeuralNet):
             self.nnet.to_gpu()
 
     def train(self, examples):
+        if args.train_mode == 'trainer':
+            self._train_trainer(examples)
+        elif args.train_mode == 'custom_loop':
+            self._train_custom_loop(examples)
+        else:
+            raise ValueError("[ERROR] Unexpected value args.train_mode={}"
+                             .format(args.train_mode))
+
+    def _train_trainer(self, examples):
+        """Training with chainer trainer module"""
+        train_iter = SerialIterator(examples, args.batch_size)
+        optimizer = optimizers.Adam(alpha=args.lr)
+        optimizer.setup(self.nnet)
+
+        def loss_func(boards, target_pis, target_vs):
+            out_pi, out_v = self.nnet(boards)
+            l_pi = self.loss_pi(target_pis, out_pi)
+            l_v = self.loss_v(target_vs, out_v)
+            total_loss = l_pi + l_v
+            chainer.reporter.report({
+                'loss': total_loss,
+                'loss_pi': l_pi,
+                'loss_v': l_v,
+            }, observer=self.nnet)
+            return total_loss
+
+        updater = training.StandardUpdater(
+            train_iter, optimizer, device=args.device, loss_func=loss_func, converter=converter)
+        # Set up the trainer.
+        trainer = training.Trainer(updater, (args.epochs, 'epoch'), out=args.out)
+        # trainer.extend(extensions.snapshot(), trigger=(args.epochs, 'epoch'))
+        trainer.extend(extensions.LogReport())
+        trainer.extend(extensions.PrintReport([
+            'epoch', 'main/loss', 'main/loss_pi', 'main/loss_v', 'elapsed_time']))
+        trainer.extend(extensions.ProgressBar(update_interval=10))
+        trainer.run()
+
+    def _train_custom_loop(self, examples):
         """
         examples: list of examples, each example is of form (board, pi, v)
         """
+        from pytorch_classification.utils import Bar, AverageMeter
         optimizer = optimizers.Adam(alpha=args.lr)
         optimizer.setup(self.nnet)
 
@@ -62,18 +112,10 @@ class NNetWrapper(NeuralNet):
             while batch_idx < int(len(examples)/args.batch_size):
                 sample_ids = np.random.randint(len(examples), size=args.batch_size)
                 boards, pis, vs = list(zip(*[examples[i] for i in sample_ids]))
-                # boards = torch.FloatTensor(np.array(boards).astype(np.float64))
-                # target_pis = torch.FloatTensor(np.array(pis))
-                # target_vs = torch.FloatTensor(np.array(vs).astype(np.float64))
                 xp = self.nnet.xp
                 boards = xp.array(boards, dtype=xp.float32)
                 target_pis = xp.array(pis, dtype=xp.float32)
                 target_vs = xp.array(vs, dtype=xp.float32)
-
-                # predict
-                # if args.cuda:
-                #     boards, target_pis, target_vs = boards.contiguous().cuda(), target_pis.contiguous().cuda(), target_vs.contiguous().cuda()
-                # boards, target_pis, target_vs = Variable(boards), Variable(target_pis), Variable(target_vs)
 
                 # measure data loading time
                 data_time.update(time.time() - end)
@@ -85,25 +127,15 @@ class NNetWrapper(NeuralNet):
                 total_loss = l_pi + l_v
 
                 # record loss
-                try:
-                    pi_loss = l_pi.data
-                    v_loss = l_v.data
-                    # if len(pi_loss.shape()) > 0:
-                    #     pi_loss = pi_loss[0]
-                    # if len(v_loss.shape()) > 0:
-                    #     v_loss = v_loss[0]
-                    pi_losses.update(cuda.to_cpu(pi_loss), boards.shape[0])
-                    v_losses.update(cuda.to_cpu(v_loss), boards.shape[0])
-                except Exception as e:
-                    print('Error at pi_losses!!-------------')
-                    import IPython; IPython.embed()
+                pi_loss = l_pi.data
+                v_loss = l_v.data
+                pi_losses.update(cuda.to_cpu(pi_loss), boards.shape[0])
+                v_losses.update(cuda.to_cpu(v_loss), boards.shape[0])
 
                 # compute gradient and do SGD step
                 self.nnet.cleargrads()
-                # optimizer.zero_grad()
                 total_loss.backward()
                 optimizer.update()
-                # optimizer.step()
 
                 # measure elapsed time
                 batch_time.update(time.time() - end)
@@ -133,20 +165,11 @@ class NNetWrapper(NeuralNet):
         start = time.time()
 
         # preparing input
-        # board = torch.FloatTensor(board.astype(np.float64))
-        # if args.cuda: board = board.contiguous().cuda()
         xp = self.nnet.xp
         board = xp.array(board, dtype=xp.float32)
-        # board = Variable(board, volatile=True)
-        # with torch.no_grad():
         with chainer.using_config('train', False), chainer.no_backprop_mode():
-            # board = Variable(board)
             board = xp.reshape(board, (1, self.board_x, self.board_y))
-            # self.nnet.eval()
             pi, v = self.nnet(board)
-
-        #print('PREDICTION TIME TAKEN : {0:03f}'.format(time.time()-start))
-        # return torch.exp(pi).data.cpu().numpy()[0], v.data.cpu().numpy()[0]
         return np.exp(cuda.to_cpu(pi.array)[0]), cuda.to_cpu(v.array)[0]
 
     def loss_pi(self, targets, outputs):
@@ -163,17 +186,13 @@ class NNetWrapper(NeuralNet):
             print("Checkpoint Directory does not exist! Making directory {}".format(folder))
             os.mkdir(folder)
         else:
-            print("Checkpoint Directory exists! ")
+            # print("Checkpoint Directory exists! ")
+            pass
+        print('Saving model at {}'.format(filepath))
         serializers.save_npz(filepath, self.nnet)
-        # torch.save({
-        #     'state_dict' : self.nnet.state_dict(),
-        # }, filepath)
 
     def load_checkpoint(self, folder='checkpoint', filename='checkpoint.pth.tar'):
-        # https://github.com/pytorch/examples/blob/master/imagenet/main.py#L98
         filepath = os.path.join(folder, filename)
         if not os.path.exists(filepath):
             raise("No model in path {}".format(filepath))
         serializers.load_npz(filepath, self.nnet)
-        # checkpoint = torch.load(filepath)
-        # self.nnet.load_state_dict(checkpoint['state_dict'])
