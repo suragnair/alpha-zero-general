@@ -16,7 +16,8 @@ from td2020.src.config import ACTS_REV, NUM_ACTS
 from utils import dotdict
 
 """
-Get Action:
+get_action.py
+
 This classes intended use is connecting to ue4 TensorFlow plugin as client and execute predict on given board.
 """
 

@@ -5,6 +5,13 @@ from numpy.ma import count
 
 from td2020.src.config import PATH
 
+"""
+files.py
+
+used for retrieving data into files while learning model or pitting against one.
+This data can be later plotted
+"""
+
 
 class Stats:
     @staticmethod

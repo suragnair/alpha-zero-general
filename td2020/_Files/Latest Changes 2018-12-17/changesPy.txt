@@ -1,0 +1,2 @@
+uporabla se ta formula:
+    if pwins+nwins == 0 or float(nwins)/(pwins+nwins) < self.args.updateThreshold:

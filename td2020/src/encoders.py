@@ -2,6 +2,15 @@ from typing import List
 
 import numpy as np
 
+"""
+encoders.py
+
+Defines 'numeric' and one-hot encoder
+
+Numeric encoder uses integers to encode game state (also negative numbers for player names)
+One-hot encoder uses binary representation of integer numbers, with exception of player name, which is processed seperately
+"""
+
 
 class Encoder:
 

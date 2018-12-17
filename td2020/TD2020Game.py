@@ -1,12 +1,20 @@
-import time
 from typing import Tuple
 
 import numpy as np
 
 from td2020.src.Board import Board
-from td2020.src.config import NUM_ENCODERS, NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, TIME_IDX, FPS, USE_TIMEOUT, MAX_TIME, d_a_type, a_m_health, INITIAL_GOLD, TIMEOUT, MAKE_STATS, visibility
+from td2020.src.config import NUM_ENCODERS, NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, TIME_IDX, FPS, USE_TIMEOUT, MAX_TIME, d_a_type, a_max_health, INITIAL_GOLD, TIMEOUT, MAKE_STATS, visibility
 from td2020.stats.files import Stats
 from utils import dotdict
+
+"""
+TD2020Game.py
+
+Defined rules for RTS game TD2020
+Includes: 
+- init - contains board configuration
+- getGameEnded - contains end game checking
+"""
 
 
 # noinspection PyPep8Naming,PyMethodMayBeStatic
@@ -16,22 +24,42 @@ class TD2020Game:
         self.n = n
 
         self.initial_board_config = [
+            # dotdict({
+            #     'x': self.n - 1,
+            #     'y': int(self.n / 2),
+            #     'player': 1,
+            #     'a_type': d_a_type['Gold'],
+            #     'health': a_max_health[d_a_type['Gold']],
+            #     'carry': 0,
+            #     'gold': INITIAL_GOLD,
+            #     'timeout': TIMEOUT
+            # }),
+            # dotdict({
+            #     'x': 0,
+            #     'y': int(self.n / 2),
+            #     'player': -1,
+            #     'a_type': d_a_type['Gold'],
+            #     'health': a_max_health[d_a_type['Gold']],
+            #     'carry': 0,
+            #     'gold': INITIAL_GOLD,
+            #     'timeout': TIMEOUT
+            # }),
             dotdict({
-                'x': self.n - 1,
+                'x': int(self.n / 2) - 1,
                 'y': int(self.n / 2),
                 'player': 1,
                 'a_type': d_a_type['Gold'],
-                'health': a_m_health[d_a_type['Gold']],
+                'health': a_max_health[d_a_type['Gold']],
                 'carry': 0,
                 'gold': INITIAL_GOLD,
                 'timeout': TIMEOUT
             }),
             dotdict({
-                'x': 0,
+                'x': int(self.n / 2),
                 'y': int(self.n / 2),
                 'player': -1,
                 'a_type': d_a_type['Gold'],
-                'health': a_m_health[d_a_type['Gold']],
+                'health': a_max_health[d_a_type['Gold']],
                 'carry': 0,
                 'gold': INITIAL_GOLD,
                 'timeout': TIMEOUT
@@ -41,7 +69,7 @@ class TD2020Game:
                 'y': int(self.n / 2) - 1,
                 'player': 1,
                 'a_type': d_a_type['Hall'],
-                'health': a_m_health[d_a_type['Hall']],
+                'health': a_max_health[d_a_type['Hall']],
                 'carry': 0,
                 'gold': INITIAL_GOLD,
                 'timeout': TIMEOUT
@@ -51,7 +79,7 @@ class TD2020Game:
                 'y': int(self.n / 2) - 1,
                 'player': -1,
                 'a_type': d_a_type['Hall'],
-                'health': a_m_health[d_a_type['Hall']],
+                'health': a_max_health[d_a_type['Hall']],
                 'carry': 0,
                 'gold': INITIAL_GOLD,
                 'timeout': TIMEOUT

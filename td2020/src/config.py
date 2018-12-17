@@ -3,51 +3,112 @@ import os
 from td2020.src.encoders import OneHotEncoder, NumericEncoder
 from utils import dotdict
 
+# ####################################################################################
+# ###################### INITIAL CONFIGS AND OUTPUTS ##################################
+# ####################################################################################
+
+# specifically choose TF cpu if needed. This will have no effect if GPU is not present
 USE_TF_CPU = False
 
+# helper path so model weights are imported and exported correctly when transferring project
 PATH = os.path.dirname(os.path.realpath(__file__))
 
+# output of learn log
 learn_file = ".\\..\\temp\\learning.txt"
 
+# output of pit log
+pit_file = ".\\..\\temp\\pitting.txt"
+
+# output for game stats during playing games (game_episode, game iteration, player name, action executed, action_name, action_direction, player_score...
+game_stats_file = ".\\..\\temp\\game_stats.csv"
+game_stats_file_player2 = ".\\..\\temp\\game_stats_player2.csv"
+
+# Show initial TF configuration when TF is getting initialized
 SHOW_TENSORFLOW_GPU = True
+
+# Show initial Pygame welcome message when Pygame is getting initialized
 SHOW_PYGAME_WELCOME = False
+
+# Should logger write learning outputs to files for later plotting
+MAKE_STATS = False
+
+# change output log verbosity. If visibility.verbose > 3, Pygame is shown
 visibility = dotdict({
     'verbose': 0,
     'verbose_learn': 0
 })
-FPS = 1000  # only relevant when pygame
 
-#############################################
-#############################################
+# Maximum number of fps Pygame will render game at. Only relevant when running with verbose > 3
+FPS = 1000
+
+# ####################################################################################
+# ################################## GAME RULES ######################################
+# ####################################################################################
+
+# board size (square)
 grid_size = 8
 
+# ##################################
+# ############# GOLD ###############
+# ##################################
 
-MAKE_STATS = False
-MONEY_INC = 3  # how much money is returned when returned resources
+# how much money is returned when returned resources
+MONEY_INC = 3
 
-INITIAL_GOLD = 1  # how much initial gold do players get at game begining
-MAX_GOLD = 255  # to encode with onehot encoder in 8 bits
+# how much initial gold do players get at game begining
+INITIAL_GOLD = 1
 
+# Maximum gold that players can have - It is limited to 8 bits for one-hot encoder
+MAX_GOLD = 255
+
+# ##################################
+# ############# HEAL ###############
+# ##################################
+
+
+# Game mechanic where actors can damage themselves to heal friendly unit. This is only used when player doesn't have any money to pay for heal action
 SACRIFICIAL_HEAL = False
+
+# How much friendly unit is healed when executing heal action
 HEAL_AMOUNT = 5
+# how much money should player pay when heal action is getting executed.
 HEAL_COST = 1
 
+# ##################################
+# ########### TIMEOUT ##############
+# ##################################
+
+# If timeout should be used. This causes game to finish after TIMEOUT number of actions. If timeout isnt used, Kill function is used, which is reducing number of hitpoints of units as seen in file "Graph.py"
 USE_TIMEOUT = True
-MAX_TIME = 2048  # this gets used by kill function that determines the end point
+
+# this gets used by kill function that determines the end point
+MAX_TIME = 2048
+
+# Check if timeout is being used. Alternatively Kill function is used
 if USE_TIMEOUT:
     print("Using Timeout")
-    TIMEOUT = 200  # how many turns until game end - this gets reduced when each turn is executed
+    # how many turns until game end - this gets reduced when each turn is executed
+    TIMEOUT = 200
 else:
     print("Using Kill Function")
-    TIMEOUT = 0  # sets initial tick to 0 and then in getGameEnded it gets incremented unitl number 8191
+    # sets initial tick to 0 and then in getGameEnded it gets incremented unitl number 8191
+    TIMEOUT = 0
+# ##################################
+# ########## ATTACKING #############
+# ##################################
 
-DAMAGE = 20  # how much damage is dealt to attacked actor
-DESTROY_ALL = False  # when attacking, all enemy units are destroyed, resulting in victory for the attacking player
+# how much damage is dealt to attacked actor
+DAMAGE = 20
+# when attacking, all enemy units are destroyed, resulting in victory for the attacking player
+DESTROY_ALL = False
 if DESTROY_ALL:
     DAMAGE = 10000
 
-############################################
-#############################################
+# ##################################
+# ########## ENCODERS ##############
+# ##################################
+
+# Should one-hot encoder be used (recommended)
 USE_ONE_HOT_ENCODER = True
 if USE_ONE_HOT_ENCODER:
     print("Using One hot encoder")
@@ -56,7 +117,10 @@ else:
     print("Using Numeric encoder")
     encoder = NumericEncoder()
 
+# Defining number of encoders
 NUM_ENCODERS = 6  # player_name, act_type, health, carrying, money, remaining_time
+
+# Setting indexes to each encoder
 P_NAME_IDX = 0
 A_TYPE_IDX = 1
 HEALTH_IDX = 2
@@ -64,9 +128,11 @@ CARRY_IDX = 3
 MONEY_IDX = 4
 TIME_IDX = 5
 
-#############################################
-#############################################
+# ##################################
+# ########### ACTORS ###############
+# ##################################
 
+# Dictionary for actors
 d_a_type = dotdict({
     'Gold': 1,
     'Work': 2,
@@ -74,6 +140,8 @@ d_a_type = dotdict({
     'Rifl': 4,
     'Hall': 5,
 })
+
+# Reverse dictionary for actors
 d_type_rev = dotdict({
     1: 'Gold',
     2: 'Work',
@@ -81,6 +149,30 @@ d_type_rev = dotdict({
     4: 'Rifl',
     5: 'Hall',
 })
+
+# Maximum health that actor can have - this is also initial health that actor has.
+a_max_health = dotdict({
+    1: 10,  # Gold
+    2: 10,  # Work
+    3: 20,  # Barr
+    4: 20,  # Rifl
+    5: 30,  # Hall
+})
+
+# Cost of actor to produce (key - actor type, value - number of gold coins to pay)
+a_cost = dotdict({
+    1: 0,  # Gold
+    2: 1,  # Work
+    3: 4,  # Barr
+    4: 2,  # Rifl
+    5: 7,  # Hall
+})
+
+# ##################################
+# ########## ACTIONS ###############
+# ##################################
+
+# Dictionary for actions and which actor can execute them
 d_acts = dotdict({
     1: [],  # Gold
     2: ['up', 'down', 'left', 'right',
@@ -92,11 +184,12 @@ d_acts = dotdict({
         ],  # Barr #'idle','heal_up', 'heal_down', 'heal_right', 'heal_left'
     4: ['up', 'down', 'left', 'right',
         'attack_up', 'attack_down', 'attack_right', 'attack_left',
-       ],  # Rifl # 'idle','heal_up', 'heal_down', 'heal_right', 'heal_left'
+        ],  # Rifl # 'idle','heal_up', 'heal_down', 'heal_right', 'heal_left'
     5: ['npc_up', 'npc_down', 'npc_right', 'npc_left',
         ],  # Hall #'idle','heal_up', 'heal_down', 'heal_right', 'heal_left'
 })
 
+# Reverse dictionary for actions
 d_acts_int = dotdict({
     1: [],  # Gold
     2: [1, 2, 3, 4,
@@ -113,30 +206,8 @@ d_acts_int = dotdict({
         ],  # Hall #0, 27, 28, 29, 30
 })
 
-a_max_health = dotdict({  # MAX HEALTH THAT UNIT CAN HAVE - this gets in use when ill be implementing healing
-    1: 10,  # Gold
-    2: 10,  # Work
-    3: 20,  # Barr
-    4: 20,  # Rifl
-    5: 30,  # Hall
-})
-
-a_m_health = dotdict({  # INITIAL HEALTH THAT UNIT HAS
-    1: 10,  # Gold
-    2: 10,  # Work
-    3: 20,  # Barr
-    4: 20,  # Rifl
-    5: 30,  # Hall
-})
-a_cost = dotdict({
-    1: 0,  # Gold
-    2: 1,  # Work
-    3: 4,  # Barr
-    4: 2,  # Rifl
-    5: 7,  # Hall
-})
-
-acts_enabled = dotdict({  # mine and return resources only
+#  Disabling actions
+acts_enabled = dotdict({
     "idle": False,
     "up": True,
     "down": True,
@@ -152,6 +223,7 @@ acts_enabled = dotdict({  # mine and return resources only
     "heal": True
 })
 
+# Defining all actions
 ACTS = {
     "idle": 0,
 
@@ -194,8 +266,8 @@ ACTS = {
     "heal_left": 30
 
 }
-NUM_ACTS = len(ACTS)
 
+# Reverse dictionary for all actions
 ACTS_REV = {
     0: "idle",
 
@@ -237,6 +309,15 @@ ACTS_REV = {
     29: "heal_right",
     30: "heal_left"
 }
+
+# Cound of all actions
+NUM_ACTS = len(ACTS)
+
+# ####################################################################################
+# ################################## PLAYING #########################################
+# ####################################################################################
+
+# User shortcuts that player can use using Pygame
 d_user_shortcuts = dotdict({
     ' ': 0,  # idle
     'w': 1,  # up
@@ -270,6 +351,8 @@ d_user_shortcuts = dotdict({
     'm': 29,  # heal_right
     ',': 30,  # heal_left
 })
+
+# Reverse dictionary for user shortcuts
 d_user_shortcuts_rev = dotdict({
     0: ' ',  # idle
 
@@ -312,9 +395,7 @@ d_user_shortcuts_rev = dotdict({
     30: ',',  # heal_left
 })
 
-######################################################
-# ################# PYGAME ###########################
-######################################################
+# Colors of actors displayed in Pygame
 d_a_color = dotdict({
     1: (230, 0, 50),  # Gold
     2: (0, 165, 208),  # Work

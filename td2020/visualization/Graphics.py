@@ -3,7 +3,14 @@ from typing import Any, Tuple, Optional
 
 import numpy as np
 
-from td2020.src.config import P_NAME_IDX, A_TYPE_IDX, d_a_color, d_type_rev, PATH, SHOW_PYGAME_WELCOME, MONEY_IDX, TIME_IDX, CARRY_IDX, HEALTH_IDX
+from td2020.src.config import P_NAME_IDX, A_TYPE_IDX, d_a_color, d_type_rev, MONEY_IDX, TIME_IDX, CARRY_IDX, HEALTH_IDX
+
+"""
+Graphics.py
+
+Used for displaying Gama visualization using Pygame
+
+"""
 
 
 def message_display(game_display, text, position, text_size, color=(0, 0, 0)) -> None:

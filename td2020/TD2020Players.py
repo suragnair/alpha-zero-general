@@ -4,14 +4,20 @@ from math import sqrt
 from typing import List
 
 import numpy as np
+import pygame
 from pygame.rect import Rect
 
 from td2020.src.Board import Board
-from td2020.src.config import NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, d_user_shortcuts, FPS, ACTS, d_a_type, ACTS_REV, d_user_shortcuts_rev, SHOW_PYGAME_WELCOME, visibility
+from td2020.src.config import NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, d_user_shortcuts, FPS, ACTS, d_a_type, ACTS_REV, d_user_shortcuts_rev, visibility
 from td2020.visualization.Graphics import init_visuals, update_graphics, message_display
 from utils import dotdict
 
-import pygame
+"""
+TD2020Players.py
+
+Contains 3 players (human player, random player, greedy player (if searching for nnet player, it is defined by pre-learnt model)
+Human player has defined input controls for Pygame and console
+"""
 
 
 class RandomPlayer:
@@ -155,7 +161,8 @@ class HumanTD2020Player:
                             for i in range(len(valids_square)):
                                 if valids_square[i]:
                                     text_scale = int(actor_size * 0.5)
-                                    message_display(game_display, u"" + ACTS_REV[i] + " s: '" + d_user_shortcuts_rev[i] + "'", ( 3*canvas_scale + int(printed_actions%3)*canvas_scale*2, (n+1) * canvas_scale+ text_scale/2 + int(printed_actions/3) * text_scale + int(text_scale/4)), text_scale)
+                                    message_display(game_display, u"" + ACTS_REV[i] + " s: '" + d_user_shortcuts_rev[i] + "'", (3 * canvas_scale + int(printed_actions % 3) * canvas_scale * 2, (n + 1) * canvas_scale + text_scale / 2 + int(printed_actions / 3) * text_scale + int(text_scale / 4)),
+                                                    text_scale)
                                     printed_actions += 1
                             # update display
                             pygame.display.update()

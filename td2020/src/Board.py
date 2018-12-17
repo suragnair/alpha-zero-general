@@ -1,12 +1,19 @@
 import sys
-from typing import List, Any
+from typing import Any
 
 import numpy as np
 
 from td2020.src.Graph import num_destroys, damage
-from td2020.src.config import d_a_type, a_m_health, d_acts, A_TYPE_IDX, P_NAME_IDX, CARRY_IDX, MONEY_IDX, a_cost, NUM_ACTS, ACTS_REV, NUM_ENCODERS, MONEY_INC, HEALTH_IDX, TIME_IDX, DAMAGE, MAX_GOLD, HEAL_AMOUNT, \
+from td2020.src.config import d_a_type, d_acts, A_TYPE_IDX, P_NAME_IDX, CARRY_IDX, MONEY_IDX, a_cost, NUM_ACTS, ACTS_REV, NUM_ENCODERS, MONEY_INC, HEALTH_IDX, TIME_IDX, DAMAGE, MAX_GOLD, HEAL_AMOUNT, \
     a_max_health, SACRIFICIAL_HEAL, HEAL_COST, acts_enabled, MAKE_STATS, visibility
 from td2020.stats.files import Stats
+
+"""
+Board.py
+
+Defines game rules (action checking, end-game conditions)
+can_execute_move is checking if move can be executed and execute_move is applying this move to new board
+"""
 
 
 class Board:
@@ -169,7 +176,7 @@ class Board:
             print("damaged unit type", self[n_x][n_y][A_TYPE_IDX], "on", n_x, n_y, "and damage initiator of type", self[x][y][A_TYPE_IDX], "on", x, y)
 
     def _spawn(self, x, y, n_x, n_y, a_type):
-        self[n_x][n_y] = [self[x][y][P_NAME_IDX], a_type, a_m_health[a_type], 0, self[x][y][MONEY_IDX], self[x][y][TIME_IDX]]
+        self[n_x][n_y] = [self[x][y][P_NAME_IDX], a_type, a_max_health[a_type], 0, self[x][y][MONEY_IDX], self[x][y][TIME_IDX]]
 
     def _heal(self, x, y, n_x, n_y):
 
@@ -289,7 +296,7 @@ class Board:
 
     def _check_if_heal(self, x, y):
         return 0 <= x < self.n and 0 <= y < self.n and self[x][y][P_NAME_IDX] == self[x][y][P_NAME_IDX] and self[x][y][A_TYPE_IDX] != d_a_type['Gold'] and self[x][y][A_TYPE_IDX] > 0 and self[x][y][HEALTH_IDX] < a_max_health[self[x][y][A_TYPE_IDX]] and (
-                    SACRIFICIAL_HEAL or self[x][y][MONEY_IDX] - HEAL_COST >= 0)
+                SACRIFICIAL_HEAL or self[x][y][MONEY_IDX] - HEAL_COST >= 0)
 
     def _check_if_nearby(self, x, y, a_type, check_friendly=False):
         coordinates = [(x - 1, y + 1),

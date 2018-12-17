@@ -10,13 +10,18 @@ from td2020.keras.TD2020NNet import TD2020NNet
 from td2020.src.config import encoder, visibility
 from utils import *
 
+"""
+NNet.py
+
+NNet wrapper uses defined nnet model to train and predict
+"""
 args = dotdict({
-    'lr': 0.001,
+    'lr': 0.01, # learning rate
     'dropout': 0.3,
-    'epochs': 100,
-    'batch_size': 512,
-    'cuda': True,
-    'num_channels': 512,
+    'epochs': 30, # times training examples are iterated through learning process
+    'batch_size': 256, # how many train examples are taken together for learning
+    'cuda': True, # this is only relevant when using TF GPU
+    'num_channels': 128, # used by nnet conv layers
 })
 
 
