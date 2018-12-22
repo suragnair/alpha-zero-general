@@ -3,9 +3,9 @@ from typing import Tuple
 import numpy as np
 
 from td2020.src.Board import Board
-from td2020.src.config import NUM_ENCODERS, NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, TIME_IDX, FPS, USE_TIMEOUT, MAX_TIME, d_a_type, a_max_health, INITIAL_GOLD, TIMEOUT, MAKE_STATS, visibility
-from td2020.stats.files import Stats
-from utils import dotdict
+from td2020.src.config import NUM_ENCODERS, NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, TIME_IDX, FPS, CONFIG
+
+""" USE_TIMEOUT, MAX_TIME, d_a_type, a_max_health, INITIAL_GOLD, TIMEOUT, visibility"""
 
 """
 TD2020Game.py
@@ -19,72 +19,11 @@ Includes:
 
 # noinspection PyPep8Naming,PyMethodMayBeStatic
 class TD2020Game:
-    def __init__(self, n) -> None:
 
-        self.n = n
+    def __init__(self) -> None:
+        self.n = CONFIG.grid_size
 
-        self.initial_board_config = [
-            # dotdict({
-            #     'x': self.n - 1,
-            #     'y': int(self.n / 2),
-            #     'player': 1,
-            #     'a_type': d_a_type['Gold'],
-            #     'health': a_max_health[d_a_type['Gold']],
-            #     'carry': 0,
-            #     'gold': INITIAL_GOLD,
-            #     'timeout': TIMEOUT
-            # }),
-            # dotdict({
-            #     'x': 0,
-            #     'y': int(self.n / 2),
-            #     'player': -1,
-            #     'a_type': d_a_type['Gold'],
-            #     'health': a_max_health[d_a_type['Gold']],
-            #     'carry': 0,
-            #     'gold': INITIAL_GOLD,
-            #     'timeout': TIMEOUT
-            # }),
-            dotdict({
-                'x': int(self.n / 2) - 1,
-                'y': int(self.n / 2),
-                'player': 1,
-                'a_type': d_a_type['Gold'],
-                'health': a_max_health[d_a_type['Gold']],
-                'carry': 0,
-                'gold': INITIAL_GOLD,
-                'timeout': TIMEOUT
-            }),
-            dotdict({
-                'x': int(self.n / 2),
-                'y': int(self.n / 2),
-                'player': -1,
-                'a_type': d_a_type['Gold'],
-                'health': a_max_health[d_a_type['Gold']],
-                'carry': 0,
-                'gold': INITIAL_GOLD,
-                'timeout': TIMEOUT
-            }),
-            dotdict({
-                'x': int(self.n / 2) - 1,
-                'y': int(self.n / 2) - 1,
-                'player': 1,
-                'a_type': d_a_type['Hall'],
-                'health': a_max_health[d_a_type['Hall']],
-                'carry': 0,
-                'gold': INITIAL_GOLD,
-                'timeout': TIMEOUT
-            }),
-            dotdict({
-                'x': int(self.n / 2),
-                'y': int(self.n / 2) - 1,
-                'player': -1,
-                'a_type': d_a_type['Hall'],
-                'health': a_max_health[d_a_type['Hall']],
-                'carry': 0,
-                'gold': INITIAL_GOLD,
-                'timeout': TIMEOUT
-            }),
-        ]
+        self.initial_board_config = CONFIG.initial_board_config
 
     def setInitBoard(self, board_config) -> None:
         self.initial_board_config = board_config
@@ -117,6 +56,12 @@ class TD2020Game:
         # first execute move, then run time function to destroy any actors if needed
         b.execute_move(move, player)
 
+        # get config for timeout
+        if player == 1:
+            USE_TIMEOUT = CONFIG.player1_config.USE_TIMEOUT
+        else:
+            USE_TIMEOUT = CONFIG.player2_config.USE_TIMEOUT
+
         # update timer on every tile:
         if USE_TIMEOUT:
             b.pieces[:, :, TIME_IDX] -= 1
@@ -132,10 +77,15 @@ class TD2020Game:
         b = Board(self.n)
         b.pieces = np.copy(board)
 
+        if player == 1:
+            config = CONFIG.player1_config
+        else:
+            config = CONFIG.player2_config
+
         for y in range(self.n):
             for x in range(self.n):
                 if b[x][y][P_NAME_IDX] == player and b[x][y][A_TYPE_IDX] != 1:  # for this player and not Gold
-                    valids.extend(b.get_moves_for_square(x, y))
+                    valids.extend(b.get_moves_for_square(x, y, config=config))
                 else:
                     valids.extend([0] * NUM_ACTS)
         valids.append(0)  # because of that +1 in action Size
@@ -151,30 +101,38 @@ class TD2020Game:
         n = board.shape[0]
 
         # detect timeout
+        if player == 1:
+            USE_TIMEOUT = CONFIG.player1_config.USE_TIMEOUT
+        else:
+            USE_TIMEOUT = CONFIG.player2_config.USE_TIMEOUT
+
         if USE_TIMEOUT:
             if board[0, 0, TIME_IDX] < 1:
 
-                if MAKE_STATS:
-                    Stats.game_end(board[0, 0, TIME_IDX], 0, 'timeout')
 
                 score_player1 = self.getScore(board, player)
                 score_player2 = self.getScore(board, -player)
 
                 if score_player1 == score_player2:
-                    if visibility.verbose:
+
+                    if CONFIG.visibility:
                         print("#################### TIMEOUT Tie #######################")
                     return 0.001
                 better_player = 1 if score_player1 > score_player2 else -1
-                if visibility.verbose:
+                if CONFIG.visibility:
                     print("#################### TIMEOUT", better_player, score_player1, score_player2, "#######################")
                 return better_player
         else:
+            if player == 1:
+                MAX_TIME = CONFIG.player1_config.MAX_TIME
+            else:
+                MAX_TIME = CONFIG.player2_config.MAX_TIME
+
             if board[0, 0, TIME_IDX] >= MAX_TIME:
                 print("######################################## ERROR ####################################")
                 print("################ YOU HAVE TIMEOUTED BECAUSE NO PLAYER HAS LOST YET #################")
                 print("###################################### END ERROR ##################################")
-                if MAKE_STATS:
-                    Stats.game_end(board[0, 0, TIME_IDX], 0, 'timeout')
+
                 return 0.001
 
         # detect win condition
@@ -188,33 +146,27 @@ class TD2020Game:
                     sum_p2 += 1
 
         if sum_p1 < 2:  # SUM IS 1 WHEN PLAYER ONLY HAS MINERALS LEFT
-            if visibility.verbose:
+            if CONFIG.visibility:
                 print("################ game end player -1, tick", board[0, 0, TIME_IDX], "################")
-            if MAKE_STATS:
-                Stats.game_end(board[0, 0, TIME_IDX], -1, 'no_actors')
+
             return -1
         if sum_p2 < 2:  # SUM IS 1 WHEN PLAYER ONLY HAS MINERALS LEFT
-            if visibility.verbose:
+            if CONFIG.visibility:
                 print("################ game end player +1,tick", board[0, 0, TIME_IDX], "################")
-            if MAKE_STATS:
-                Stats.game_end(board[0, 0, TIME_IDX], +1, 'no_actors')
 
             return +1
 
         # detect no valid actions - possible tie by overpopulating on non-attacking units and buildings - all fields are full or one player is surrounded:
         if sum(self.getValidMoves(board, 1)) == 0:
-            if visibility.verbose:
+            if CONFIG.visibility:
                 print("################ game end player +1,tick", board[0, 0, TIME_IDX], "No valid moves for player", 1, "################")
-            if MAKE_STATS:
-                Stats.game_end(board[0, 0, TIME_IDX], -1, 'no_valids')
 
             return -1
 
         if sum(self.getValidMoves(board, -1)) == 0:
-            if visibility.verbose:
+            if CONFIG.visibility:
                 print("################ game end player +1,tick", board[0, 0, TIME_IDX], "No valid moves for player", - 1, "################")
-            if MAKE_STATS:
-                Stats.game_end(board[0, 0, TIME_IDX], +1, 'no_valids')
+
             return 1
         # continue game
         return 0
@@ -256,12 +208,12 @@ class TD2020Game:
 def display(board):
     from td2020.visualization.Graphics import init_visuals, update_graphics
 
-    if not visibility.verbose:
+    if not CONFIG.visibility:
         return
 
     n = board.shape[0]
-    if visibility.verbose > 3:
-        game_display, clock = init_visuals(n, n, visibility.verbose)
+    if CONFIG.visibility > 3:
+        game_display, clock = init_visuals(n, n, CONFIG.visibility.verbose)
         update_graphics(board, game_display, clock, FPS)
     else:
         for y in range(n):

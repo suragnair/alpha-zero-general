@@ -7,8 +7,7 @@ import numpy as np
 import pygame
 from pygame.rect import Rect
 
-from td2020.src.Board import Board
-from td2020.src.config import NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, d_user_shortcuts, FPS, ACTS, d_a_type, ACTS_REV, d_user_shortcuts_rev, visibility
+from td2020.src.config import NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, d_user_shortcuts, FPS, ACTS, d_a_type, ACTS_REV, d_user_shortcuts_rev
 from td2020.visualization.Graphics import init_visuals, update_graphics, message_display
 from utils import dotdict
 
@@ -38,12 +37,13 @@ class HumanTD2020Player:
         self.USER_PLAYER = 1  # used by Human Player - this does not change if human pit player is 1 or -1
 
     def play(self, board: np.ndarray) -> List:
+        from td2020.src.config import CONFIG
         n = board.shape[0]
         valid = self.game.getValidMoves(board, 1)
         self.display_valid_moves(board, valid)
         while True:
 
-            if visibility.verbose > 3:
+            if CONFIG.visibility > 3:
                 a = self._manage_input(board)
                 x, y, action_index = a
 
@@ -100,9 +100,12 @@ class HumanTD2020Player:
         return dotdict({"x": -1, "y": -1})
 
     def _manage_input(self, board: np.ndarray) -> list:
+        from td2020.src.Board import Board
+        from td2020.src.config import CONFIG
+
         n = board.shape[0]
 
-        game_display, clock = init_visuals(n, n, visibility.verbose)
+        game_display, clock = init_visuals(n, n, CONFIG.visibility)
         update_graphics(board, game_display, clock, FPS)
 
         canvas_scale: int = int(ctypes.windll.user32.GetSystemMetrics(1) * (16 / 30) / n)
@@ -141,7 +144,7 @@ class HumanTD2020Player:
                             clicked_actor_index_arr = [clicked_actor.x, clicked_actor.y]
 
                             # draw selected bounding box
-                            game_display, clock = init_visuals(n, n, visibility.verbose)
+                            game_display, clock = init_visuals(n, n, CONFIG.visibility)
                             update_graphics(board, game_display, clock, FPS)
 
                             actor_size = int(canvas_scale / 3)
@@ -155,7 +158,11 @@ class HumanTD2020Player:
                             b = Board(n)
                             b.pieces = np.copy(board)
 
-                            valids_square = b.get_moves_for_square(clicked_actor.x, clicked_actor.y)
+                            if self.USER_PLAYER == 1:
+                                config = CONFIG.player1_config
+                            else:
+                                config = CONFIG.player2_config
+                            valids_square = b.get_moves_for_square(clicked_actor.x, clicked_actor.y,config=config)
 
                             printed_actions = 0
                             for i in range(len(valids_square)):

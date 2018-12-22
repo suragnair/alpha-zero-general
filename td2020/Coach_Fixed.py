@@ -1,4 +1,3 @@
-import datetime
 import os
 import sys
 import time
@@ -7,12 +6,11 @@ from pickle import Pickler, Unpickler
 from random import shuffle
 
 import numpy as np
-import psutil
 
 from Arena import Arena
 from MCTS import MCTS
 from pytorch_classification.utils import Bar, AverageMeter
-from td2020.src.config import learn_file, game_stats_file
+from td2020.src.config import CONFIG
 
 """
 
@@ -88,8 +86,7 @@ class Coach():
 
         for i in range(1, self.args.numIters + 1):
             # bookkeeping
-            with open(learn_file, "a") as f:
-                f.write('------ITER ' + str(i) + '------' + str(datetime.datetime.now()) + '\n')
+            # CONFIG.append_item('------ITER ' + str(i) + '------' + str(datetime.datetime.now()) + '\n')
             print('------ITER ' + str(i) + '------')
             # examples of the iteration
             if not self.skipFirstSelfPlay or i > 1:
@@ -113,9 +110,9 @@ class Coach():
 
                 # save the iteration examples to the history 
                 self.trainExamplesHistory.append(iterationTrainExamples)
-            with open(learn_file, "a") as f:
-                f.write("len(trainExamplesHistory) =" + str(len(self.trainExamplesHistory)) + "\n")
-                f.write("Free memory: " + str(psutil.virtual_memory().available / 1000000000) + "Gig\n")
+            # CONFIG.append_item("len(trainExamplesHistory) =" + str(len(self.trainExamplesHistory)) + "\n")
+            # CONFIG.append_item("Free memory: " + str(psutil.virtual_memory().available / 1000000000) + "Gig\n")
+
             if len(self.trainExamplesHistory) > self.args.numItersForTrainExamplesHistory:
                 print("len(trainExamplesHistory) =", len(self.trainExamplesHistory), " => remove the oldest trainExamples")
                 self.trainExamplesHistory.pop(0)
@@ -158,32 +155,34 @@ class Coach():
         return 'checkpoint_' + str(iteration) + '.pth.tar'
 
     def saveTrainExamples(self, iteration):
-        return
-        folder = self.args.checkpoint
-        if not os.path.exists(folder):
-            os.makedirs(folder)
-        filename = os.path.join(folder, self.getCheckpointFile(iteration) + ".examples")
-        try:
-            with open(filename, "wb+") as f:
-                Pickler(f).dump(self.trainExamplesHistory)
-        except MemoryError as memory_error:
-            print("REMOVING TRAIN EXAMPLES BECAUSE OF ERROR WHEN PICKLE DUMPING", "in iteration", iteration, memory_error)
-            self.trainExamplesHistory.pop(0)
-            self.saveTrainExamples(iteration)
-        f.closed
+        if CONFIG.learn_args.save_train_examples:
+
+            folder = self.args.checkpoint
+            if not os.path.exists(folder):
+                os.makedirs(folder)
+            filename = os.path.join(folder, self.getCheckpointFile(iteration) + ".examples")
+            try:
+                with open(filename, "wb+") as f:
+                    Pickler(f).dump(self.trainExamplesHistory)
+            except MemoryError as memory_error:
+                print("REMOVING TRAIN EXAMPLES BECAUSE OF ERROR WHEN PICKLE DUMPING", "in iteration", iteration, memory_error)
+                self.trainExamplesHistory.pop(0)
+                self.saveTrainExamples(iteration)
+            f.closed
 
     def loadTrainExamples(self):
-        modelFile = os.path.join(self.args.load_folder_file[0], self.args.load_folder_file[1])
-        examplesFile = modelFile + ".examples"
-        if not os.path.isfile(examplesFile):
-            print(examplesFile)
-            r = input("File with trainExamples not found. Continue? [y|n]")
-            if r != "y":
-                sys.exit()
-        else:
-            print("File with trainExamples found. Read it.")
-            with open(examplesFile, "rb") as f:
-                self.trainExamplesHistory = Unpickler(f).load()
-            f.closed
-            # examples based on the model were already collected (loaded)
-            self.skipFirstSelfPlay = True
+        if CONFIG.learn_args.load_train_examples:
+            modelFile = os.path.join(self.args.load_folder_file[0], self.args.load_folder_file[1])
+            examplesFile = modelFile + ".examples"
+            if not os.path.isfile(examplesFile):
+                print(examplesFile)
+                r = input("File with trainExamples not found. Continue? [y|n]")
+                if r != "y":
+                    sys.exit()
+            else:
+                print("File with trainExamples found. Read it.")
+                with open(examplesFile, "rb") as f:
+                    self.trainExamplesHistory = Unpickler(f).load()
+                f.closed
+                # examples based on the model were already collected (loaded)
+                self.skipFirstSelfPlay = True

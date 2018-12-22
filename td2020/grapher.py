@@ -2,11 +2,11 @@ import numpy as np
 import pandas as pd
 import pylab as plt
 
-from td2020.src.config import game_stats_file, game_stats_file_player2
+_skiprows = 59
 
 
-def fun1():
-    df = pd.read_csv(game_stats_file, skiprows=2)
+def fun1(file1, file2):
+    df = pd.read_csv(file1, skiprows=_skiprows)
 
     score = df['score']
     score1 = score[(df.player == 1) & (df.game_ep == 1)]
@@ -16,19 +16,19 @@ def fun1():
     plt.plot(arrange_both, score2, 'b--')
 
     # next file
-    df1 = pd.read_csv(game_stats_file_player2, skiprows=2)
+    df1 = pd.read_csv(file2, skiprows=_skiprows)
     score = df1['score']
     score3 = score[(df.player == 1) & (df.game_ep == 1)]
     plt.plot(arrange_both, score3, 'g--')
     plt.title("Primerjava točk treh igralcev")
     plt.ylabel("Število točk")
     plt.xlabel("Iteracija igre")
-    plt.legend(["Numerični*", "One-Hot*","Naključni*"]) # todo pazi vrstni red
+    plt.legend(["Numerični*", "One-Hot*", "Naključni*"])  # todo pazi vrstni red
     plt.show()
 
 
-def fun2():
-    df = pd.read_csv(game_stats_file, skiprows=2)
+def fun2(file):
+    df = pd.read_csv(file, skiprows=_skiprows)
 
     player = df['player']
     act = df['act_rev']
@@ -81,8 +81,8 @@ def to_bins(x, bins):
     return ar
 
 
-def fun3():
-    df = pd.read_csv(game_stats_file, skiprows=2)
+def fun3(file):
+    df = pd.read_csv(file, skiprows=_skiprows)
     num_bins = 10
 
     player = df['player']
@@ -153,8 +153,8 @@ def fun3():
     plt.show()
 
 
-def fun4():
-    df = pd.read_csv(game_stats_file, skiprows=2)
+def fun4(file):
+    df = pd.read_csv(file, skiprows=_skiprows)
     num_bins = 10
 
     player = df['player']
@@ -182,7 +182,7 @@ def fun4():
     plt.show()
 
 
-fun1()
-fun2()
-fun3()
-fun4()
+fun1(".\\..\\temp\\learning.csv", ".\\..\\temp\\learning.csv")  # todo
+fun2(".\\..\\temp\\learning.csv")  # todo
+fun3(".\\..\\temp\\learning.csv")  # todo
+fun4(".\\..\\temp\\learning.csv")  # todo

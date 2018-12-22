@@ -7,28 +7,20 @@ from tensorflow.python.keras.utils import plot_model
 
 from NeuralNet import NeuralNet
 from td2020.keras.TD2020NNet import TD2020NNet
-from td2020.src.config import encoder, visibility
-from utils import *
+from td2020.src.config import VERBOSE_MODEL_FIT
 
 """
 NNet.py
 
 NNet wrapper uses defined nnet model to train and predict
 """
-args = dotdict({
-    'lr': 0.01, # learning rate
-    'dropout': 0.3,
-    'epochs': 30, # times training examples are iterated through learning process
-    'batch_size': 256, # how many train examples are taken together for learning
-    'cuda': True, # this is only relevant when using TF GPU
-    'num_channels': 128, # used by nnet conv layers
-})
 
 
 # noinspection PyMissingConstructor
 class NNetWrapper(NeuralNet):
     def __init__(self, game):
-        self.nnet = TD2020NNet(game, args)
+
+        self.nnet = TD2020NNet(game)
         self.board_x, self.board_y, num_encoders = game.getBoardSize()
         self.action_size = game.getActionSize()
 
@@ -36,6 +28,7 @@ class NNetWrapper(NeuralNet):
         plot_model(self.nnet.model, to_file='C:\\TrumpDefense2020\\TD2020\\Content\\Scripts\\td2020\\models\\' + type(self.nnet).__name__ + '_model_plot.png', show_shapes=True, show_layer_names=True)
 
     def train(self, examples):
+        from td2020.src.config import CONFIG
         """
         examples: list of examples, each example is of form (board, pi, v)
         """
@@ -44,18 +37,19 @@ class NNetWrapper(NeuralNet):
         target_pis = np.asarray(target_pis)
         target_vs = np.asarray(target_vs)
 
-        input_boards = encoder.encode_multiple(input_boards)
+        input_boards = CONFIG.nnet_args.encoder.encode_multiple(input_boards)
 
-        self.nnet.model.fit(x=input_boards, y=[target_pis, target_vs], batch_size=args.batch_size, epochs=args.epochs, verbose=visibility.verbose_learn, callbacks=[self.tensorboard])
+        self.nnet.model.fit(x=input_boards, y=[target_pis, target_vs], batch_size=CONFIG.nnet_args.batch_size, epochs=CONFIG.nnet_args.epochs, verbose=VERBOSE_MODEL_FIT, callbacks=[self.tensorboard])
 
     def predict(self, board):
+        from td2020.src.config import CONFIG
         """
         board: np array with board
         """
         # timing
         start = time.time()
 
-        board = encoder.encode(board)
+        board = CONFIG.nnet_args.encoder.encode(board)
 
         # preparing input
         board = board[np.newaxis, :, :]

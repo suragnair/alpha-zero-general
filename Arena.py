@@ -3,7 +3,7 @@ import time
 import numpy as np
 
 from pytorch_classification.utils import Bar, AverageMeter
-from td2020.src.config import NUM_ACTS, ACTS_REV, game_stats_file
+from td2020.src.config import NUM_ACTS, ACTS_REV,  CONFIG
 
 
 class Arena():
@@ -82,8 +82,7 @@ class Arena():
             # csv format
             stat = str(game_iteration) + "," + str(game_episode) + "," + str(curPlayer) + "," + str(x) + "," + str(y) + "," + str(action_index) + "," + ACTS_REV[action_index] + "," + str(dir) + "," + str(score) + "," + str(it)
 
-            with open(game_stats_file, "a") as f:
-                f.write(stat + "\n")
+            CONFIG.append_item(stat)
             # #####################################################################################################################
             # ################################################## END STATS ########################################################
             # #####################################################################################################################
