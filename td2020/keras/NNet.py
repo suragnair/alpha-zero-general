@@ -41,23 +41,26 @@ class NNetWrapper(NeuralNet):
 
         self.nnet.model.fit(x=input_boards, y=[target_pis, target_vs], batch_size=CONFIG.nnet_args.batch_size, epochs=CONFIG.nnet_args.epochs, verbose=VERBOSE_MODEL_FIT, callbacks=[self.tensorboard])
 
-    def predict(self, board):
+    def predict(self, board, player=None):
         from td2020.src.config import CONFIG
         """
         board: np array with board
         """
-        # timing
-        start = time.time()
 
-        board = CONFIG.nnet_args.encoder.encode(board)
+        # If we are learning model, use only 1 encoder on both players, else use player, specific encoder, as we might be comparing 2 different encoders using 'pit'
+        if CONFIG.runner == "learn":
+            board = CONFIG.nnet_args.encoder.encode(board)
+        else:
+            if player == 1:
+                board = CONFIG.player1_config.encoder.encode(board)
+            else:
+                board = CONFIG.player2_config.encoder.encode(board)
 
         # preparing input
         board = board[np.newaxis, :, :]
 
         # run
         pi, v = self.nnet.model.predict(board)
-
-        # print('PREDICTION TIME TAKEN : {0:03f}'.format(time.time()-start))
         return pi[0], v[0]
 
     def save_checkpoint(self, folder='checkpoint', filename='checkpoint.pth.tar'):

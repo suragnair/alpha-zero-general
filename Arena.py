@@ -76,8 +76,8 @@ class Arena():
                 dir = 'right'
 
             stat = "iteration:" + str(game_iteration) + "$game_ep:" + str(game_episode) + "$player:" + str(curPlayer) + "$x:" + str(x) + "$y:" + str(y) + "$action_index:" + str(action_index) + "$act_rev:" + ACTS_REV[action_index] + '$direction:' + str(dir) + "$score:" + str(
-                score) + "$iteration:" + str(it)
-            print(stat)
+                score) + "it:" + str(it)
+            # print(stat)
 
             # csv format
             stat = str(game_iteration) + "," + str(game_episode) + "," + str(curPlayer) + "," + str(x) + "," + str(y) + "," + str(action_index) + "," + ACTS_REV[action_index] + "," + str(dir) + "," + str(score) + "," + str(it)

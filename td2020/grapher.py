@@ -182,7 +182,7 @@ def fun4(file):
     plt.show()
 
 
-fun1(".\\..\\temp\\learning.csv", ".\\..\\temp\\learning.csv")  # todo
-fun2(".\\..\\temp\\learning.csv")  # todo
-fun3(".\\..\\temp\\learning.csv")  # todo
-fun4(".\\..\\temp\\learning.csv")  # todo
+fun1(".\\..\\temp\\config_pit.csv", ".\\..\\temp\\config_pit.csv")  # todo
+fun2(".\\..\\temp\\config_pit.csv")  # todo
+fun3(".\\..\\temp\\config_pit.csv")  # todo
+fun4(".\\..\\temp\\config_pit.csv")  # todo

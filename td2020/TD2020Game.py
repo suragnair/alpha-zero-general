@@ -109,7 +109,6 @@ class TD2020Game:
         if USE_TIMEOUT:
             if board[0, 0, TIME_IDX] < 1:
 
-
                 score_player1 = self.getScore(board, player)
                 score_player2 = self.getScore(board, -player)
 

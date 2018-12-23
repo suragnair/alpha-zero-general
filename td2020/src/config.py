@@ -4,6 +4,7 @@ from typing import List, Tuple
 
 import numpy as np
 
+from td2020.src.encoders import OneHotEncoder, Encoder
 from utils import dotdict
 
 # ####################################################################################
@@ -280,24 +281,24 @@ class Configuration:
                      batch_size,
                      cuda,
                      num_channels):
-            self.lr = lr,  # learning rate
-            self.dropout = dropout,
-            self.epochs = epochs,  # times training examples are iterated through learning process
-            self.batch_size = batch_size,  # how many train examples are taken together for learning
-            self.cuda = cuda,  # this is only relevant when using TF GPU
-            self.num_channels = num_channels,  # used by nnet conv layers
+
+            self.lr = lr  # learning rate
+            self.dropout = dropout
+            self.epochs = epochs  # times training examples are iterated through learning process
+            self.batch_size = batch_size  # how many train examples are taken together for learning
+            self.cuda = cuda  # this is only relevant when using TF GPU
+            self.num_channels = num_channels  # used by nnet conv layers
 
             # Should one-hot encoder be used (recommended)
             from td2020.src.encoders import OneHotEncoder, NumericEncoder
             if use_one_hot_encoder:
-                print("Using One hot encoder")
                 self.encoder = OneHotEncoder()
             else:
-                print("Using Numeric encoder")
                 self.encoder = NumericEncoder()
 
     class _GameConfig:
         def __init__(self,
+                     encoder,
                      money_increment,
                      initial_gold,
                      maximum_gold,
@@ -311,6 +312,8 @@ class Configuration:
                      a_max_health,
                      a_cost,
                      acts_enabled):
+
+            self.encoder = encoder
 
             # ##################################
             # ############# GOLD ###############
@@ -350,11 +353,9 @@ class Configuration:
 
             # Check if timeout is being used. Alternatively Kill function is used
             if self.USE_TIMEOUT:
-                print("Using Timeout")
                 # how many turns until game end - this gets reduced when each turn is executed
                 self.TIMEOUT = 200
             else:
-                print("Using Kill Function")
                 # sets initial tick to 0 and then in getGameEnded it gets incremented unitl number 8191
                 self.TIMEOUT = 0
             # ##################################
@@ -403,7 +404,6 @@ class Configuration:
     class _PitArgs:
 
         def __init__(self,
-                     game,
                      player1_type,
                      player2_type,
                      player1_config,
@@ -414,16 +414,17 @@ class Configuration:
             self.player2_type = player2_type
             self.player1_config = player1_config or {'numMCTSSims': 2, 'cpuct': 1.0}
             self.player2_config = player2_config or {'numMCTSSims': 2, 'cpuct': 1.0}
-
-            self.player1 = self.create_player(game, self.player1_type, self.player1_config)
-            self.player2 = self.create_player(game, self.player2_type, self.player2_config)
-
             self.num_games = num_games
 
-        def create_player(self,
-                          game,
-                          player_type: str,
-                          player_config: dict):
+        def create_players(self,
+                           game):
+
+            return self._create_player(game, self.player1_type, self.player1_config), self._create_player(game, self.player1_type, self.player1_config)
+
+        def _create_player(self,
+                           game,
+                           player_type: str,
+                           player_config: dict):
             from td2020.TD2020Players import RandomPlayer, GreedyTD2020Player, HumanTD2020Player
 
             if player_type == 'nnet':
@@ -479,14 +480,14 @@ class Configuration:
             self.cpuct = cpuct  # search parameter for MCTS
 
             self.checkpoint = checkpoint
-            self.load_model = load_model,  # Load training examples from file - WARNING - this is disabled in TD2020Players.py because of memory errors received when loading data from file
+            self.load_model = load_model  # Load training examples from file - WARNING - this is disabled in TD2020Players.py because of memory errors received when loading data from file
             self.load_folder_file = load_folder_file
-            self.numItersForTrainExamplesHistory = num_iters_for_train_examples_history,  # maximum number of 'iterations' that game episodes are kept in queue. After that last is popped and new one is added.
+            self.numItersForTrainExamplesHistory = num_iters_for_train_examples_history  # maximum number of 'iterations' that game episodes are kept in queue. After that last is popped and new one is added.
 
             self.save_train_examples = save_train_examples
             self.load_train_examples = load_train_examples
 
-    class _BoardTile:
+    class BoardTile:
         def __init__(self,
                      player: int,
                      x: int,
@@ -502,6 +503,7 @@ class Configuration:
                  learn_visibility=0,
                  pit_visibility=4,
 
+                 encoder_player1: Encoder= OneHotEncoder(),
                  money_increment_player1: int = 3,
                  initial_gold_player1: int = 1,
                  maximum_gold_player1: int = 255,
@@ -516,6 +518,7 @@ class Configuration:
                  a_cost_player1: dict = None,
                  acts_enabled_player1: dict = None,
 
+                 encoder_player2: Encoder = OneHotEncoder(),
                  money_increment_player2: int = 3,
                  initial_gold_player2: int = 1,
                  maximum_gold_player2: int = 255,
@@ -559,66 +562,148 @@ class Configuration:
                  cuda: bool = True,
                  num_channels: int = 128,
 
-                 initial_board_config: List[_BoardTile] = None):
+                 initial_board_config: List[BoardTile] = None):
         """
-        :param grid_size:
-        :param learn_visibility:
-        :param pit_visibility:
-        :param money_increment_player1:
-        :param initial_gold_player1:
-        :param maximum_gold_player1:
-        :param sacrificial_heal_player1:
-        :param heal_amount_player1:
-        :param heal_cost_player1:
-        :param use_timeout_player1:
-        :param max_time_player1:
-        :param damage_player1:
-        :param destroy_all_player1:
-        :param a_max_health_player1:
-        :param a_cost_player1:
-        :param acts_enabled_player1:
-        :param money_increment_player2:
-        :param initial_gold_player2:
-        :param maximum_gold_player2:
-        :param sacrificial_heal_player2:
-        :param heal_amount_player2:
-        :param heal_cost_player2:
-        :param use_timeout_player2:
-        :param max_time_player2:
-        :param damage_player2:
-        :param destroy_all_player2:
-        :param a_max_health_player2:
-        :param a_cost_player2:
-        :param acts_enabled_player2:
-        :param num_iters:
-        :param num_eps:
-        :param temp_threshold:
-        :param update_threshold:
-        :param maxlen_of_queue:
-        :param num_mcts_sims:
-        :param arena_compare:
-        :param cpuct:
-        :param checkpoint:
-        :param load_model:
-        :param load_folder_file:
-        :param num_iters_for_train_examples_history:
-        :param save_train_examples:
-        :param load_train_examples:
-        :param player1_type:
-        :param player2_type:
-        :param player1_config:
-        :param player2_config:
-        :param num_games:
-        :param use_one_hot_encoder:
-        :param lr:
-        :param dropout:
-        :param epochs:
-        :param batch_size:
-        :param cuda:
-        :param num_channels:
-        :param initial_board_config:
+        :param grid_size: Grid size of game for example 8,6...
+        :param learn_visibility: How much console should output while running learn. If visibility.verbose > 3, Pygame is shown
+        :param pit_visibility: How much console should output while running pit. If visibility.verbose > 3, Pygame is shown
+
+        :param encoder_player1: Which encoder should this player use while pitting (OneHotEncoder, NumericEncoder)
+        :param money_increment_player1: How much money player should gain when worker returns gold coins
+        :param initial_gold_player1: How much initial gold should player have
+        :param maximum_gold_player1: Maximum gold for player (max allowed value is 255)
+        :param sacrificial_heal_player1: If actors can sacrifice their health to heal other actors if player doesn't have enough gold
+        :param heal_amount_player1: how much should action 'heal' heal other actor
+        :param heal_cost_player1: how much should action 'heal' cost gold coins. If sacrificial_heal is enabled, this is the amount that actors health will be reduced if player doesn't have enough gold
+        :param use_timeout_player1: If timeout function should be used. If false, 'kill function' will be used
+        :param max_time_player1: Maximum amount of time after which game ends and score is evaluated
+        :param damage_player1: How much damage is inflicted upon action 'attack' on other actor
+        :param destroy_all_player1: If by executing action 'attack', all opponents actors are destroyed
+        :param a_max_health_player1: dictionary of maximum amount of healths for each actor. See its default values to override
+            ``
+            Example: {
+                1: 10,  # Gold
+                2: 10,  # Work
+                3: 20,  # Barr
+                4: 20,  # Rifl
+                5: 30,  # Hall
+            }
+            ``
+        :param a_cost_player1: dictionary of costs for each actor. See its default values to override
+            ``
+            Example: {
+                1: 0,  # Gold
+                2: 1,  # Work
+                3: 4,  # Barr
+                4: 2,  # Rifl
+                5: 7,  # Hall
+            }
+            ``
+        :param acts_enabled_player1: dictionary of which actions are enabled for player. See its default values to override.
+            ``
+            Example: {
+                "idle": False,
+                "up": True,
+                "down": True,
+                "right": True,
+                "left": True,
+                "mine_resources": True,
+                "return_resources": True,
+                "attack": True,
+                "npc": True,
+                "rifle_infantry": True,
+                "barracks": True,
+                "town_hall": True,
+                "heal": True
+            }
+            ``
+        :param encoder_player2: Which encoder should this player use while pitting (OneHotEncoder, NumericEncoder)
+        :param money_increment_player2: How much money player should gain when worker returns gold coins
+        :param initial_gold_player2: How much initial gold should player have
+        :param maximum_gold_player2: Maximum gold for player (max allowed value is 255)
+        :param sacrificial_heal_player2: If actors can sacrifice their health to heal other actors if player doesn't have enough gold
+        :param heal_amount_player2: how much should action 'heal' heal other actor
+        :param heal_cost_player2: how much should action 'heal' cost gold coins. If sacrificial_heal is enabled, this is the amount that actors health will be reduced if player doesn't have enough gold
+        :param use_timeout_player2: If timeout function should be used. If false, 'kill function' will be used
+        :param max_time_player2: Maximum amount of time after which game ends and score is evaluated
+        :param damage_player2: How much damage is inflicted upon action 'attack' on other actor
+        :param destroy_all_player2: If by executing action 'attack', all opponents actors are destroyed
+        :param a_max_health_player2: dictionary of maximum amout of healths for each actor. See its default values to override
+            ``
+            Example: {
+                1: 10,  # Gold
+                2: 10,  # Work
+                3: 20,  # Barr
+                4: 20,  # Rifl
+                5: 30,  # Hall
+            }
+            ``
+        :param a_cost_player2: dictionary of costs for each actor. See its default values to override
+            ``
+            Example: {
+                1: 0,  # Gold
+                2: 1,  # Work
+                3: 4,  # Barr
+                4: 2,  # Rifl
+                5: 7,  # Hall
+            }
+            ``
+        :param acts_enabled_player2: dictionary of which actions are enabled for player. See its default values to override
+            ``
+            Example: {
+                "idle": False,
+                "up": True,
+                "down": True,
+                "right": True,
+                "left": True,
+                "mine_resources": True,
+                "return_resources": True,
+                "attack": True,
+                "npc": True,
+                "rifle_infantry": True,
+                "barracks": True,
+                "town_hall": True,
+                "heal": True
+            }
+            ``
+        :param num_iters: How many iterations of games it should be played
+        :param num_eps: How many episodes in each game iteration it should be played
+        :param temp_threshold: Used by coach. "It uses a temp=1 if episodeStep < tempThreshold, and thereafter uses temp=0."
+        :param update_threshold: Percentage of how much wins should newer model have to be accepted
+        :param maxlen_of_queue: How many train examples can be stored in each iteration
+        :param num_mcts_sims: How many MCTS sims are executed in each game episode while learning
+        :param arena_compare: How many comparations of newer and older model should be made before evaluating which is better
+        :param cpuct: Exploration parameter for MCTS
+        :param checkpoint: folder where checkpoints should be saved while learning
+        :param load_model: If model is loaded from checkpoint on learning start
+        :param load_folder_file: tuple(folder, file) where model is loaded from
+        :param num_iters_for_train_examples_history: How many iterations of train examples should be kept for learning. If this number is exceeded, oldest iteration of train exaples is removed from queue
+        :param save_train_examples: If train examples should be saved to file (Caution if choosing this, because of memory error)
+        :param load_train_examples: If train examples should be loaded from file (Caution if choosing this, because of memory error)
+
+        :param player1_type: What type should player 1 be ("nnet", "random", "greedy", "human")
+        :param player2_type: What type should player 2 be ("nnet", "random", "greedy", "human")
+        :param player1_config: If "nnet" player is chosen, config can be provided {'numMCTSSims': 2, 'cpuct': 1.0}
+        :param player2_config: If "nnet" player is chosen, config can be provided {'numMCTSSims': 2, 'cpuct': 1.0}
+        :param num_games: How many games should be played for pit config
+
+        :param use_one_hot_encoder: If oneHot encoder should be used for both players while learning. (While pitting see configs encoder_player1, encoder_player2)
+        :param lr: Learning rate of model
+        :param dropout: Dropout in NNet Model config
+        :param epochs: How many epochs should learning take
+        :param batch_size: How big batches of learning examples there should be while learning
+        :param cuda: Whether to use cuda if tensorflow gpu is installed and GPU supports cuda operations
+        :param num_channels: Number of channels in NNet Model config
+
+        :param initial_board_config: Configuration of initial non-empty tiles for actors. See its default values to override.
+            ``Example: initial_board_config=[
+                Configuration.BoardTile(1,4,4,'Gold'),
+                Configuration.BoardTile(-1,4,5,'Gold'),
+                Configuration.BoardTile(1,5,4,'Hall'),
+                Configuration.BoardTile(-1,5,5,'Hall')]
+            ``
         """
-        from td2020.TD2020Game import TD2020Game
+
 
         # output for game stats during playing games (game_episode, game iteration, player name, action executed, action_name, action_direction, player_score...
         self.config_file_pit = ".\\..\\temp\\config_pit.csv"
@@ -626,14 +711,12 @@ class Configuration:
 
         self.grid_size = grid_size
 
-        self.game = TD2020Game()
-
-        # change output log verbosity. If visibility.verbose > 3, Pygame is shown
         self.visibility = 4
         self._pit_visibility = pit_visibility
         self._learn_visibility = learn_visibility
 
         self.player1_config = self._GameConfig(
+            encoder=encoder_player1,
             money_increment=money_increment_player1,
             initial_gold=initial_gold_player1,
             maximum_gold=maximum_gold_player1,
@@ -648,6 +731,7 @@ class Configuration:
             a_cost=a_cost_player1,
             acts_enabled=acts_enabled_player1)
         self.player2_config = self._GameConfig(
+            encoder=encoder_player2,
             money_increment=money_increment_player2,
             initial_gold=initial_gold_player2,
             maximum_gold=maximum_gold_player2,
@@ -677,8 +761,8 @@ class Configuration:
             num_iters_for_train_examples_history=num_iters_for_train_examples_history,
             save_train_examples=save_train_examples,
             load_train_examples=load_train_examples)
+
         self.pit_args = self._PitArgs(
-            game=self.game,
             player1_type=player1_type,
             player2_type=player2_type,
             player1_config=player1_config,
@@ -776,6 +860,7 @@ class Configuration:
                 + "grid_size: " + str(self.grid_size) + " \n"
 
                 + "Player 1 config \n"
+                + "encoder: " + str(self.player1_config.encoder) + " \n"
                 + "money_increment: " + str(self.player1_config.MONEY_INC) + " \n"
                 + "initial_gold: " + str(self.player1_config.INITIAL_GOLD) + " \n"
                 + "maximum_gold: " + str(self.player1_config.MAX_GOLD) + " \n"
@@ -790,6 +875,7 @@ class Configuration:
                 + "acts_enabled: " + str(self.player1_config.acts_enabled) + " \n"
 
                 + "player 2 config \n"
+                + "encoder: " + str(self.player1_config.encoder) + " \n"
                 + "money_increment: " + str(self.player2_config.MONEY_INC) + " \n"
                 + "initial_gold: " + str(self.player2_config.INITIAL_GOLD) + " \n"
                 + "maximum_gold: " + str(self.player2_config.MAX_GOLD) + " \n"
@@ -849,6 +935,7 @@ class Configuration:
             file = ""
             exit(1)
         self._to_file_config(file)
+        self.append_item("iteration,game_ep,player,x,y,action_index,act_rev,output_direction,score,it")
 
     def append_item(self, item):
         if self.runner == 'pit':
@@ -860,5 +947,6 @@ class Configuration:
             file = ""
             exit(1)
         self._to_file_str(item, file)
+
 
 CONFIG = Configuration()

@@ -24,7 +24,7 @@ class NeuralNet():
         """
         pass
 
-    def predict(self, board):
+    def predict(self, board, player=None):
         """
         Input:
             board: current board in its canonical form.

@@ -21,7 +21,7 @@ Has changed model choosing function from previously defined Coach class
 """
 
 
-class Coach():
+class Coach:
     """
     This class executes the self-play + learning. It uses the functions defined
     in Game and NeuralNet. args are specified in main.py.
@@ -168,7 +168,6 @@ class Coach():
                 print("REMOVING TRAIN EXAMPLES BECAUSE OF ERROR WHEN PICKLE DUMPING", "in iteration", iteration, memory_error)
                 self.trainExamplesHistory.pop(0)
                 self.saveTrainExamples(iteration)
-            f.closed
 
     def loadTrainExamples(self):
         if CONFIG.learn_args.load_train_examples:
@@ -183,6 +182,5 @@ class Coach():
                 print("File with trainExamples found. Read it.")
                 with open(examplesFile, "rb") as f:
                     self.trainExamplesHistory = Unpickler(f).load()
-                f.closed
                 # examples based on the model were already collected (loaded)
                 self.skipFirstSelfPlay = True
