@@ -13,15 +13,15 @@ args = dotdict({
     'arenaCompare': 40,
     'cpuct': 1,
 
-    'checkpoint': '/workspace/checkpoints/',
-    'load_model': True,
-    'load_folder_file': ('./pretrained_models/othello/pytorch/','8x8_100checkpoints_best.pth.tar'),
+    'checkpoint': './temp/',
+    'load_model': False,
+    'load_folder_file': ('/dev/models/8x100x50','best.pth.tar'),
     'numItersForTrainExamplesHistory': 20,
 
 })
 
 if __name__=="__main__":
-    g = Game(8)
+    g = Game(6)
     nnet = nn(g)
 
     if args.load_model:
