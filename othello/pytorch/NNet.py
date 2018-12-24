@@ -77,8 +77,8 @@ class NNetWrapper(NeuralNet):
                 total_loss = l_pi + l_v
 
                 # record loss
-                pi_losses.update(l_pi.data[0], boards.size(0))
-                v_losses.update(l_v.data[0], boards.size(0))
+                pi_losses.update(l_pi.item(), boards.size(0))
+                v_losses.update(l_v.item(), boards.size(0))
 
                 # compute gradient and do SGD step
                 optimizer.zero_grad()
@@ -117,7 +117,6 @@ class NNetWrapper(NeuralNet):
         if args.cuda: board = board.contiguous().cuda()
         with torch.no_grad():
             board = board.view(1, self.board_x, self.board_y)
-
             self.nnet.eval()
             pi, v = self.nnet(board)
 
@@ -146,5 +145,6 @@ class NNetWrapper(NeuralNet):
         filepath = os.path.join(folder, filename)
         if not os.path.exists(filepath):
             raise("No model in path {}".format(filepath))
-        checkpoint = torch.load(filepath)
+        map_location = None if args.cuda else 'cpu'
+        checkpoint = torch.load(filepath, map_location=map_location)
         self.nnet.load_state_dict(checkpoint['state_dict'])
