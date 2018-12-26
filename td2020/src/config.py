@@ -3,7 +3,8 @@ import os
 from typing import List, Tuple
 
 import numpy as np
-
+import sys
+sys.path.append('../..')
 from td2020.src.encoders import OneHotEncoder, Encoder
 from utils import dotdict
 

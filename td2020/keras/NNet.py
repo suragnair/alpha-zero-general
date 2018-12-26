@@ -4,7 +4,8 @@ import time
 import numpy as np
 from tensorflow.python.keras.callbacks import TensorBoard
 from tensorflow.python.keras.utils import plot_model
-
+import sys
+sys.path.append('../..')
 from NeuralNet import NeuralNet
 from td2020.keras.TD2020NNet import TD2020NNet
 from td2020.src.config import VERBOSE_MODEL_FIT

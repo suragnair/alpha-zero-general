@@ -6,7 +6,8 @@ from typing import List
 import numpy as np
 import pygame
 from pygame.rect import Rect
-
+import sys
+sys.path.append('..')
 from td2020.src.config import NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, d_user_shortcuts, FPS, ACTS, d_a_type, ACTS_REV, d_user_shortcuts_rev
 from td2020.visualization.Graphics import init_visuals, update_graphics, message_display
 from utils import dotdict

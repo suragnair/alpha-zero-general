@@ -1,3 +1,5 @@
+import sys
+sys.path.append('..')
 from td2020.Coach_Fixed import Coach
 # from td2020.configurations.ConfigWrapper import LearnArgs
 from td2020.TD2020Game import TD2020Game

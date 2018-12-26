@@ -1,7 +1,8 @@
 from typing import Tuple
 
 import numpy as np
-
+import sys
+sys.path.append('..')
 from td2020.src.Board import Board
 from td2020.src.config import NUM_ENCODERS, NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, TIME_IDX, FPS, CONFIG
 

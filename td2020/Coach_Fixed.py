@@ -6,7 +6,8 @@ from pickle import Pickler, Unpickler
 from random import shuffle
 
 import numpy as np
-
+import sys
+sys.path.append('..')
 from Arena import Arena
 from MCTS import MCTS
 from pytorch_classification.utils import Bar, AverageMeter

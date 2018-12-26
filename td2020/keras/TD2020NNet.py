@@ -4,10 +4,10 @@ import sys
 from tensorflow.python.keras import Input, Model
 from tensorflow.python.keras.layers import Conv2D, BatchNormalization, Activation, Dense, Dropout, Flatten, Reshape
 from tensorflow.python.keras.optimizers import Adam
-
+import sys
+sys.path.append('../..')
 from td2020.src.config import USE_TF_CPU, SHOW_TENSORFLOW_GPU
 
-sys.path.append('..')
 
 if USE_TF_CPU:
     print("Using TensorFlow CPU")
