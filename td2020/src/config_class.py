@@ -3,7 +3,7 @@ from td2020.src.config import Configuration
 
 # Basic config:
 
-CONFIG = Configuration()
+CONFIG = Configuration(player1_type='human')
 
 # ################################# OVERRIDES #######################################
 
@@ -12,9 +12,7 @@ CONFIG = Configuration()
 CONFIG = Configuration(num_iters=20, 
                        num_eps=10,
                        num_mcts_sims=30,
-                       epochs=100, 
-                       use_timeout_player1=True,
-                       use_timeout_player2=True)
+                       epochs=100)
 """
 
 # Model Gathering Task
@@ -23,8 +21,8 @@ CONFIG = Configuration(num_iters=10,
                        num_eps=10,
                        num_mcts_sims=30,
                        epochs=100,
-                       max_time_player1=100,
-                       max_time_player2=100,
+                       timeout_player1=100,
+                       timeout_player2=100,
                        acts_enabled_player1={
                            "idle": False,
                            "up": True,

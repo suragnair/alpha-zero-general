@@ -1,9 +1,10 @@
 import datetime
 import os
+import sys
 from typing import List, Tuple
 
 import numpy as np
-import sys
+
 sys.path.append('../..')
 from td2020.src.encoders import OneHotEncoder, Encoder
 from utils import dotdict
@@ -313,7 +314,8 @@ class Configuration:
                      a_max_health,
                      a_cost,
                      acts_enabled,
-                     score_function):
+                     score_function,
+                     timeout):
 
             self.encoder = encoder
 
@@ -356,7 +358,7 @@ class Configuration:
             # Check if timeout is being used. Alternatively Kill function is used
             if self.USE_TIMEOUT:
                 # how many turns until game end - this gets reduced when each turn is executed
-                self.TIMEOUT = 200
+                self.TIMEOUT = timeout
             else:
                 # sets initial tick to 0 and then in getGameEnded it gets incremented unitl number 8191
                 self.TIMEOUT = 0
@@ -506,7 +508,7 @@ class Configuration:
                  learn_visibility=0,
                  pit_visibility=4,
 
-                 encoder_player1: Encoder= OneHotEncoder(),
+                 encoder_player1: Encoder = OneHotEncoder(),
                  money_increment_player1: int = 3,
                  initial_gold_player1: int = 1,
                  maximum_gold_player1: int = 255,
@@ -521,6 +523,7 @@ class Configuration:
                  a_cost_player1: dict = None,
                  acts_enabled_player1: dict = None,
                  score_function_player1: int = 3,
+                 timeout_player1: int = 200,
 
                  encoder_player2: Encoder = OneHotEncoder(),
                  money_increment_player2: int = 3,
@@ -537,6 +540,7 @@ class Configuration:
                  a_cost_player2: dict = None,
                  acts_enabled_player2: dict = None,
                  score_function_player2: int = 3,
+                 timeout_player2: int = 200,
 
                  num_iters: int = 4,
                  num_eps: int = 4,
@@ -557,7 +561,7 @@ class Configuration:
                  player2_type: str = 'nnet',
                  player1_config: dict = None,
                  player2_config: dict = None,
-                 num_games: int = 2,
+                 num_games: int = 4,
 
                  use_one_hot_encoder: bool = True,
                  lr: float = 0.01,
@@ -623,6 +627,7 @@ class Configuration:
             }
             ``
         :param score_function_player1: which function to use (1, 2 or 3)
+        :param timeout_player1: After what time game will timeout if 'useTimeout' is set to true
         :param encoder_player2: Which encoder should this player use while pitting (OneHotEncoder, NumericEncoder)
         :param money_increment_player2: How much money player should gain when worker returns gold coins
         :param initial_gold_player2: How much initial gold should player have
@@ -673,6 +678,7 @@ class Configuration:
             }
             ``
         :param score_function_player2: which function to use (1, 2 or 3)
+        :param timeout_player2: After what time game will timeout if 'useTimeout' is set to true
         :param num_iters: How many iterations of games it should be played
         :param num_eps: How many episodes in each game iteration it should be played
         :param temp_threshold: Used by coach. "It uses a temp=1 if episodeStep < tempThreshold, and thereafter uses temp=0."
@@ -711,7 +717,6 @@ class Configuration:
             ``
         """
 
-
         # output for game stats during playing games (game_episode, game iteration, player name, action executed, action_name, action_direction, player_score...
         self.config_file_pit = ".\\..\\temp\\config_pit.csv"
         self.config_file_learn = ".\\..\\temp\\config_learn.csv"
@@ -737,7 +742,9 @@ class Configuration:
             a_max_health=a_max_health_player1,
             a_cost=a_cost_player1,
             acts_enabled=acts_enabled_player1,
-            score_function = score_function_player1)
+            score_function=score_function_player1,
+            timeout=timeout_player1)
+
         self.player2_config = self._GameConfig(
             encoder=encoder_player2,
             money_increment=money_increment_player2,
@@ -753,7 +760,8 @@ class Configuration:
             a_max_health=a_max_health_player2,
             a_cost=a_cost_player2,
             acts_enabled=acts_enabled_player2,
-            score_function=score_function_player2)
+            score_function=score_function_player2,
+            timeout=timeout_player2)
 
         self.learn_args = self._LearnArgs(
             num_iters=num_iters,
@@ -882,9 +890,11 @@ class Configuration:
                 + "a_max_health: " + str(self.player1_config.a_max_health) + " \n"
                 + "a_cost: " + str(self.player1_config.a_cost) + " \n"
                 + "acts_enabled: " + str(self.player1_config.acts_enabled) + " \n"
+                + "score_function_player1: " + str(self.player1_config.score_function) + " \n"
+                + "timeout_player1: " + str(self.player1_config.TIMEOUT) + " \n"
 
                 + "player 2 config \n"
-                + "encoder: " + str(self.player1_config.encoder) + " \n"
+                + "encoder: " + str(self.player2_config.encoder) + " \n"
                 + "money_increment: " + str(self.player2_config.MONEY_INC) + " \n"
                 + "initial_gold: " + str(self.player2_config.INITIAL_GOLD) + " \n"
                 + "maximum_gold: " + str(self.player2_config.MAX_GOLD) + " \n"
@@ -897,6 +907,8 @@ class Configuration:
                 + "a_max_health: " + str(self.player2_config.a_max_health) + " \n"
                 + "a_cost: " + str(self.player2_config.a_cost) + " \n"
                 + "acts_enabled: " + str(self.player2_config.acts_enabled) + " \n"
+                + "score_function_player2: " + str(self.player2_config.score_function) + " \n"
+                + "timeout_player2: " + str(self.player2_config.TIMEOUT) + " \n"
 
                 + "Learn args \n"
                 + "num_iters: " + str(self.learn_args.numIters) + " \n"
@@ -956,5 +968,3 @@ class Configuration:
             file = ""
             exit(1)
         self._to_file_str(item, file)
-
-

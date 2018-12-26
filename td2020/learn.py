@@ -35,3 +35,8 @@ if __name__ == "__main__":
         print("Load trainExamples from file")
         c.loadTrainExamples()
     c.learn()
+
+
+
+FIRST TO FIX:
+Check if runner really changes verbose of output to pygame while pitting
