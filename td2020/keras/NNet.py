@@ -5,6 +5,8 @@ import numpy as np
 from tensorflow.python.keras.callbacks import TensorBoard
 # from tensorflow.python.keras.utils import plot_model
 import sys
+
+
 sys.path.append('../..')
 from NeuralNet import NeuralNet
 from td2020.keras.TD2020NNet import TD2020NNet
@@ -29,7 +31,8 @@ class NNetWrapper(NeuralNet):
         # plot_model(self.nnet.model, to_file='C:\\TrumpDefense2020\\TD2020\\Content\\Scripts\\td2020\\models\\' + type(self.nnet).__name__ + '_model_plot.png', show_shapes=True, show_layer_names=True)
 
     def train(self, examples):
-        from td2020.src.config import CONFIG
+        from td2020.src.config_class import CONFIG
+
         """
         examples: list of examples, each example is of form (board, pi, v)
         """
@@ -43,7 +46,8 @@ class NNetWrapper(NeuralNet):
         self.nnet.model.fit(x=input_boards, y=[target_pis, target_vs], batch_size=CONFIG.nnet_args.batch_size, epochs=CONFIG.nnet_args.epochs, verbose=VERBOSE_MODEL_FIT, callbacks=[self.tensorboard])
 
     def predict(self, board, player=None):
-        from td2020.src.config import CONFIG
+        from td2020.src.config_class import CONFIG
+
         """
         board: np array with board
         """

@@ -1,10 +1,12 @@
 import sys
+
+from td2020.src.config_class import CONFIG
+
 sys.path.append('..')
 from td2020.Coach_Fixed import Coach
 # from td2020.configurations.ConfigWrapper import LearnArgs
 from td2020.TD2020Game import TD2020Game
 from td2020.keras.NNet import NNetWrapper as NN
-from td2020.src.config import CONFIG
 
 # from td2020.src.config import grid_size
 

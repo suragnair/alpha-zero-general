@@ -25,7 +25,8 @@ class Board:
         return self.pieces[index]
 
     def execute_move(self, move, player) -> None:
-        from td2020.src.config import CONFIG
+        from td2020.src.config_class import CONFIG
+
         if player == 1:
             config = CONFIG.player1_config
         else:

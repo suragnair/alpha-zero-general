@@ -1,8 +1,10 @@
 import sys
+
+from td2020.src.config_class import CONFIG
+
 sys.path.append('..')
 import Arena
 from td2020.TD2020Game import display, TD2020Game
-from td2020.src.config import CONFIG
 
 
 CONFIG.set_runner('pit')  # set visibility as pit

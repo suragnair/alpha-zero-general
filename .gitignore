@@ -1,7 +1,9 @@
 *.pyc
 .DS_Store
 
-/temp/
+/temp/*
+!/temp/.gitkeep
+
 /.project
 /.pydevproject
 

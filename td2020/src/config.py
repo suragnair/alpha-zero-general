@@ -312,7 +312,8 @@ class Configuration:
                      destroy_all,
                      a_max_health,
                      a_cost,
-                     acts_enabled):
+                     acts_enabled,
+                     score_function):
 
             self.encoder = encoder
 
@@ -401,6 +402,7 @@ class Configuration:
                 "town_hall": True,
                 "heal": True
             })
+            self.score_function = score_function
 
     class _PitArgs:
 
@@ -518,6 +520,7 @@ class Configuration:
                  a_max_health_player1: dict = None,
                  a_cost_player1: dict = None,
                  acts_enabled_player1: dict = None,
+                 score_function_player1: int = 3,
 
                  encoder_player2: Encoder = OneHotEncoder(),
                  money_increment_player2: int = 3,
@@ -533,6 +536,7 @@ class Configuration:
                  a_max_health_player2: dict = None,
                  a_cost_player2: dict = None,
                  acts_enabled_player2: dict = None,
+                 score_function_player2: int = 3,
 
                  num_iters: int = 4,
                  num_eps: int = 4,
@@ -618,6 +622,7 @@ class Configuration:
                 "heal": True
             }
             ``
+        :param score_function_player1: which function to use (1, 2 or 3)
         :param encoder_player2: Which encoder should this player use while pitting (OneHotEncoder, NumericEncoder)
         :param money_increment_player2: How much money player should gain when worker returns gold coins
         :param initial_gold_player2: How much initial gold should player have
@@ -667,6 +672,7 @@ class Configuration:
                 "heal": True
             }
             ``
+        :param score_function_player2: which function to use (1, 2 or 3)
         :param num_iters: How many iterations of games it should be played
         :param num_eps: How many episodes in each game iteration it should be played
         :param temp_threshold: Used by coach. "It uses a temp=1 if episodeStep < tempThreshold, and thereafter uses temp=0."
@@ -730,7 +736,8 @@ class Configuration:
             destroy_all=destroy_all_player1,
             a_max_health=a_max_health_player1,
             a_cost=a_cost_player1,
-            acts_enabled=acts_enabled_player1)
+            acts_enabled=acts_enabled_player1,
+            score_function = score_function_player1)
         self.player2_config = self._GameConfig(
             encoder=encoder_player2,
             money_increment=money_increment_player2,
@@ -745,7 +752,8 @@ class Configuration:
             destroy_all=destroy_all_player2,
             a_max_health=a_max_health_player2,
             a_cost=a_cost_player2,
-            acts_enabled=acts_enabled_player2)
+            acts_enabled=acts_enabled_player2,
+            score_function=score_function_player2)
 
         self.learn_args = self._LearnArgs(
             num_iters=num_iters,
@@ -950,4 +958,3 @@ class Configuration:
         self._to_file_str(item, file)
 
 
-CONFIG = Configuration()

@@ -7,6 +7,8 @@ import numpy as np
 import pygame
 from pygame.rect import Rect
 import sys
+
+
 sys.path.append('..')
 from td2020.src.config import NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, d_user_shortcuts, FPS, ACTS, d_a_type, ACTS_REV, d_user_shortcuts_rev
 from td2020.visualization.Graphics import init_visuals, update_graphics, message_display
@@ -38,7 +40,8 @@ class HumanTD2020Player:
         self.USER_PLAYER = 1  # used by Human Player - this does not change if human pit player is 1 or -1
 
     def play(self, board: np.ndarray) -> List:
-        from td2020.src.config import CONFIG
+        from td2020.src.config_class import CONFIG
+
         n = board.shape[0]
         valid = self.game.getValidMoves(board, 1)
         self.display_valid_moves(board, valid)
@@ -102,7 +105,7 @@ class HumanTD2020Player:
 
     def _manage_input(self, board: np.ndarray) -> list:
         from td2020.src.Board import Board
-        from td2020.src.config import CONFIG
+        from td2020.src.config_class import CONFIG
 
         n = board.shape[0]
 

@@ -3,7 +3,8 @@ import time
 import numpy as np
 
 from pytorch_classification.utils import Bar, AverageMeter
-from td2020.src.config import NUM_ACTS, ACTS_REV,  CONFIG
+from td2020.src.config import NUM_ACTS, ACTS_REV
+from td2020.src.config_class import CONFIG
 
 
 class Arena():

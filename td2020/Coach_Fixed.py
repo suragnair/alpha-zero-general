@@ -7,11 +7,13 @@ from random import shuffle
 
 import numpy as np
 import sys
+
+from td2020.src.config_class import CONFIG
+
 sys.path.append('..')
 from Arena import Arena
 from MCTS import MCTS
 from pytorch_classification.utils import Bar, AverageMeter
-from td2020.src.config import CONFIG
 
 """
 

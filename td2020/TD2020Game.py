@@ -1,10 +1,13 @@
+import sys
 from typing import Tuple
 
 import numpy as np
-import sys
+
+from td2020.src.config_class import CONFIG
+
 sys.path.append('..')
 from td2020.src.Board import Board
-from td2020.src.config import NUM_ENCODERS, NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, TIME_IDX, FPS, CONFIG
+from td2020.src.config import NUM_ENCODERS, NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, TIME_IDX, FPS
 
 """ USE_TIMEOUT, MAX_TIME, d_a_type, a_max_health, INITIAL_GOLD, TIMEOUT, visibility"""
 
@@ -200,9 +203,18 @@ class TD2020Game:
         b = Board(self.n)
         b.pieces = np.copy(board)
 
-        # return b.get_health_score(player)
-        # return b.get_money_score(player)
-        return b.get_combined_score(player)
+        # can use different score functions for each player
+        if player == 1:
+            score_function = CONFIG.player1_config.score_function
+        else:
+            score_function = CONFIG.player2_config.score_function
+
+        if score_function == 1:
+            return b.get_health_score(player)
+        elif score_function == 2:
+            return b.get_money_score(player)
+        else:
+            return b.get_combined_score(player)
 
 
 def display(board):

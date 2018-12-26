@@ -24,7 +24,7 @@ Defined NNet model used for game TD2020
 
 class TD2020NNet:
     def __init__(self, game):
-        from td2020.src.config import CONFIG
+        from td2020.src.config_class import CONFIG
 
         # game params
         self.board_x, self.board_y, num_encoders = game.getBoardSize()
