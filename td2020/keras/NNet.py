@@ -3,7 +3,7 @@ import time
 
 import numpy as np
 from tensorflow.python.keras.callbacks import TensorBoard
-from tensorflow.python.keras.utils import plot_model
+# from tensorflow.python.keras.utils import plot_model
 import sys
 sys.path.append('../..')
 from NeuralNet import NeuralNet
@@ -26,7 +26,7 @@ class NNetWrapper(NeuralNet):
         self.action_size = game.getActionSize()
 
         self.tensorboard = TensorBoard(log_dir='C:\\TrumpDefense2020\\TD2020\\Content\\Scripts\\td2020\\models\\logs' + type(self.nnet).__name__, histogram_freq=0, write_graph=True, write_images=True)
-        plot_model(self.nnet.model, to_file='C:\\TrumpDefense2020\\TD2020\\Content\\Scripts\\td2020\\models\\' + type(self.nnet).__name__ + '_model_plot.png', show_shapes=True, show_layer_names=True)
+        # plot_model(self.nnet.model, to_file='C:\\TrumpDefense2020\\TD2020\\Content\\Scripts\\td2020\\models\\' + type(self.nnet).__name__ + '_model_plot.png', show_shapes=True, show_layer_names=True)
 
     def train(self, examples):
         from td2020.src.config import CONFIG
