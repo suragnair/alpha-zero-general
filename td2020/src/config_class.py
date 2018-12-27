@@ -2,10 +2,22 @@
 from td2020.src.config import Configuration
 
 # Basic config:
+CONFIG = Configuration()
 
-CONFIG = Configuration(use_one_hot_encoder=False, onehot_encoder_player1=True, onehot_encoder_player2=False)
 
 # ################################# OVERRIDES #######################################
+# Two different encoders
+"""
+# First learning model:
+# CONFIG = Configuration(use_one_hot_encoder=True, onehot_encoder_player1=True, onehot_encoder_player2=False)
+# Run learn
+# Dont forget to rename it to "best_player1.pth.tar" after learning 
+# Second learning model:
+# CONFIG = Configuration(use_one_hot_encoder=True, onehot_encoder_player1=True, onehot_encoder_player2=False) 
+# Run learn
+# Dont forget to rename it to "best_player2.pth.tar" after learning
+# Run pit
+"""
 
 # Sample Health Task
 """
