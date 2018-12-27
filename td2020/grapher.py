@@ -8,6 +8,16 @@ _skiprows = 73
 def fun1(file1, file2):
     df = pd.read_csv(file1, skiprows=_skiprows)
 
+    print("TODOOOOOOOOOOOOOOOOOO - USE BINS!!!!!!!!!")
+    # TODO
+    """
+    zakaj tukej uporablam samo game_ep == 1
+    
+    nardit bi mogu tko... da se naredi sum čez celo game_ep... pa se primerja samo točke diff med game epizodam za playerje
+    ker drgač to rata:
+    https://prnt.sc/m0b6sl
+    """
+
     score = df['score']
     score1 = score[(df.player == 1) & (df.game_ep == 1)]
     score2 = score[(df.player == -1) & (df.game_ep == 1)]
@@ -29,12 +39,12 @@ def fun1(file1, file2):
 
 def fun2(file):
     df = pd.read_csv(file, skiprows=_skiprows)
-
+    print("Fun 2 - maybe display normal plot bar without stacks")
     player = df['player']
     act = df['act_rev']
 
-    move1 = act[((df.act_rev == 'up') | (df.act_rev == 'down') | (df.act_rev == 'left') | (df.act_rev == 'right')) & (player == 1)]
-    move2 = act[((df.act_rev == 'up') | (df.act_rev == 'down') | (df.act_rev == 'left') | (df.act_rev == 'right')) & (player == -1)]
+    move1 = []  # act[((df.act_rev == 'up') | (df.act_rev == 'down') | (df.act_rev == 'left') | (df.act_rev == 'right')) & (player == 1)]
+    move2 = []  # act[((df.act_rev == 'up') | (df.act_rev == 'down') | (df.act_rev == 'left') | (df.act_rev == 'right')) & (player == -1)]
 
     mine1 = act[(df.act_rev == 'mine_resources') & (player == 1)]
     mine2 = act[(df.act_rev == 'mine_resources') & (player == -1)]
@@ -60,14 +70,20 @@ def fun2(file):
     heal1 = act[((df.act_rev == 'heal_up') | (df.act_rev == 'heal_down') | (df.act_rev == 'heal_right') | (df.act_rev == 'heal_left')) & (player == 1)]
     heal2 = act[((df.act_rev == 'heal_up') | (df.act_rev == 'heal_down') | (df.act_rev == 'heal_right') | (df.act_rev == 'heal_left')) & (player == -1)]
 
-    acts = ["move", "mine", "return", "attack", "npc", "infantry", "barracks", "town_hall", "heal"]
+    # acts = ["move", "mine", "return", "attack", "npc", "infantry", "barracks", "town_hall", "heal"]
+    acts = ["mine", "return", "attack", "npc", "infantry", "barracks", "town_hall", "heal"]
 
-    plt.bar(acts, [len(move1), len(mine1), len(return_resources1), len(attack1), len(npc1), len(rifl1), len(barr1), len(th1), len(heal1)], width=0.8)
-    plt.bar(acts, [len(move2), len(mine2), len(return_resources2), len(attack2), len(npc2), len(rifl2), len(barr2), len(th2), len(heal2)], width=0.8, bottom=[len(move1), len(mine1), len(return_resources1), len(attack1), len(npc1), len(rifl1), len(barr1), len(th1), len(heal1)])
+    # plt.bar(acts, [len(move1), len(mine1), len(return_resources1), len(attack1), len(npc1), len(rifl1), len(barr1), len(th1), len(heal1)], width=0.8)
+    # plt.bar(acts, [len(move2), len(mine2), len(return_resources2), len(attack2), len(npc2), len(rifl2), len(barr2), len(th2), len(heal2)], width=0.8, bottom=[len(move1), len(mine1), len(return_resources1), len(attack1), len(npc1), len(rifl1), len(barr1), len(th1), len(heal1)])
+
+    plt.bar(acts, [len(mine1), len(return_resources1), len(attack1), len(npc1), len(rifl1), len(barr1), len(th1), len(heal1)], width=0.8)
+    plt.bar(acts, [len(mine2), len(return_resources2), len(attack2), len(npc2), len(rifl2), len(barr2), len(th2), len(heal2)], width=0.8, bottom=[len(mine1), len(return_resources1), len(attack1), len(npc1), len(rifl1), len(barr1), len(th1), len(heal1)])
     plt.title("Izvajanje akcij dveh igralcev")
-    plt.xlabel("Akcije")
+    plt.xlabel("Akcije (izključeni premiki)")
     plt.ylabel("Število izvedenih akcij")
-    plt.xticks(np.arange(8), rotation=20, labels=("Premik", "Nabiranje", "Vračanje", "Napad", "Delavec", "Vojak", "Vojašnica", "Zdravljenje"))
+    # plt.xticks(np.arange(8), rotation=20, labels=("Premik", "Nabiranje", "Vračanje", "Napad", "Delavec", "Vojak", "Vojašnica", "Zdravljenje"))
+    plt.xticks(np.arange(8), rotation=20, labels=("Nabiranje", "Vračanje", "Napad", "Delavec", "Vojak", "Vojašnica", "Zdravljenje"))
+
     plt.legend(["Igralec 1", "Igralec -1"])
 
     plt.show()
@@ -83,7 +99,9 @@ def to_bins(x, bins):
 
 def fun3(file):
     df = pd.read_csv(file, skiprows=_skiprows)
-    num_bins = 10
+    print("TODO Play with bins fun 3")
+
+    num_bins = 100
 
     player = df['player']
     act = df['act_rev']
@@ -126,7 +144,7 @@ def fun3(file):
     sum_move_mine_return_attack_npc_rifl_barr_th = np.add(sum_move_mine_return_attack_npc_rifl_barr, th1_bin)
     sum_move_mine_return_attack_npc_rifl_barr_th_heal = np.add(sum_move_mine_return_attack_npc_rifl_barr_th, heal1_bin)
 
-    plt.plot(all_arrange, move1_bin, color='aqua')
+    # plt.plot(all_arrange, move1_bin, color='aqua')
     plt.plot(all_arrange, sum_move_mine, color='gold')
     plt.plot(all_arrange, sum_move_mine_return, color='magenta')
     plt.plot(all_arrange, sum_move_mine_return_attack, color='green')
@@ -144,10 +162,11 @@ def fun3(file):
     plt.fill_between(all_arrange, sum_move_mine_return_attack, color='green')
     plt.fill_between(all_arrange, sum_move_mine_return, color='magenta')
     plt.fill_between(all_arrange, sum_move_mine, color='gold')
-    plt.fill_between(all_arrange, move1_bin, color='aqua')
+    # plt.fill_between(all_arrange, move1_bin, color='aqua')
 
-    plt.legend(["Premik", "Nabiranje zlatnikov", "Vračanje zlatnikov", "Napad", "Urjenje delavca", "Urjenje vojaške enote", "Izgradnja vojašnice", "Zdravljenje"])
-    plt.title("Izvajanje akcij skozi učni postopek igralca 1")
+    plt.legend([  # "Premik",
+        "Nabiranje zlatnikov", "Vračanje zlatnikov", "Napad", "Urjenje delavca", "Urjenje vojaške enote", "Izgradnja vojašnice", "Zdravljenje"])
+    plt.title("Izvajanje akcij skozi učni postopek igralca 1 (Izključeni premiki)")
     plt.xlabel("Število izbranih akcij")
     plt.ylabel("Število odigranih akcij v koših po " + str(int(num_bins / 2)))
     plt.show()
@@ -155,7 +174,10 @@ def fun3(file):
 
 def fun4(file):
     df = pd.read_csv(file, skiprows=_skiprows)
-    num_bins = 10
+    print("TODO Play with bins fun 4")
+
+    print("second same plot can plot by game episode - so we show viewer that games, which are player in later stages of the game have more attack actions than prev")
+    num_bins = 200
 
     player = df['player']
     player1 = player[player == 1]
@@ -182,7 +204,7 @@ def fun4(file):
     plt.show()
 
 
-fun1(".\\..\\temp\\config_pit.csv", ".\\..\\temp\\config_pit.csv")  # todo
-fun2(".\\..\\temp\\config_pit.csv")  # todo
-fun3(".\\..\\temp\\config_pit.csv")  # todo
-fun4(".\\..\\temp\\config_pit.csv")  # todo
+fun1(".\\..\\temp\\config_learn.csv", ".\\..\\temp\\config_learn.csv")  # todo
+fun2(".\\..\\temp\\config_learn.csv")  # todo
+fun3(".\\..\\temp\\config_learn.csv")  # todo
+fun4(".\\..\\temp\\config_learn.csv")  # todo

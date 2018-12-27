@@ -568,7 +568,7 @@ class Configuration:
                  update_threshold: float = 0.6,
                  maxlen_of_queue: int = 6400,
                  num_mcts_sims: int = 10,
-                 arena_compare: int = 5,
+                 arena_compare: int = 10,
                  cpuct: float = 1,
                  checkpoint: str = '.\\..\\temp\\',
                  load_model: bool = False,
