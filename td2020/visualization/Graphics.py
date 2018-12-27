@@ -1,8 +1,9 @@
 import ctypes
+import sys
 from typing import Any, Tuple, Optional
 
 import numpy as np
-import sys
+
 sys.path.append('../..')
 from td2020.src.config import P_NAME_IDX, A_TYPE_IDX, d_a_color, d_type_rev, MONEY_IDX, TIME_IDX, CARRY_IDX, HEALTH_IDX
 

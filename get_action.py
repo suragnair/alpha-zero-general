@@ -13,6 +13,7 @@ from MCTS import MCTS
 from td2020.TD2020Game import TD2020Game
 from td2020.keras.NNet import NNetWrapper as NNet
 from td2020.src.config import ACTS_REV, NUM_ACTS
+from td2020.src.encoders import OneHotEncoder
 from utils import dotdict
 
 """
@@ -41,8 +42,8 @@ class TD2020LearnAPI(TFPluginAPI):
             session = tf.Session()
             with session.as_default():
                 current_directory = os.path.join(os.path.dirname(__file__), 'temp/')
-                self.g = TD2020Game(8)
-                n1 = NNet(self.g)
+                self.g = TD2020Game()
+                n1 = NNet(self.g, OneHotEncoder())
                 n1.load_checkpoint(current_directory, 'best.pth.tar')
                 args = dotdict({'numMCTSSims': 2, 'cpuct': 1.0})
                 self.mcts = MCTS(self.g, n1, args)

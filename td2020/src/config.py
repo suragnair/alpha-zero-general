@@ -6,7 +6,7 @@ from typing import List, Tuple
 import numpy as np
 
 sys.path.append('../..')
-from td2020.src.encoders import OneHotEncoder, Encoder
+from td2020.src.encoders import OneHotEncoder, NumericEncoder
 from utils import dotdict
 
 # ####################################################################################
@@ -292,7 +292,6 @@ class Configuration:
             self.num_channels = num_channels  # used by nnet conv layers
 
             # Should one-hot encoder be used (recommended)
-            from td2020.src.encoders import OneHotEncoder, NumericEncoder
             if use_one_hot_encoder:
                 self.encoder = OneHotEncoder()
             else:
@@ -300,7 +299,7 @@ class Configuration:
 
     class _GameConfig:
         def __init__(self,
-                     encoder,
+                     onehot_encoder,
                      money_increment,
                      initial_gold,
                      maximum_gold,
@@ -317,7 +316,10 @@ class Configuration:
                      score_function,
                      timeout):
 
-            self.encoder = encoder
+            if onehot_encoder:
+                self.encoder = OneHotEncoder()
+            else:
+                self.encoder = NumericEncoder()
 
             # ##################################
             # ############# GOLD ###############
@@ -329,7 +331,7 @@ class Configuration:
             # how much initial gold do players get at game begining
             self.INITIAL_GOLD = initial_gold
 
-            # Maximum gold that players can have - It is limited to 8 bits for one-hot encoder
+            # Maximum gold that players can have - It is limited to 8 bits for one-hot onehot_encoder
             self.MAX_GOLD = maximum_gold
 
             # ##################################
@@ -413,10 +415,18 @@ class Configuration:
                      player2_type,
                      player1_config,
                      player2_config,
+                     player1_onehot_encoder,
+                     player2_onehot_encoder,
+                     player1_model_file,
+                     player2_model_file,
                      num_games):
 
             self.player1_type = player1_type
             self.player2_type = player2_type
+            self.player1_model_file = player1_model_file
+            self.player2_model_file = player2_model_file
+            self.player1_onehot_encoder = player1_onehot_encoder
+            self.player2_onehot_encoder = player2_onehot_encoder
             self.player1_config = player1_config or {'numMCTSSims': 2, 'cpuct': 1.0}
             self.player2_config = player2_config or {'numMCTSSims': 2, 'cpuct': 1.0}
             self.num_games = num_games
@@ -424,19 +434,21 @@ class Configuration:
         def create_players(self,
                            game):
 
-            return self._create_player(game, self.player1_type, self.player1_config), self._create_player(game, self.player1_type, self.player1_config)
+            return self._create_player(game, self.player1_type, self.player1_config, self.player1_onehot_encoder, self.player1_model_file), self._create_player(game, self.player1_type, self.player1_config, self.player2_onehot_encoder, self.player2_model_file)
 
         def _create_player(self,
                            game,
                            player_type: str,
-                           player_config: dict):
+                           player_config: dict,
+                           onehot_encoder: bool,
+                           player_model_file: str):
             from td2020.TD2020Players import RandomPlayer, GreedyTD2020Player, HumanTD2020Player
 
             if player_type == 'nnet':
                 if player_config is None:
                     print("Invalid pit configuration. Returning")
                     exit(1)
-                return self._PitNNetPlayer(game, player_config).play
+                return self._PitNNetPlayer(game, player_config, onehot_encoder, player_model_file).play
             if player_type == 'random':
                 return RandomPlayer(game).play
             if player_type == 'greedy':
@@ -449,12 +461,18 @@ class Configuration:
         class _PitNNetPlayer:
             def __init__(self,
                          g,
-                         player_config):
+                         player_config,
+                         onehot_encoder,
+                         player_model_file):
                 from td2020.keras.NNet import NNetWrapper as NNet
                 from MCTS import MCTS
 
-                n1 = NNet(g)
-                n1.load_checkpoint('.\\..\\temp\\', 'best.pth.tar')
+                if onehot_encoder:
+                    encoder = OneHotEncoder()
+                else:
+                    encoder = NumericEncoder()
+                n1 = NNet(g, encoder)
+                n1.load_checkpoint('.\\..\\temp\\', player_model_file)
                 args1 = dotdict(player_config or {'numMCTSSims': 2, 'cpuct': 1.0})
                 mcts1 = MCTS(g, n1, args1)
                 self.play = lambda x: np.argmax(mcts1.getActionProb(x, temp=0))
@@ -508,7 +526,7 @@ class Configuration:
                  learn_visibility=0,
                  pit_visibility=4,
 
-                 encoder_player1: Encoder = OneHotEncoder(),
+                 onehot_encoder_player1: bool = True,
                  money_increment_player1: int = 3,
                  initial_gold_player1: int = 1,
                  maximum_gold_player1: int = 255,
@@ -524,8 +542,9 @@ class Configuration:
                  acts_enabled_player1: dict = None,
                  score_function_player1: int = 3,
                  timeout_player1: int = 200,
+                 player1_model_file: str = "best_player1.pth.tar",
 
-                 encoder_player2: Encoder = OneHotEncoder(),
+                 onehot_encoder_player2: bool = True,
                  money_increment_player2: int = 3,
                  initial_gold_player2: int = 1,
                  maximum_gold_player2: int = 255,
@@ -541,6 +560,7 @@ class Configuration:
                  acts_enabled_player2: dict = None,
                  score_function_player2: int = 3,
                  timeout_player2: int = 200,
+                 player2_model_file: str = "best_player2.pth.tar",
 
                  num_iters: int = 4,
                  num_eps: int = 4,
@@ -577,7 +597,7 @@ class Configuration:
         :param learn_visibility: How much console should output while running learn. If visibility.verbose > 3, Pygame is shown
         :param pit_visibility: How much console should output while running pit. If visibility.verbose > 3, Pygame is shown
 
-        :param encoder_player1: Which encoder should this player use while pitting (OneHotEncoder, NumericEncoder)
+        :param onehot_encoder_player1: Which encoder should this player use while pitting
         :param money_increment_player1: How much money player should gain when worker returns gold coins
         :param initial_gold_player1: How much initial gold should player have
         :param maximum_gold_player1: Maximum gold for player (max allowed value is 255)
@@ -628,7 +648,9 @@ class Configuration:
             ``
         :param score_function_player1: which function to use (1, 2 or 3)
         :param timeout_player1: After what time game will timeout if 'useTimeout' is set to true
-        :param encoder_player2: Which encoder should this player use while pitting (OneHotEncoder, NumericEncoder)
+        :param player1_model_file: Filename in temp folder that player 1 nnet player uses
+
+        :param onehot_encoder_player2: Which encoder should this player use while pitting
         :param money_increment_player2: How much money player should gain when worker returns gold coins
         :param initial_gold_player2: How much initial gold should player have
         :param maximum_gold_player2: Maximum gold for player (max allowed value is 255)
@@ -679,6 +701,9 @@ class Configuration:
             ``
         :param score_function_player2: which function to use (1, 2 or 3)
         :param timeout_player2: After what time game will timeout if 'useTimeout' is set to true
+        :param player2_model_file: Filename in temp folder that player 2 nnet player uses
+
+
         :param num_iters: How many iterations of games it should be played
         :param num_eps: How many episodes in each game iteration it should be played
         :param temp_threshold: Used by coach. "It uses a temp=1 if episodeStep < tempThreshold, and thereafter uses temp=0."
@@ -700,7 +725,7 @@ class Configuration:
         :param player2_config: If "nnet" player is chosen, config can be provided {'numMCTSSims': 2, 'cpuct': 1.0}
         :param num_games: How many games should be played for pit config
 
-        :param use_one_hot_encoder: If oneHot encoder should be used for both players while learning. (While pitting see configs encoder_player1, encoder_player2)
+        :param use_one_hot_encoder: If oneHot encoder should be used for both players while learning. (While pitting see configs encoder_player1, onehot_encoder_player2)
         :param lr: Learning rate of model
         :param dropout: Dropout in NNet Model config
         :param epochs: How many epochs should learning take
@@ -728,7 +753,7 @@ class Configuration:
         self._learn_visibility = learn_visibility
 
         self.player1_config = self._GameConfig(
-            encoder=encoder_player1,
+            onehot_encoder=onehot_encoder_player1,
             money_increment=money_increment_player1,
             initial_gold=initial_gold_player1,
             maximum_gold=maximum_gold_player1,
@@ -746,7 +771,7 @@ class Configuration:
             timeout=timeout_player1)
 
         self.player2_config = self._GameConfig(
-            encoder=encoder_player2,
+            onehot_encoder=onehot_encoder_player2,
             money_increment=money_increment_player2,
             initial_gold=initial_gold_player2,
             maximum_gold=maximum_gold_player2,
@@ -784,6 +809,10 @@ class Configuration:
             player2_type=player2_type,
             player1_config=player1_config,
             player2_config=player2_config,
+            player1_onehot_encoder=onehot_encoder_player1,
+            player2_onehot_encoder=onehot_encoder_player2,
+            player1_model_file=player1_model_file,
+            player2_model_file=player2_model_file,
             num_games=num_games
         )
         self.nnet_args = self._NNetArgs(
@@ -873,11 +902,12 @@ class Configuration:
         with open(file_name, "w") as f:
             f.write(
                 "Writing config:" + "\n"
-                + "time: " + str(datetime.datetime.now()) + "\n"
+                + "\n"
+                + "Time started: " + str(datetime.datetime.now()) + "\n"
                 + "grid_size: " + str(self.grid_size) + " \n"
-
+                + "\n"
                 + "Player 1 config \n"
-                + "encoder: " + str(self.player1_config.encoder) + " \n"
+                + "onehot_encoder: " + str(self.player1_config.encoder) + " \n"
                 + "money_increment: " + str(self.player1_config.MONEY_INC) + " \n"
                 + "initial_gold: " + str(self.player1_config.INITIAL_GOLD) + " \n"
                 + "maximum_gold: " + str(self.player1_config.MAX_GOLD) + " \n"
@@ -892,9 +922,9 @@ class Configuration:
                 + "acts_enabled: " + str(self.player1_config.acts_enabled) + " \n"
                 + "score_function_player1: " + str(self.player1_config.score_function) + " \n"
                 + "timeout_player1: " + str(self.player1_config.TIMEOUT) + " \n"
-
+                + "\n"
                 + "player 2 config \n"
-                + "encoder: " + str(self.player2_config.encoder) + " \n"
+                + "onehot_encoder: " + str(self.player2_config.encoder) + " \n"
                 + "money_increment: " + str(self.player2_config.MONEY_INC) + " \n"
                 + "initial_gold: " + str(self.player2_config.INITIAL_GOLD) + " \n"
                 + "maximum_gold: " + str(self.player2_config.MAX_GOLD) + " \n"
@@ -909,7 +939,7 @@ class Configuration:
                 + "acts_enabled: " + str(self.player2_config.acts_enabled) + " \n"
                 + "score_function_player2: " + str(self.player2_config.score_function) + " \n"
                 + "timeout_player2: " + str(self.player2_config.TIMEOUT) + " \n"
-
+                + "\n"
                 + "Learn args \n"
                 + "num_iters: " + str(self.learn_args.numIters) + " \n"
                 + "num_eps: " + str(self.learn_args.numEps) + " \n"
@@ -925,14 +955,14 @@ class Configuration:
                 + "num_iters_for_train_examples_history: " + str(self.learn_args.numItersForTrainExamplesHistory) + " \n"
                 + "save_train_examples: " + str(self.learn_args.save_train_examples) + " \n"
                 + "load_train_examples: " + str(self.learn_args.load_train_examples) + " \n"
-
+                + "\n"
                 + "Pit args \n"
                 + "player1_type: " + str(self.pit_args.player1_type) + " \n"
                 + "player2_type: " + str(self.pit_args.player2_type) + " \n"
                 + "player1_config: " + str(self.pit_args.player1_config) + " \n"
                 + "player2_config: " + str(self.pit_args.player2_config) + " \n"
                 + "num_games: " + str(self.pit_args.num_games) + " \n"
-
+                + "\n"
                 + "Nnet args \n"
                 + "use_one_hot_encoder: " + str(self.nnet_args.num_channels) + " \n"
                 + "lr: " + str(self.nnet_args.num_channels) + " \n"
@@ -941,7 +971,9 @@ class Configuration:
                 + "batch_size: " + str(self.nnet_args.num_channels) + " \n"
                 + "cuda: " + str(self.nnet_args.num_channels) + " \n"
                 + "num_channels: " + str(self.nnet_args.num_channels) + " \n"
+                + "\n"
                 + "###################################################\n"
+                + "\n"
             )
 
     def to_file(self):

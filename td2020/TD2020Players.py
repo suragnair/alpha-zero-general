@@ -1,13 +1,12 @@
 import ctypes
 import os
+import sys
 from math import sqrt
 from typing import List
 
 import numpy as np
 import pygame
 from pygame.rect import Rect
-import sys
-
 
 sys.path.append('..')
 from td2020.src.config import NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, d_user_shortcuts, FPS, ACTS, d_a_type, ACTS_REV, d_user_shortcuts_rev
@@ -166,7 +165,7 @@ class HumanTD2020Player:
                                 config = CONFIG.player1_config
                             else:
                                 config = CONFIG.player2_config
-                            valids_square = b.get_moves_for_square(clicked_actor.x, clicked_actor.y,config=config)
+                            valids_square = b.get_moves_for_square(clicked_actor.x, clicked_actor.y, config=config)
 
                             printed_actions = 0
                             for i in range(len(valids_square)):

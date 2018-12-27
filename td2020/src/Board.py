@@ -2,7 +2,7 @@ import sys
 from typing import Any
 
 import numpy as np
-import sys
+
 sys.path.append('../..')
 from td2020.src.Graph import num_destroys, damage
 from td2020.src.config import d_a_type, d_acts, A_TYPE_IDX, P_NAME_IDX, CARRY_IDX, MONEY_IDX, NUM_ACTS, ACTS_REV, NUM_ENCODERS, HEALTH_IDX, TIME_IDX

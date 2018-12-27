@@ -1,11 +1,9 @@
 import os
-import time
-
-import numpy as np
-from tensorflow.python.keras.callbacks import TensorBoard
 # from tensorflow.python.keras.utils import plot_model
 import sys
 
+import numpy as np
+from tensorflow.python.keras.callbacks import TensorBoard
 
 sys.path.append('../..')
 from NeuralNet import NeuralNet
@@ -21,11 +19,13 @@ NNet wrapper uses defined nnet model to train and predict
 
 # noinspection PyMissingConstructor
 class NNetWrapper(NeuralNet):
-    def __init__(self, game):
+    def __init__(self, game, encoder):
 
-        self.nnet = TD2020NNet(game)
+        self.nnet = TD2020NNet(game, encoder)
         self.board_x, self.board_y, num_encoders = game.getBoardSize()
         self.action_size = game.getActionSize()
+
+        self.encoder = encoder
 
         self.tensorboard = TensorBoard(log_dir='C:\\TrumpDefense2020\\TD2020\\Content\\Scripts\\td2020\\models\\logs' + type(self.nnet).__name__, histogram_freq=0, write_graph=True, write_images=True)
         # plot_model(self.nnet.model, to_file='C:\\TrumpDefense2020\\TD2020\\Content\\Scripts\\td2020\\models\\' + type(self.nnet).__name__ + '_model_plot.png', show_shapes=True, show_layer_names=True)
@@ -41,7 +41,11 @@ class NNetWrapper(NeuralNet):
         target_pis = np.asarray(target_pis)
         target_vs = np.asarray(target_vs)
 
+        """
         input_boards = CONFIG.nnet_args.encoder.encode_multiple(input_boards)
+        """
+        input_boards = self.encoder.encode(input_boards)
+
 
         self.nnet.model.fit(x=input_boards, y=[target_pis, target_vs], batch_size=CONFIG.nnet_args.batch_size, epochs=CONFIG.nnet_args.epochs, verbose=VERBOSE_MODEL_FIT, callbacks=[self.tensorboard])
 
@@ -53,6 +57,7 @@ class NNetWrapper(NeuralNet):
         """
 
         # If we are learning model, use only 1 encoder on both players, else use player, specific encoder, as we might be comparing 2 different encoders using 'pit'
+        """
         if CONFIG.runner == "learn":
             board = CONFIG.nnet_args.encoder.encode(board)
         else:
@@ -60,6 +65,8 @@ class NNetWrapper(NeuralNet):
                 board = CONFIG.player1_config.encoder.encode(board)
             else:
                 board = CONFIG.player2_config.encoder.encode(board)
+        """
+        board = self.encoder.encode(board)
 
         # preparing input
         board = board[np.newaxis, :, :]

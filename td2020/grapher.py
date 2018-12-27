@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pylab as plt
 
-_skiprows = 59
+_skiprows = 73
 
 
 def fun1(file1, file2):

@@ -225,7 +225,7 @@ def display(board):
 
     n = board.shape[0]
     if CONFIG.visibility > 3:
-        game_display, clock = init_visuals(n, n, CONFIG.visibility.verbose)
+        game_display, clock = init_visuals(n, n, CONFIG.visibility)
         update_graphics(board, game_display, clock, FPS)
     else:
         for y in range(n):

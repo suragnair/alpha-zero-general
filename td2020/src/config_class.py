@@ -3,7 +3,7 @@ from td2020.src.config import Configuration
 
 # Basic config:
 
-CONFIG = Configuration(player1_type='human')
+CONFIG = Configuration(use_one_hot_encoder=False, onehot_encoder_player1=True, onehot_encoder_player2=False)
 
 # ################################# OVERRIDES #######################################
 

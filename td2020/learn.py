@@ -23,7 +23,7 @@ if __name__ == "__main__":
 
     # create nnet for this game
     g = TD2020Game()
-    nnet = NN(g)
+    nnet = NN(g, CONFIG.nnet_args.encoder)
 
     # If training examples should be loaded from file
     if CONFIG.learn_args.load_model:
@@ -35,8 +35,3 @@ if __name__ == "__main__":
         print("Load trainExamples from file")
         c.loadTrainExamples()
     c.learn()
-
-
-
-FIRST TO FIX:
-Check if runner really changes verbose of output to pygame while pitting

@@ -4,10 +4,9 @@ import sys
 from tensorflow.python.keras import Input, Model
 from tensorflow.python.keras.layers import Conv2D, BatchNormalization, Activation, Dense, Dropout, Flatten, Reshape
 from tensorflow.python.keras.optimizers import Adam
-import sys
+
 sys.path.append('../..')
 from td2020.src.config import USE_TF_CPU, SHOW_TENSORFLOW_GPU
-
 
 if USE_TF_CPU:
     print("Using TensorFlow CPU")
@@ -23,14 +22,17 @@ Defined NNet model used for game TD2020
 
 
 class TD2020NNet:
-    def __init__(self, game):
+    def __init__(self, game, encoder):
         from td2020.src.config_class import CONFIG
 
         # game params
         self.board_x, self.board_y, num_encoders = game.getBoardSize()
         self.action_size = game.getActionSize()
 
+        """
         num_encoders = CONFIG.nnet_args.encoder.num_encoders
+        """
+        num_encoders = encoder.num_encoders
 
         # Neural Net
         self.input_boards = Input(shape=(self.board_x, self.board_y, num_encoders))  # s: batch_size x board_x x board_y x num_encoders
