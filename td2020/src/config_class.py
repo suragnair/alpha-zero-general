@@ -2,8 +2,7 @@
 from td2020.src.config import Configuration
 
 # Basic config:
-CONFIG = Configuration()
-
+# CONFIG = Configuration()
 
 # ################################# OVERRIDES #######################################
 # Two different encoders
@@ -19,6 +18,13 @@ CONFIG = Configuration()
 # Run pit
 """
 
+# ################################# RUN 1 ##############################################
+# Onehot encoder
+CONFIG = Configuration(num_iters=10,
+                       num_eps=10,
+                       num_mcts_sims=30,
+                       epochs=100)
+# ################################# OLD RUNS ###########################################
 # Sample Health Task
 """
 CONFIG = Configuration(num_iters=20, 
