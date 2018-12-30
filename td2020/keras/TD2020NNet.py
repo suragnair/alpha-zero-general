@@ -50,3 +50,6 @@ class TD2020NNet:
 
         self.model = Model(inputs=self.input_boards, outputs=[self.pi, self.v])
         self.model.compile(loss=['categorical_crossentropy', 'mean_squared_error'], optimizer=Adam(CONFIG.nnet_args.lr))
+
+        # num weights:
+        # 256*8*8*128 + 256*8*8*128 + 256*6*6*128 + 256*4*4*128 + 256 + 128 + 8*8*30+1 + 1
