@@ -17,13 +17,13 @@ Main files to start learning and pitting:
 
 # Install instructions
 download git cmd
-    https://git-scm.com/downloads
+> https://git-scm.com/downloads
 open git bash cmd
+```
 git clone https://github.com/JernejHabjan/alpha-zero-general.git
-
+```
 run install script in 
 > alpha-zero-general/td2020/install.sh
-
 
 ## Tensorflow-Gpu installation (Optional):
 ```pip install 'tensorflow-gpu==1.8'```
