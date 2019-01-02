@@ -17,7 +17,7 @@ CONFIG = Configuration(use_one_hot_encoder=True, onehot_encoder_player1=True, on
 Run learn
 Dont forget to rename it to "best_player1.pth.tar" after learning 
 Second learning model:
-CONFIG = Configuration(use_one_hot_encoder=True, onehot_encoder_player1=True, onehot_encoder_player2=False) 
+CONFIG = Configuration(use_one_hot_encoder=False, onehot_encoder_player1=True, onehot_encoder_player2=False) 
 Run learn
 Dont forget to rename it to "best_player2.pth.tar" after learning
 Run pit
@@ -40,6 +40,7 @@ Example of longer learning with high number of eps and mcts sims.
 """
 
 # ################################# RUN 1 ##############################################
+"""
 CONFIG = Configuration(num_iters=100,
                        num_iters_for_train_examples_history=30,
                        num_eps=4,
@@ -48,6 +49,7 @@ CONFIG = Configuration(num_iters=100,
                        epochs=100,
                        initial_gold_player1=10,
                        initial_gold_player2=10)
+"""
 # Release:
 """
 https://github.com/JernejHabjan/alpha-zero-general/releases/tag/1.0.0
@@ -103,6 +105,52 @@ Initial board config: players have gold actors on edges of map
 Players start game by constructing as much actors as they can with provided gold.
 Players continue to successfully gather gold when they get near gold minerals, but randomly walk around when they are not.
 Attacking units continue to damage and destroy enemy units when nearby, but attacks on enemy base are not initiated, resulting in annihilation
+"""
+
+# ################################# RUN 2 ##############################################
+
+# First learning model (best_player1.pth.tar):
+CONFIG = Configuration(use_one_hot_encoder=True,
+                       onehot_encoder_player1=True,
+                       onehot_encoder_player2=False,
+
+                       num_iters=20,
+                       num_iters_for_train_examples_history=5,
+                       num_eps=4,
+                       num_mcts_sims=5,
+                       arena_compare=7,
+                       epochs=100,
+                       initial_gold_player1=10,
+                       initial_gold_player2=10)
+
+# Second learning model (best_player2.pth.tar):
+"""
+CONFIG = Configuration(use_one_hot_encoder=False,
+                       onehot_encoder_player1=True,
+                       onehot_encoder_player2=False,
+
+                       num_iters=20,
+                       num_iters_for_train_examples_history=5,
+                       num_eps=4,
+                       num_mcts_sims=5,
+                       arena_compare=7,
+                       epochs=100,
+                       initial_gold_player1=10,
+                       initial_gold_player2=10)
+"""
+# Release
+"""
+TODO
+"""
+
+# Description
+"""
+Comparing model encoded using one-hot encoder against numeric encoder
+"""
+
+# Results:
+"""
+TODO
 """
 
 # ################################# OLD RUNS (Deprecated) ###########################################
