@@ -19,9 +19,15 @@ def fun1(file1, file2):
     score_player3 = score2[(df2.player == 1)]
     score_player3 += 10  # TODO for test
 
+    """
     score_player1 = to_bins_avg(score_player1, int(CONFIG.player1_config.TIMEOUT * 2))
     score_player2 = to_bins_avg(score_player2, int(CONFIG.player1_config.TIMEOUT * 2))
     score_player3 = to_bins_avg(score_player3, int(CONFIG.player1_config.TIMEOUT * 2))
+    """
+    n_bins = 5
+    score_player1 = to_bins_avg(score_player1, int(CONFIG.player1_config.TIMEOUT * 2) * n_bins)
+    score_player2 = to_bins_avg(score_player2, int(CONFIG.player1_config.TIMEOUT * 2) * n_bins)
+    score_player3 = to_bins_avg(score_player3, int(CONFIG.player1_config.TIMEOUT * 2) * n_bins)
 
     arrange_both = np.arange(len(score_player1)) + 1
 
@@ -30,10 +36,10 @@ def fun1(file1, file2):
     plt.plot(arrange_both, score_player2, 'b--')
     # plt.plot(arrange_both, score_player3, 'g--')
 
-    plt.title("Primerjava točk igralcev")
+    plt.title("Primerjava točk igralcev v koših po " + str(n_bins))
     plt.ylabel("Število točk")
     plt.xlabel("Iteracija igre")
-    plt.legend(["Igralec1*", "Igralec2*", "Igralec3*"])  # todo pazi vrstni red
+    plt.legend(["Igralec 1", "Igralec -1"])
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))  # force integers on x axis
     plt.show()
 
@@ -41,6 +47,8 @@ def fun1(file1, file2):
 def fun2(file, file2=None):
     df_player1 = pd.read_csv(file, skiprows=_skiprows)
     df_player2 = pd.read_csv(file2 or file, skiprows=_skiprows)
+
+    n_bins = 500
 
     player_1 = df_player1['player']
     act_1 = df_player1['act_rev']
@@ -74,6 +82,34 @@ def fun2(file, file2=None):
 
     heal1 = act_1[((df_player1.act_rev == 'heal_up') | (df_player1.act_rev == 'heal_down') | (df_player1.act_rev == 'heal_right') | (df_player1.act_rev == 'heal_left')) & (player_1 == 1)]
     heal2 = act_2[((df_player2.act_rev == 'heal_up') | (df_player2.act_rev == 'heal_down') | (df_player2.act_rev == 'heal_right') | (df_player2.act_rev == 'heal_left')) & (player_2 == -1)]
+    """
+    move1= to_bins_count(move1,n_bins)
+    move2= to_bins_count(move2,n_bins)
+
+    mine1= to_bins_count(mine1,n_bins)
+    mine2= to_bins_count(mine2,n_bins)
+
+    return_resources1= to_bins_count(return_resources1,n_bins)
+    return_resources2= to_bins_count(return_resources2,n_bins)
+
+    attack1= to_bins_count(attack1,n_bins)
+    attack2= to_bins_count(attack2,n_bins)
+
+    npc1= to_bins_count(npc1,n_bins)
+    npc2= to_bins_count(npc2,n_bins)
+
+    rifl1= to_bins_count(rifl1,n_bins)
+    rifl2= to_bins_count(rifl2,n_bins)
+
+    barr1= to_bins_count(barr1,n_bins)
+    barr2= to_bins_count(barr2,n_bins)
+
+    th1= to_bins_count(th1,n_bins)
+    th2= to_bins_count(th2,n_bins)
+
+    heal1= to_bins_count(heal1,n_bins)
+    heal2= to_bins_count(heal2,n_bins)
+    """
 
     acts = (  # "Premik",
         "Nabiranje", "Vračanje", "Napad", "Delavec", "Vojak", "Vojašnica", "Glavna hiša", "Zdravljenje")
@@ -104,6 +140,13 @@ def fun2(file, file2=None):
     plt.show()
 
 
+def to_bins_count(x, bins):
+    ar = []
+    for i in range(0, len(x), bins):
+        ar.append(len(x[i:i + bins]))
+    return ar
+
+
 def to_bins_avg(x, bins):
     x = x.astype(int)
     ar = []
@@ -120,39 +163,39 @@ def to_bins_sum(x, bins):
     return ar
 
 
-def fun3(file):
+def fun3(file, player):
     df = pd.read_csv(file, skiprows=_skiprows)
 
-    num_bins = 2000
+    num_bins = 4000
 
-    player = df['player']
+    df_player = df['player']
     act = df['act_rev']
 
-    move1 = (((df.act_rev == 'up') | (df.act_rev == 'down') | (df.act_rev == 'left') | (df.act_rev == 'right')) & (player == 1))
+    move1 = (((df.act_rev == 'up') | (df.act_rev == 'down') | (df.act_rev == 'left') | (df.act_rev == 'right')) & (df_player == player))
     move1_bin = to_bins_sum(move1, bins=num_bins)
 
-    mine1 = ((df.act_rev == 'mine_resources') & (player == 1))
+    mine1 = ((df.act_rev == 'mine_resources') & (df_player == player))
     mine1_bin = to_bins_sum(mine1, bins=num_bins)
 
-    return_resources1 = ((df.act_rev == 'return_resources') & (player == 1))
+    return_resources1 = ((df.act_rev == 'return_resources') & (df_player == player))
     return_resources1_bin = to_bins_sum(return_resources1, bins=num_bins)
 
-    attack1 = (((df.act_rev == 'attack_up') | (df.act_rev == 'attack_down') | (df.act_rev == 'attack_right') | (df.act_rev == 'attack_left')) & (player == 1))
+    attack1 = (((df.act_rev == 'attack_up') | (df.act_rev == 'attack_down') | (df.act_rev == 'attack_right') | (df.act_rev == 'attack_left')) & (df_player == player))
     attack1_bin = to_bins_sum(attack1, bins=num_bins)
 
-    npc1 = (((df.act_rev == 'npc_up') | (df.act_rev == 'npc_down') | (df.act_rev == 'npc_right') | (df.act_rev == 'npc_left')) & (player == 1))
+    npc1 = (((df.act_rev == 'npc_up') | (df.act_rev == 'npc_down') | (df.act_rev == 'npc_right') | (df.act_rev == 'npc_left')) & (df_player == player))
     npc1_bin = to_bins_sum(npc1, bins=num_bins)
 
-    rifl1 = (((df.act_rev == 'rifle_infantry_up') | (df.act_rev == 'rifle_infantry_down') | (df.act_rev == 'rifle_infantry_right') | (df.act_rev == 'rifle_infantry_left')) & (player == 1))
+    rifl1 = (((df.act_rev == 'rifle_infantry_up') | (df.act_rev == 'rifle_infantry_down') | (df.act_rev == 'rifle_infantry_right') | (df.act_rev == 'rifle_infantry_left')) & (df_player == player))
     rifl1_bin = to_bins_sum(rifl1, bins=num_bins)
 
-    barr1 = (((df.act_rev == 'barracks_up') | (df.act_rev == 'barracks_down') | (df.act_rev == 'barracks_right') | (df.act_rev == 'barracks_left')) & (player == 1))
+    barr1 = (((df.act_rev == 'barracks_up') | (df.act_rev == 'barracks_down') | (df.act_rev == 'barracks_right') | (df.act_rev == 'barracks_left')) & (df_player == player))
     barr1_bin = to_bins_sum(barr1, bins=num_bins)
 
-    th1 = (((df.act_rev == 'town_hall_up') | (df.act_rev == 'town_hall_down') | (df.act_rev == 'town_hall_right') | (df.act_rev == 'town_hall_left')) & (player == 1))
+    th1 = (((df.act_rev == 'town_hall_up') | (df.act_rev == 'town_hall_down') | (df.act_rev == 'town_hall_right') | (df.act_rev == 'town_hall_left')) & (df_player == player))
     th1_bin = to_bins_sum(th1, bins=num_bins)
 
-    heal1 = (((df.act_rev == 'heal_up') | (df.act_rev == 'heal_down') | (df.act_rev == 'heal_right') | (df.act_rev == 'heal_left')) & (player == 1))
+    heal1 = (((df.act_rev == 'heal_up') | (df.act_rev == 'heal_down') | (df.act_rev == 'heal_right') | (df.act_rev == 'heal_left')) & (df_player == player))
     heal1_bin = to_bins_sum(heal1, bins=num_bins)
 
     all_arrange = np.arange(len(act) / num_bins) + 1
@@ -190,30 +233,29 @@ def fun3(file):
     """
     ax = plt.figure().gca()
 
-    # plt.plot(all_arrange, move1_bin, color='aqua')
+    plt.plot(all_arrange, move1_bin, color='aqua')
     plt.plot(all_arrange, mine1_bin, color='gold')
     plt.plot(all_arrange, return_resources1_bin, color='magenta')
-    # plt.plot(all_arrange, attack1_bin, color='green')
-    # plt.plot(all_arrange, npc1_bin, color='orange')
-    # plt.plot(all_arrange, rifl1_bin, color='teal')
-    # plt.plot(all_arrange, barr1_bin, color='orchid')
-    # plt.plot(all_arrange, th1_bin, color='lime')
-    # plt.plot(all_arrange, heal1_bin, color='lightblue')
+    plt.plot(all_arrange, attack1_bin, color='green')
+    plt.plot(all_arrange, npc1_bin, color='orange')
+    plt.plot(all_arrange, rifl1_bin, color='teal')
+    plt.plot(all_arrange, barr1_bin, color='orchid')
+    plt.plot(all_arrange, th1_bin, color='lime')
+    plt.plot(all_arrange, heal1_bin, color='lightblue')
 
     plt.legend([
-        # "Premik",
+        "Premik",
         "Nabiranje zlatnikov",
         "Vračanje zlatnikov",
-        # "Napad",
-        # "Urjenje delavca",
-        # "Urjenje vojaške enote",
-        # "Izgradnja vojašnice",
-        # "Izgradnja glavne hiše",
-
-        # "Zdravljenje"
+        "Napad",
+        "Urjenje delavca",
+        "Urjenje vojaške enote",
+        "Izgradnja vojašnice",
+        "Izgradnja glavne hiše",
+        "Zdravljenje"
     ])
-    plt.title("Izvajanje akcij skozi učni postopek igralca 1 (Izključeni premiki)")
-    plt.xlabel("Število izbranih akcij x " +  str(int(num_bins / 2)))
+    plt.title("Izvajanje akcij skozi učni postopek igralca " + str(player))
+    plt.xlabel("Število izbranih akcij x " + str(int(num_bins / 2)))
     plt.ylabel("Število odigranih akcij v koših po " + str(int(num_bins / 2)))
 
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))  # force integers on x axis
@@ -255,6 +297,7 @@ def fun4(file):
 fun1(".\\..\\temp\\config_learn.csv", ".\\..\\temp\\config_learn.csv")  # todo
 fun2(".\\..\\temp\\config_learn.csv")  # todo
 # fun2(".\\..\\temp\\config_learn.csv", ".\\..\\temp\\config_learn1.csv")  # todo - to compare different configs (onehot vs numeric)
-fun3(".\\..\\temp\\config_learn.csv")  # todo
+fun3(".\\..\\temp\\config_learn.csv", player=1)
+fun3(".\\..\\temp\\config_learn.csv", player=-1)
 # fun4(".\\..\\temp\\config_learn.csv")
 exit(0)
