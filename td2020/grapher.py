@@ -17,6 +17,8 @@ def fun1(file1, file2):
     score_player1 = score1[(df1.player == 1)]
     score_player2 = score1[(df1.player == -1)]
     score_player3 = score2[(df2.player == 1)]
+    score_player4 = score2[(df2.player == -1)]
+
     score_player3 += 10  # TODO for test
 
     """
@@ -28,18 +30,20 @@ def fun1(file1, file2):
     score_player1 = to_bins_avg(score_player1, int(CONFIG.player1_config.TIMEOUT * 2) * n_bins)
     score_player2 = to_bins_avg(score_player2, int(CONFIG.player1_config.TIMEOUT * 2) * n_bins)
     score_player3 = to_bins_avg(score_player3, int(CONFIG.player1_config.TIMEOUT * 2) * n_bins)
+    score_player4 = to_bins_avg(score_player4, int(CONFIG.player1_config.TIMEOUT * 2) * n_bins)
 
     arrange_both = np.arange(len(score_player1)) + 1
 
     ax = plt.figure().gca()
     plt.plot(arrange_both, score_player1, 'r--')
     plt.plot(arrange_both, score_player2, 'b--')
-    # plt.plot(arrange_both, score_player3, 'g--')
+    plt.plot(arrange_both, score_player3, 'g--')
+    plt.plot(arrange_both, score_player4, 'y--')
 
     plt.title("Primerjava točk igralcev v koših po " + str(n_bins))
     plt.ylabel("Število točk")
     plt.xlabel("Iteracija igre")
-    plt.legend(["Igralec 1", "Igralec -1"])
+    plt.legend(["Datoteka 1 igralec 1", "Datoteka 1 igralec -1", "Datoteka 2 igralec 1", "Datoteka 2 igralec -1"])
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))  # force integers on x axis
     plt.show()
 
@@ -294,10 +298,15 @@ def fun4(file):
     plt.show()
 
 
-fun1(".\\..\\temp\\config_learn.csv", ".\\..\\temp\\config_learn.csv")  # todo
-fun2(".\\..\\temp\\config_learn.csv")  # todo
-# fun2(".\\..\\temp\\config_learn.csv", ".\\..\\temp\\config_learn1.csv")  # todo - to compare different configs (onehot vs numeric)
-fun3(".\\..\\temp\\config_learn.csv", player=1)
-fun3(".\\..\\temp\\config_learn.csv", player=-1)
+file1 = ".\\..\\temp\\config_learn.csv"
+file2 = ".\\..\\temp\\config_learn.csv"
+# file1 = ".\\..\\temp\\config_pit.csv"
+# file2 = ".\\..\\temp\\config_pit.csv"
+
+fun1(file1, file2)
+# fun2(file1)
+# fun2(".\\..\\temp\\config_learn_onehot.csv", ".\\..\\temp\\config_learn_numeric.csv")  # to compare different configs (onehot vs numeric)
+fun3(file1, player=1)
+fun3(file1, player=-1)
 # fun4(".\\..\\temp\\config_learn.csv")
 exit(0)
