@@ -45,7 +45,6 @@ class NNetWrapper(NeuralNet):
         self.board_x, self.board_y = game.getBoardSize()
         self.action_size = game.getActionSize()
 
-        # if args.cuda:
         device = args.device
         if device >= 0:
             chainer.cuda.get_device_from_id(device).use()  # Make a specified GPU current
@@ -173,11 +172,9 @@ class NNetWrapper(NeuralNet):
         return np.exp(cuda.to_cpu(pi.array)[0]), cuda.to_cpu(v.array)[0]
 
     def loss_pi(self, targets, outputs):
-        # return -torch.sum(targets * outputs) / targets.size()[0]
         return -F.sum(targets * outputs) / targets.shape[0]
 
     def loss_v(self, targets, outputs):
-        # return torch.sum((targets-outputs.view(-1))**2)/targets.size()[0]
         return F.mean_squared_error(targets[:, None], outputs)
 
     def save_checkpoint(self, folder='checkpoint', filename='checkpoint.pth.tar'):
