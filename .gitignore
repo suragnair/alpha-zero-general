@@ -4,3 +4,5 @@
 /temp/
 /.project
 /.pydevproject
+# For PyCharm users
+.idea/
