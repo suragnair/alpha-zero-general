@@ -22,7 +22,7 @@ args = dotdict({
     'dropout': 0.3,
     'epochs': 10,
     'batch_size': 64,
-    'device': 0,  # GPU device id for training model, -1 indicates to use CPU.
+    'device': 0 if chainer.cuda.available else -1,  # GPU device id for training model, -1 indicates to use CPU.
     'num_channels': 512,
     'out': 'result_chainer',  # Output directory for chainer
     'train_mode': 'trainer'  # 'trainer' or 'custom_loop' supported.
