@@ -1,13 +1,10 @@
 import os
-import sys
 import time
 
 import numpy as np
 
-sys.path.append('..')
-from utils import *
 from NeuralNet import NeuralNet
-
+from utils import *
 from .TicTacToeNNet import TicTacToeNNet as onnet
 
 """

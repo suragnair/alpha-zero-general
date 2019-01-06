@@ -1,4 +1,4 @@
-class Game():
+class Game:
     """
     This class specifies the base Game class. To define your own game, subclass
     this class and implement the functions below. This works when the game is

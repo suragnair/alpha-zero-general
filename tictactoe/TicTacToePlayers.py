@@ -11,7 +11,7 @@ Based on the OthelloPlayers by Surag Nair.
 """
 
 
-class RandomPlayer():
+class RandomPlayer:
     def __init__(self, game):
         self.game = game
 
@@ -23,7 +23,7 @@ class RandomPlayer():
         return a
 
 
-class HumanTicTacToePlayer():
+class HumanTicTacToePlayer:
     def __init__(self, game):
         self.game = game
 

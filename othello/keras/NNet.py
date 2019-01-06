@@ -1,14 +1,11 @@
 import os
-import sys
 import time
 
 import numpy as np
 
-sys.path.append('../..')
-from utils import *
 from NeuralNet import NeuralNet
-
-from OthelloNNet import OthelloNNet as onnet
+from utils import *
+from .OthelloNNet import OthelloNNet as onnet
 
 args = dotdict({
     'lr': 0.001,

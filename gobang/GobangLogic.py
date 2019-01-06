@@ -1,4 +1,4 @@
-'''
+"""
 Author: MBoss
 Date: Jan 17, 2018.
 Board class.
@@ -9,12 +9,12 @@ Board data:
      at the opposite end of the board in row 8.
 Squares are stored and manipulated as (x,y) tuples.
 x is the column, y is the row.
-'''
+"""
 
 
-class Board():
+class Board:
     def __init__(self, n):
-        "Set up initial board configuration."
+        """Set up initial board configuration."""
         self.n = n
         # Create the empty board array.
         self.pieces = [None] * self.n

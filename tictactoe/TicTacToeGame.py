@@ -1,11 +1,9 @@
 from __future__ import print_function
 
-import sys
+import numpy as np
 
-sys.path.append('..')
 from Game import Game
 from .TicTacToeLogic import Board
-import numpy as np
 
 """
 Game class implementation for the game of TicTacToe.
@@ -29,7 +27,7 @@ class TicTacToeGame(Game):
 
     def getBoardSize(self):
         # (a,b) tuple
-        return (self.n, self.n)
+        return self.n, self.n
 
     def getActionSize(self):
         # return number of actions
@@ -39,12 +37,12 @@ class TicTacToeGame(Game):
         # if player takes action on board, return next (board,player)
         # action must be a valid move
         if action == self.n * self.n:
-            return (board, -player)
+            return board, -player
         b = Board(self.n)
         b.pieces = np.copy(board)
         move = (int(action / self.n), action % self.n)
         b.execute_move(move, player)
-        return (b.pieces, -player)
+        return b.pieces, -player
 
     def getValidMoves(self, board, player):
         # return a fixed size binary vector

@@ -1,9 +1,5 @@
-import sys
-
-sys.path.append('..')
-
-from keras.models import *
 from keras.layers import *
+from keras.models import *
 from keras.optimizers import *
 
 """
@@ -16,7 +12,7 @@ Based on the OthelloNNet by SourKream and Surag Nair.
 """
 
 
-class TicTacToeNNet():
+class TicTacToeNNet:
     def __init__(self, game, args):
         # game params
         self.board_x, self.board_y = game.getBoardSize()

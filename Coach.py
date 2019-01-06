@@ -12,7 +12,7 @@ from MCTS import MCTS
 from common.utils import Bar, AverageMeter
 
 
-class Coach():
+class Coach:
     """
     This class executes the self-play + learning. It uses the functions defined
     in Game and NeuralNet. args are specified in main.py.

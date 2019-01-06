@@ -3,7 +3,7 @@ import time
 from common.utils import Bar, AverageMeter
 
 
-class Arena():
+class Arena:
     """
     An Arena class where any 2 agents can be pit against each other.
     """
@@ -42,7 +42,7 @@ class Arena():
         while self.game.getGameEnded(board, curPlayer) == 0:
             it += 1
             if verbose:
-                assert (self.display)
+                assert self.display
                 print("Turn ", str(it), "Player ", str(curPlayer))
                 self.display(board)
             action = players[curPlayer + 1](self.game.getCanonicalForm(board, curPlayer))
@@ -54,7 +54,7 @@ class Arena():
                 assert valids[action] > 0
             board, curPlayer = self.game.getNextState(board, curPlayer, action)
         if verbose:
-            assert (self.display)
+            assert self.display
             print("Game over: Turn ", str(it), "Result ", str(self.game.getGameEnded(board, 1)))
             self.display(board)
         return self.game.getGameEnded(board, 1)

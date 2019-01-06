@@ -1,4 +1,4 @@
-'''
+"""
 Board class for the game of TicTacToe.
 Default board size is 3x3.
 Board data:
@@ -13,16 +13,16 @@ Date: Jan 5, 2018.
 
 Based on the board for the game of Othello by Eric P. Nichols.
 
-'''
+"""
 
 
 # from bkcharts.attributes import color
-class Board():
+class Board:
     # list of all 8 directions on the board, as (x,y) offsets
     __directions = [(1, 1), (1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1), (0, 1)]
 
     def __init__(self, n=3):
-        "Set up initial board configuration."
+        """Set up initial board configuration."""
 
         self.n = n
         # Create the empty board array.

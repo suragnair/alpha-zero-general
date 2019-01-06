@@ -1,4 +1,4 @@
-class NeuralNet():
+class NeuralNet:
     """
     This class specifies the base NeuralNet class. To define your own neural
     network, subclass this class and implement the functions below. The neural

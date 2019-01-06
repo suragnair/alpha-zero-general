@@ -1,13 +1,10 @@
 import os
-import sys
 
 import numpy as np
 import tensorflow as tf
 
-sys.path.append('..')
-from utils import *
 from NeuralNet import NeuralNet
-
+from utils import *
 from .GobangNNet import GobangNNet as onnet
 
 args = dotdict({
