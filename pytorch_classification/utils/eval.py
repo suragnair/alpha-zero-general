@@ -2,6 +2,7 @@ from __future__ import print_function, absolute_import
 
 __all__ = ['accuracy']
 
+
 def accuracy(output, target, topk=(1,)):
     """Computes the precision@k for the specified values of k"""
     maxk = max(topk)

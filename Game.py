@@ -8,6 +8,7 @@ class Game():
 
     See othello/OthelloGame.py for an example implementation.
     """
+
     def __init__(self):
         pass
 

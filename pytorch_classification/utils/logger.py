@@ -1,17 +1,18 @@
 # A simple torch style logger
 # (C) Wei YANG 2017
 from __future__ import absolute_import
-#import matplotlib.pyplot as plt
-import os
-import sys
+
+# import matplotlib.pyplot as plt
 import numpy as np
 
 __all__ = ['Logger', 'LoggerMonitor', 'savefig']
 
+
 def savefig(fname, dpi=None):
     dpi = 150 if dpi == None else dpi
     plt.savefig(fname, dpi=dpi)
-    
+
+
 def plot_overlap(logger, names=None):
     names = logger.names if names == None else names
     numbers = logger.numbers
@@ -20,15 +21,17 @@ def plot_overlap(logger, names=None):
         plt.plot(x, np.asarray(numbers[name]))
     return [logger.title + '(' + name + ')' for name in names]
 
+
 class Logger(object):
     '''Save training process to log file with simple plot function.'''
-    def __init__(self, fpath, title=None, resume=False): 
+
+    def __init__(self, fpath, title=None, resume=False):
         self.file = None
         self.resume = resume
         self.title = '' if title == None else title
         if fpath is not None:
-            if resume: 
-                self.file = open(fpath, 'r') 
+            if resume:
+                self.file = open(fpath, 'r')
                 name = self.file.readline()
                 self.names = name.rstrip().split('\t')
                 self.numbers = {}
@@ -40,12 +43,12 @@ class Logger(object):
                     for i in range(0, len(numbers)):
                         self.numbers[self.names[i]].append(numbers[i])
                 self.file.close()
-                self.file = open(fpath, 'a')  
+                self.file = open(fpath, 'a')
             else:
                 self.file = open(fpath, 'w')
 
     def set_names(self, names):
-        if self.resume: 
+        if self.resume:
             pass
         # initialize numbers as empty list
         self.numbers = {}
@@ -57,7 +60,6 @@ class Logger(object):
         self.file.write('\n')
         self.file.flush()
 
-
     def append(self, numbers):
         assert len(self.names) == len(numbers), 'Numbers do not match names'
         for index, num in enumerate(numbers):
@@ -67,7 +69,7 @@ class Logger(object):
         self.file.write('\n')
         self.file.flush()
 
-    def plot(self, names=None):   
+    def plot(self, names=None):
         names = self.names if names == None else names
         numbers = self.numbers
         for _, name in enumerate(names):
@@ -80,9 +82,11 @@ class Logger(object):
         if self.file is not None:
             self.file.close()
 
+
 class LoggerMonitor(object):
     '''Load and visualize multiple logs.'''
-    def __init__ (self, paths):
+
+    def __init__(self, paths):
         '''paths is a distionary with {name:filepath} pair'''
         self.loggers = []
         for title, path in paths.items():
@@ -97,7 +101,8 @@ class LoggerMonitor(object):
             legend_text += plot_overlap(logger, names)
         plt.legend(legend_text, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
         plt.grid(True)
-                    
+
+
 if __name__ == '__main__':
     # # Example
     # logger = Logger('test.txt')
@@ -115,9 +120,9 @@ if __name__ == '__main__':
 
     # Example: logger monitor
     paths = {
-    'resadvnet20':'/home/wyang/code/pytorch-classification/checkpoint/cifar10/resadvnet20/log.txt', 
-    'resadvnet32':'/home/wyang/code/pytorch-classification/checkpoint/cifar10/resadvnet32/log.txt',
-    'resadvnet44':'/home/wyang/code/pytorch-classification/checkpoint/cifar10/resadvnet44/log.txt',
+        'resadvnet20': '/home/wyang/code/pytorch-classification/checkpoint/cifar10/resadvnet20/log.txt',
+        'resadvnet32': '/home/wyang/code/pytorch-classification/checkpoint/cifar10/resadvnet32/log.txt',
+        'resadvnet44': '/home/wyang/code/pytorch-classification/checkpoint/cifar10/resadvnet44/log.txt',
     }
 
     field = ['Valid Acc.']

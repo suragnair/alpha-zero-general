@@ -8,9 +8,9 @@ import time
 from progress.bar import (Bar, ChargingBar, FillingSquaresBar,
                           FillingCirclesBar, IncrementalBar, PixelBar,
                           ShadyBar)
+from progress.counter import Counter, Countdown, Stack, Pie
 from progress.spinner import (Spinner, PieSpinner, MoonSpinner, LineSpinner,
                               PixelSpinner)
-from progress.counter import Counter, Countdown, Stack, Pie
 
 
 def sleep():

@@ -10,8 +10,8 @@ https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py
 import torch.nn as nn
 import math
 
-
 __all__ = ['preresnet']
+
 
 def conv3x3(in_planes, out_planes, stride=1):
     "3x3 convolution with padding"
@@ -98,7 +98,7 @@ class PreResNet(nn.Module):
         assert (depth - 2) % 6 == 0, 'depth should be 6n+2'
         n = (depth - 2) / 6
 
-        block = Bottleneck if depth >=44 else BasicBlock
+        block = Bottleneck if depth >= 44 else BasicBlock
 
         self.inplanes = 16
         self.conv1 = nn.Conv2d(3, 16, kernel_size=3, padding=1,

@@ -23,13 +23,16 @@ class HumanConnect4Player():
 
         while True:
             move = int(input())
-            if valid_moves[move]: break
-            else: print('Invalid move')
+            if valid_moves[move]:
+                break
+            else:
+                print('Invalid move')
         return move
 
 
 class OneStepLookaheadConnect4Player():
     """Simple player who always takes a win if presented, or blocks a loss if obvious, otherwise is random."""
+
     def __init__(self, game, verbose=True):
         self.game = game
         self.player_num = 1

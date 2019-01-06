@@ -1,5 +1,7 @@
 from __future__ import print_function
+
 import sys
+
 sys.path.append('..')
 from Game import Game
 from .GobangLogic import Board
@@ -82,7 +84,7 @@ class GobangGame(Game):
     # modified
     def getSymmetries(self, board, pi):
         # mirror, rotational
-        assert(len(pi) == self.n**2 + 1)  # 1 for pass
+        assert (len(pi) == self.n ** 2 + 1)  # 1 for pass
         pi_board = np.reshape(pi[:-1], (self.n, self.n))
         l = []
 
@@ -109,9 +111,9 @@ def display(board):
     print("")
     print(" -----------------------")
     for y in range(n):
-        print(y, "|", end="")    # print the row #
+        print(y, "|", end="")  # print the row #
         for x in range(n):
-            piece = board[y][x]    # get the piece to print
+            piece = board[y][x]  # get the piece to print
             if piece == -1:
                 print("b ", end="")
             elif piece == 1:

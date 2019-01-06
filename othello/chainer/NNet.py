@@ -1,13 +1,11 @@
 import os
+import sys
 import time
 
 import chainer
 import chainer.functions as F
-from chainer import optimizers, cuda, serializers, training
-
 import numpy as np
-import sys
-
+from chainer import optimizers, cuda, serializers, training
 from chainer.dataset import concat_examples
 from chainer.iterators import SerialIterator
 from chainer.training import extensions
@@ -97,7 +95,7 @@ class NNetWrapper(NeuralNet):
         optimizer.setup(self.nnet)
 
         for epoch in range(args.epochs):
-            print('EPOCH ::: ' + str(epoch+1))
+            print('EPOCH ::: ' + str(epoch + 1))
             # self.nnet.train()
             data_time = AverageMeter()
             batch_time = AverageMeter()
@@ -105,10 +103,10 @@ class NNetWrapper(NeuralNet):
             v_losses = AverageMeter()
             end = time.time()
 
-            bar = Bar('Training Net', max=int(len(examples)/args.batch_size))
+            bar = Bar('Training Net', max=int(len(examples) / args.batch_size))
             batch_idx = 0
 
-            while batch_idx < int(len(examples)/args.batch_size):
+            while batch_idx < int(len(examples) / args.batch_size):
                 sample_ids = np.random.randint(len(examples), size=args.batch_size)
                 boards, pis, vs = list(zip(*[examples[i] for i in sample_ids]))
                 xp = self.nnet.xp
@@ -144,15 +142,15 @@ class NNetWrapper(NeuralNet):
                 # plot progress
                 bar.suffix = '({batch}/{size}) Data: {data:.3f}s | Batch: {bt:.3f}s | Total: {total:} | ETA: {eta:} ' \
                              '| Loss_pi: {lpi:.4f} | Loss_v: {lv:.3f}'.format(
-                              batch=batch_idx,
-                              size=int(len(examples)/args.batch_size),
-                              data=data_time.avg,
-                              bt=batch_time.avg,
-                              total=bar.elapsed_td,
-                              eta=bar.eta_td,
-                              lpi=pi_losses.avg,
-                              lv=v_losses.avg,
-                              )
+                    batch=batch_idx,
+                    size=int(len(examples) / args.batch_size),
+                    data=data_time.avg,
+                    bt=batch_time.avg,
+                    total=bar.elapsed_td,
+                    eta=bar.eta_td,
+                    lpi=pi_losses.avg,
+                    lv=v_losses.avg,
+                )
                 bar.next()
             bar.finish()
 
@@ -191,5 +189,5 @@ class NNetWrapper(NeuralNet):
     def load_checkpoint(self, folder='checkpoint', filename='checkpoint.pth.tar'):
         filepath = os.path.join(folder, filename)
         if not os.path.exists(filepath):
-            raise("No model in path {}".format(filepath))
+            raise ("No model in path {}".format(filepath))
         serializers.load_npz(filepath, self.nnet)

@@ -1,4 +1,5 @@
 from __future__ import division
+
 """ 
 Creates a ResNeXt Model as defined in:
 Xie, S., Girshick, R., Dollar, P., Tu, Z., & He, K. (2016). 
@@ -8,11 +9,9 @@ import from https://github.com/facebookresearch/ResNeXt/blob/master/models/resne
 """
 import math
 import torch.nn as nn
-import torch.nn.functional as F
-from torch.nn import init
-import torch
 
 __all__ = ['resnext50', 'resnext101', 'resnext152']
+
 
 class Bottleneck(nn.Module):
     """
@@ -34,11 +33,11 @@ class Bottleneck(nn.Module):
         D = int(math.floor(planes * (baseWidth / 64)))
         C = cardinality
 
-        self.conv1 = nn.Conv2d(inplanes, D*C, kernel_size=1, stride=1, padding=0, bias=False)
-        self.bn1 = nn.BatchNorm2d(D*C)
-        self.conv2 = nn.Conv2d(D*C, D*C, kernel_size=3, stride=stride, padding=1, groups=C, bias=False)
-        self.bn2 = nn.BatchNorm2d(D*C)
-        self.conv3 = nn.Conv2d(D*C, planes * 4, kernel_size=1, stride=1, padding=0, bias=False)
+        self.conv1 = nn.Conv2d(inplanes, D * C, kernel_size=1, stride=1, padding=0, bias=False)
+        self.bn1 = nn.BatchNorm2d(D * C)
+        self.conv2 = nn.Conv2d(D * C, D * C, kernel_size=3, stride=stride, padding=1, groups=C, bias=False)
+        self.bn2 = nn.BatchNorm2d(D * C)
+        self.conv3 = nn.Conv2d(D * C, planes * 4, kernel_size=1, stride=1, padding=0, bias=False)
         self.bn3 = nn.BatchNorm2d(planes * 4)
         self.relu = nn.ReLU(inplace=True)
 
@@ -72,6 +71,7 @@ class ResNeXt(nn.Module):
     ResNext optimized for the ImageNet dataset, as specified in
     https://arxiv.org/pdf/1611.05431.pdf
     """
+
     def __init__(self, baseWidth, cardinality, layers, num_classes):
         """ Constructor
         Args:
@@ -97,7 +97,7 @@ class ResNeXt(nn.Module):
         self.layer2 = self._make_layer(block, 128, layers[1], 2)
         self.layer3 = self._make_layer(block, 256, layers[2], 2)
         self.layer4 = self._make_layer(block, 512, layers[3], 2)
-        self.avgpool = nn.AvgPool2d(7)      
+        self.avgpool = nn.AvgPool2d(7)
         self.fc = nn.Linear(512 * block.expansion, num_classes)
 
         for m in self.modules():

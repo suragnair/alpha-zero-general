@@ -17,16 +17,15 @@ from __future__ import division
 from collections import deque
 from datetime import timedelta
 from math import ceil
-from sys import stderr, stdout
+from sys import stdout
 from time import time
-
 
 __version__ = '1.3'
 
 
 class Infinite(object):
     file = stdout
-    sma_window = 10         # Simple Moving Average window
+    sma_window = 10  # Simple Moving Average window
 
     def __init__(self, *args, **kwargs):
         self.index = 0

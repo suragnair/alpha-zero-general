@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
-from setuptools import setup
-
 import progress
-
+from setuptools import setup
 
 setup(
     name='progress',

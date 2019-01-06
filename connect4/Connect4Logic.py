@@ -1,4 +1,5 @@
 from collections import namedtuple
+
 import numpy as np
 
 DEFAULT_HEIGHT = 6
@@ -42,8 +43,8 @@ class Board():
             player_pieces = self.np_pieces == -player
             # Check rows & columns for win
             if (self._is_straight_winner(player_pieces) or
-                self._is_straight_winner(player_pieces.transpose()) or
-                self._is_diagonal_winner(player_pieces)):
+                    self._is_straight_winner(player_pieces.transpose()) or
+                    self._is_diagonal_winner(player_pieces)):
                 return WinState(True, -player)
 
         # draw has very little value.
