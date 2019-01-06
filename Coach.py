@@ -9,7 +9,7 @@ import numpy as np
 
 from Arena import Arena
 from MCTS import MCTS
-from pytorch_classification.utils import Bar, AverageMeter
+from common.utils import Bar, AverageMeter
 
 
 class Coach():

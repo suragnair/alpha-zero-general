@@ -1,6 +1,6 @@
 import time
 
-from pytorch_classification.utils import Bar, AverageMeter
+from common.utils import Bar, AverageMeter
 
 
 class Arena():
