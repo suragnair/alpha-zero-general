@@ -18,7 +18,7 @@ class MazeBattleGame(Game):
     def getInitBoard(self):
         # return initial board (numpy board)
         b = Board(self.n, wallPercent=.35)
-        return np.array(b.board)
+        return np.array(b.pieces)
 
     def getBoardSize(self):
         # (a,b) tuple
@@ -31,21 +31,34 @@ class MazeBattleGame(Game):
     def getNextState(self, board, player, action):
         # if player takes action on board, return next (board,player)
         # action must be a valid move
-        if action == self.n * self.n:
-            return board, -player
-        b = Board(self.n)
-        b.pieces = np.copy(board)
-        move = (int(action / self.n), action % self.n)
+        b = Board(self.n, board)
+        actionType = None
+        direction = None
+        # [stay, move1, .. , move8, build1, .., build8, break1, .., break8, shoot1, .., shoot8]
+        if action == 0:
+            actionType = board.ACTION_STAY
+            direction = 0
+        elif 1 <= action <= 8:
+            actionType = board.ACTION_MOVE
+            direction = action
+        elif 9 <= action <= 16:
+            actionType = board.ACTION_BUILD_WALL
+            direction = action - 8
+        elif 17 <= action <= 24:
+            actionType = board.ACTION_BREAK_WALL
+            direction = action - 16
+        elif 25 <= action <= 32:
+            actionType = board.ACTION_SHOOT
+            direction = action - 16
+
+        move = (actionType, direction)
         b.execute_move(move, player)
         return b.pieces, -player
 
     def getValidMoves(self, board, player):
         # return a fixed size binary vector
-        valids = [0] * self.getActionSize()
         legalMoves = board.get_legal_moves(player)
-        for x, y in legalMoves:
-            valids[self.n * x + y] = 1
-        return np.array(valids)
+        return np.array(legalMoves)
 
     def getGameEnded(self, board, player):
         # return 0 if not ended, 1 if player 1 won, -1 if player 1 lost
@@ -73,37 +86,30 @@ class MazeBattleGame(Game):
         return []
 
     def stringRepresentation(self, board):
-        # 8x8 numpy array (canonical board)
+        # nxn numpy array (canonical board)
         return board.tostring()
 
 
 def display(board):
     n = board.shape[0]
-
     print("   ", end="")
-    for y in range(n):
-        print(y, "", end="")
-    print("")
-    print("  ", end="")
-    for _ in range(n):
-        print("-", end="-")
-    print("--")
-    for y in range(n):
-        print(y, "|", end="")  # print the row #
-        for x in range(n):
-            piece = board[y][x]  # get the piece to print
-            if piece == -1:
-                print("X ", end="")
-            elif piece == 1:
-                print("O ", end="")
+    for x in range(n):
+        for y in range(n):
+            tag = board[x][y]
+            if tag == Board.TAG_EMPTY:
+                print(" ")
+            elif tag == Board.TAG_WALL_0_HIT:
+                print("Ñ")
+            elif tag == Board.TAG_WALL_1_HIT:
+                print("#")
+            elif tag == Board.TAG_PLAYER1_STARTING_POINT:
+                print("º")
+            elif tag == Board.TAG_PLAYER2_STARTING_POINT:
+                print("ª")
+            elif tag == Board.TAG_PLAYER1:
+                print("1")
+            elif tag == Board.TAG_PLAYER2:
+                print("2")
             else:
-                if x == n:
-                    print("-", end="")
-                else:
-                    print("- ", end="")
-        print("|")
-
-    print("  ", end="")
-    for _ in range(n):
-        print("-", end="-")
+                print("*")
     print("--")

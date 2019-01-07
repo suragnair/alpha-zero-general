@@ -77,33 +77,36 @@ class Board:
     ACTION_BREAK_WALL = 3
     ACTION_SHOOT = 4
 
-    def __init__(self, n=20, wallPercent=.35):
+    def __init__(self, n=20, wallPercent=.35, initialBoard=None):
         """Set up initial board configuration."""
 
         self.n = n
         # Create the empty board array.
-        self.board = [None] * self.n
-        for i in range(self.n):
-            self.board[i] = [self.TAG_EMPTY] * self.n
-        self.p1StartPoint = Point.random(0, n)
-        self.p2StartPoint = Point.random(0, n)
-        self.walls = round(wallPercent * (n ** 2))
-        currentWalls = 0
-        while currentWalls < self.walls:
-            wallPoint = Point.random(0, n)
-            while self.board[wallPoint.x][wallPoint.y] != self.TAG_EMPTY:
+        if initialBoard is None:
+            self.pieces = [None] * self.n
+            for i in range(self.n):
+                self.pieces[i] = [self.TAG_EMPTY] * self.n
+            p1StartPoint = Point.random(0, n)
+            p2StartPoint = Point.random(0, n)
+            walls = round(wallPercent * (n ** 2))
+            currentWalls = 0
+            while currentWalls < walls:
                 wallPoint = Point.random(0, n)
-            self.board[wallPoint.x][wallPoint.y] = self.TAG_WALL_1_HIT if bool(
-                random.getrandbits(1)) else self.TAG_WALL_0_HIT
-            currentWalls += 1
-        while self.p1StartPoint == self.p2StartPoint:
-            self.p2StartPoint = Point.random(0, n)
-        self.board[self.p1StartPoint.x][self.p1StartPoint.y] = self.TAG_PLAYER1_STARTING_POINT
-        self.board[self.p2StartPoint.x][self.p2StartPoint.y] = self.TAG_PLAYER2_STARTING_POINT
+                while self.pieces[wallPoint.x][wallPoint.y] != self.TAG_EMPTY:
+                    wallPoint = Point.random(0, n)
+                self.pieces[wallPoint.x][wallPoint.y] = self.TAG_WALL_1_HIT if bool(
+                    random.getrandbits(1)) else self.TAG_WALL_0_HIT
+                currentWalls += 1
+            while p1StartPoint == p2StartPoint:
+                p2StartPoint = Point.random(0, n)
+            self.pieces[p1StartPoint.x][p1StartPoint.y] = self.TAG_PLAYER1_STARTING_POINT
+            self.pieces[p2StartPoint.x][p2StartPoint.y] = self.TAG_PLAYER2_STARTING_POINT
+        else:
+            self.pieces = initialBoard
 
     # add [][] indexer syntax to the Board
     def __getitem__(self, index):
-        return self.board[index]
+        return self.pieces[index]
 
     def get_legal_moves(self, color):
         """Returns all the legal moves for the given color.
@@ -119,26 +122,23 @@ class Board:
         toTags = self.positions_to_tags(surroundings)
 
         # MOVE
-        movePositions = filter(lambda tag: self.can_move(color, tag), toTags)
-        moveMoves = zip([self.ACTION_MOVE] * len(movePositions), movePositions)
+
+        movePositions = list(map(lambda tag: 1 if self.can_move(color, tag) else 0, toTags))
+        moves += movePositions
 
         # BUILD
-        buildPositions = filter(lambda tag: self.can_build(color, tag), toTags)
-        buildMoves = zip([self.ACTION_BUILD_WALL] * len(movePositions), buildPositions)
+        buildPositions = list(map(lambda tag: 1 if self.can_build(color, tag) else 0, toTags))
+        moves += buildPositions
 
         # BREAK
-        breakPositions = filter(lambda tag: self.can_break(color, tag), toTags)
-        breakMoves = zip([self.ACTION_BREAK_WALL] * len(movePositions), breakPositions)
+        breakPositions = list(map(lambda tag: 1 if self.can_break(color, tag) else 0, toTags))
+        moves += breakPositions
 
         # SHOOT
-        shootPositions = filter(lambda tag: self.can_shoot(color, tag), toTags)
-        shootMoves = zip([self.ACTION_SHOOT] * len(movePositions), shootPositions)
+        shootPositions = list(map(lambda tag: 1 if self.can_shoot(color, tag) else 0, toTags))
+        moves += shootPositions
 
-        moves.update(moveMoves)
-        moves.update(buildMoves)
-        moves.update(breakMoves)
-        moves.update(shootMoves)
-        return list(moves)
+        return moves
 
     def get_surrounding_points(self, point: Point):
         '''
@@ -148,25 +148,39 @@ class Board:
         703
         654
 
-        8 (-1, -1)
         1 (-1, 0)
         2 ( -1, 1)
         3 (0, 1)
-        7 (0, -1)
-        6 (1, -1)
-        5 (1, 0)
         4 (1, 1)
+        5 (1, 0)
+        6 (1, -1)
+        7 (0, -1)
+        8 (-1, -1)
 
         '''
-        points = [point.add_point(Point(-1, -1)), point.add_point(Point(-1, 0)), point.add_point(Point(-1, 1)),
-                  point.add_point(Point(0, 1)), point.add_point(Point(0, -1)), point.add_point(Point(1, -1)),
-                  point.add_point(Point(1, 0)), point.add_point(Point(1, 1))]
-        return filter(self.valid_position, points)
+        points = []
+        # We can return the points 1-8 as 0-7 in an array so we will also contain addresses
+        points[0] = Point(-1, 0).add_point(point)
+        points[1] = Point(-1, 1).add_point(point)
+        points[2] = Point(0, 1).add_point(point)
+        points[3] = Point(1, 1).add_point(point)
+        points[4] = Point(1, 0).add_point(point)
+        points[5] = Point(1, -1).add_point(point)
+        points[6] = Point(0, -1).add_point(point)
+        points[7] = Point(-1, -1).add_point(point)
+
+        for i in range(0, len(points)):
+            if not self.valid_position(points[i]):
+                points[i] = None
+        return points
 
     def positions_to_tags(self, positions):
         toTags = []
         for position in positions:
-            toTags.append(self[position.x][position.y])
+            if position is not None:
+                toTags.append(self[position.x][position.y])
+            else:
+                toTags.append(None)
         return toTags
 
     def find_player(self, color):
@@ -212,7 +226,7 @@ class Board:
                 if self[x][y] == color:
                     surroundingPoints = self.get_surrounding_points(Point(x, y))
                     toTags = self.positions_to_tags(surroundingPoints)
-                    if (color == 1):
+                    if color == 1:
                         return len(filter(lambda toTag: toTag == self.TAG_PLAYER2_STARTING_POINT, toTags)) > 0
                     else:
                         return len(filter(lambda toTag: toTag == self.TAG_PLAYER1_STARTING_POINT, toTags)) > 0
