@@ -1,13 +1,13 @@
 from Coach import Coach
-from othello.OthelloGame import OthelloGame as Game
-from othello.keras.NNet import NNetWrapper as nn
+from mazebattle.MazeBattleGame import MazeBattleGame as Game
+from mazebattle.keras.NNet import NNetWrapper as nn
 from utils import *
 
 args = dotdict({
     'numIters': 1000,
     'numEps': 100,
     'tempThreshold': 15,
-    'updateThreshold': 0.6,
+    'updateThreshold': 0.55,
     'maxlenOfQueue': 200000,
     'numMCTSSims': 25,
     'arenaCompare': 40,

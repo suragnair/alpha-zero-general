@@ -2,17 +2,8 @@ from keras.layers import *
 from keras.models import *
 from keras.optimizers import *
 
-"""
-NeuralNet for the game of TicTacToe.
 
-Author: Evgeny Tyurin, github.com/evg-tyurin
-Date: Jan 5, 2018.
-
-Based on the OthelloNNet by SourKream and Surag Nair.
-"""
-
-
-class TicTacToeNNet:
+class MazeBattleNNet:
     def __init__(self, game, args):
         # game params
         self.board_x, self.board_y = game.getBoardSize()

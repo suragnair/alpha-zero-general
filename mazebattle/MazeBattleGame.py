@@ -1,5 +1,7 @@
 from __future__ import print_function
 
+import random
+
 import numpy as np
 
 from Game import Game
@@ -12,7 +14,7 @@ Game class implementation for the game of MazeBattleGame.
 
 
 class MazeBattleGame(Game):
-    def __init__(self, n=3):
+    def __init__(self, n=random.randint(5, 20)):
         self.n = n
 
     def getInitBoard(self):

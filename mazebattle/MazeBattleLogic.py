@@ -77,7 +77,7 @@ class Board:
     ACTION_BREAK_WALL = 3
     ACTION_SHOOT = 4
 
-    def __init__(self, n=20, wallPercent=None, initialBoard=None):
+    def __init__(self, n=random.randint(5, 20), wallPercent=None, initialBoard=None):
         """Set up initial board configuration."""
 
         self.n = n
