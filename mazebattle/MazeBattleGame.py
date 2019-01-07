@@ -95,7 +95,6 @@ class MazeBattleGame(Game):
                         copied[x][y] = Board.TAG_PLAYER2_STARTING_POINT
         return copied
 
-
     def getSymmetries(self, board, pi):
         # mirror, rotational
         assert (len(pi) == self.getActionSize())

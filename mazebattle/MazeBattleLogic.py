@@ -199,7 +199,7 @@ class Board:
                 toTag == Board.TAG_PLAYER1 and color == -1)
 
     def can_move(self, color, toTag):
-        return (toTag is not None) and (toTag == Board.TAG_EMPTY or self.is_different_player_start(color, toTag) or toTag >= Board.TAG_BULLET_1)
+        return (toTag is not None) and (toTag == Board.TAG_EMPTY or toTag >= Board.TAG_BULLET_1)
 
     def can_shoot(self, color, toTag):
         return (toTag is not None) and (toTag == Board.TAG_EMPTY or self.is_different_player(color, toTag))
@@ -279,7 +279,7 @@ class Board:
                         toTag = self[nextBulletPoint.x][nextBulletPoint.y]
                         if toTag == Board.TAG_PLAYER2 or toTag == Board.TAG_PLAYER1:
                             self[nextBulletPoint.x][nextBulletPoint.y] = Board.TAG_EMPTY  # Player killed
-                        else:
+                        elif toTag == Board.TAG_EMPTY:
                             self[nextBulletPoint.x][nextBulletPoint.y] = self[currentBulletPoint.x][
                                 currentBulletPoint.y]  # Continue the bullet
                     self[currentBulletPoint.x][
