@@ -87,22 +87,22 @@ class Board:
         if initialBoard is None:
             self.pieces = [None] * self.n
             for i in range(self.n):
-                self.pieces[i] = [self.TAG_EMPTY] * self.n
+                self.pieces[i] = [Board.TAG_EMPTY] * self.n
             p1StartPoint = Point.random(0, n - 1)
             p2StartPoint = Point.random(0, n - 1)
             walls = round(wallPercent * (n ** 2))
             currentWalls = 0
             while currentWalls < walls:
                 wallPoint = Point.random(0, n - 1)
-                while self.pieces[wallPoint.x][wallPoint.y] != self.TAG_EMPTY:
+                while self.pieces[wallPoint.x][wallPoint.y] != Board.TAG_EMPTY:
                     wallPoint = Point.random(0, n - 1)
-                self.pieces[wallPoint.x][wallPoint.y] = self.TAG_WALL_1_HIT if bool(
-                    random.getrandbits(1)) else self.TAG_WALL_0_HIT
+                self.pieces[wallPoint.x][wallPoint.y] = Board.TAG_WALL_1_HIT if bool(
+                    random.getrandbits(1)) else Board.TAG_WALL_0_HIT
                 currentWalls += 1
             while p1StartPoint == p2StartPoint:
                 p2StartPoint = Point.random(0, n - 1)
-            self.pieces[p1StartPoint.x][p1StartPoint.y] = self.TAG_PLAYER1_STARTING_POINT
-            self.pieces[p2StartPoint.x][p2StartPoint.y] = self.TAG_PLAYER2_STARTING_POINT
+            self.pieces[p1StartPoint.x][p1StartPoint.y] = Board.TAG_PLAYER1_STARTING_POINT
+            self.pieces[p2StartPoint.x][p2StartPoint.y] = Board.TAG_PLAYER2_STARTING_POINT
         else:
             self.pieces = initialBoard
 
@@ -116,7 +116,7 @@ class Board:
         @param color not used and came from previous version.        
         """
         moves = [1]  # stores the legal moves.
-        # moves.add((self.ACTION_STAY, 0))  # Add no move action
+        # moves.add((Board.ACTION_STAY, 0))  # Add no move action
 
         # Get surrounding coordinates
         playerPos = self.find_player(color)
@@ -184,35 +184,34 @@ class Board:
         for x in range(self.n):
             for y in range(self.n):
                 if self[x][y] == color:
-                    playerPos = Point(x, y)
-                elif playerPos is None and ((self[x][y] == self.TAG_PLAYER1_STARTING_POINT and color == 1) or (
-                        self[x][y] == self.TAG_PLAYER2_STARTING_POINT and color == -1)):
+                    return Point(x, y)
+                elif playerPos is None and ((self[x][y] == Board.TAG_PLAYER1_STARTING_POINT and color == 1) or (
+                        self[x][y] == Board.TAG_PLAYER2_STARTING_POINT and color == -1)):
                     playerPos = Point(x, y)
         return playerPos
 
     def is_different_player_start(self, color, toTag):
-        return (toTag == self.TAG_PLAYER2_STARTING_POINT and color == 1) or (
-                toTag == self.TAG_PLAYER1_STARTING_POINT and color == -1)
+        return (toTag == Board.TAG_PLAYER2_STARTING_POINT and color == 1) or (
+                toTag == Board.TAG_PLAYER1_STARTING_POINT and color == -1)
 
     def is_different_player(self, color, toTag):
-        return (toTag == self.TAG_PLAYER2 and color == 1) or (
-                toTag == self.TAG_PLAYER1 and color == -1)
+        return (toTag == Board.TAG_PLAYER2 and color == 1) or (
+                toTag == Board.TAG_PLAYER1 and color == -1)
 
     def can_move(self, color, toTag):
-        return (toTag is not None) and toTag == self.TAG_EMPTY or self.is_different_player_start(color,
-                                                                                                 toTag) or toTag >= self.TAG_BULLET_1
+        return (toTag is not None) and (toTag == Board.TAG_EMPTY or self.is_different_player_start(color, toTag) or toTag >= Board.TAG_BULLET_1)
 
     def can_shoot(self, color, toTag):
-        return (toTag is not None) and toTag == self.TAG_EMPTY or self.is_different_player(color, toTag)
+        return (toTag is not None) and (toTag == Board.TAG_EMPTY or self.is_different_player(color, toTag))
 
     def can_build(self, color, toTag):
-        return (toTag is not None) and toTag == self.TAG_EMPTY or toTag == self.TAG_WALL_1_HIT
+        return (toTag is not None) and (toTag == Board.TAG_EMPTY or toTag == Board.TAG_WALL_1_HIT)
 
     def can_break(self, color, toTag):
-        return (toTag is not None) and toTag == self.TAG_WALL_1_HIT or toTag == self.TAG_WALL_0_HIT
+        return (toTag is not None) and (toTag == Board.TAG_WALL_1_HIT or toTag == Board.TAG_WALL_0_HIT)
 
     def valid_position(self, point: Point):
-        return (0 <= point.x <= self.n) and (0 <= point.y <= self.n)
+        return (0 <= point.x < self.n) and (0 <= point.y < self.n)
 
     def is_win(self, color):
         """Check whether the given player has reached a point next to other player starting point
@@ -224,9 +223,9 @@ class Board:
                     surroundingPoints = self.get_surrounding_points(Point(x, y))
                     toTags = self.positions_to_tags(surroundingPoints)
                     if color == 1:
-                        return len(list(filter(lambda toTag: toTag == self.TAG_PLAYER2_STARTING_POINT, toTags))) > 0
+                        return len(list(filter(lambda toTag: toTag == Board.TAG_PLAYER2_STARTING_POINT, toTags))) > 0
                     else:
-                        return len(list(filter(lambda toTag: toTag == self.TAG_PLAYER1_STARTING_POINT, toTags))) > 0
+                        return len(list(filter(lambda toTag: toTag == Board.TAG_PLAYER1_STARTING_POINT, toTags))) > 0
 
     def updateBullets(self):
         '''
@@ -250,40 +249,41 @@ class Board:
             for y in range(self.n):
                 currentBulletPoint = None
                 nextBulletPoint = None
-                if self[x][y] == self.TAG_BULLET_1:
+                if self[x][y] == Board.TAG_BULLET_1:
                     currentBulletPoint = Point(x, y)
                     nextBulletPoint = currentBulletPoint.add_point(Point(-1, 0))
-                elif self[x][y] == self.TAG_BULLET_2:
+                elif self[x][y] == Board.TAG_BULLET_2:
                     currentBulletPoint = Point(x, y)
                     nextBulletPoint = currentBulletPoint.add_point(Point(-1, 1))
-                elif self[x][y] == self.TAG_BULLET_3:
+                elif self[x][y] == Board.TAG_BULLET_3:
                     currentBulletPoint = Point(x, y)
                     nextBulletPoint = currentBulletPoint.add_point(Point(0, 1))
-                elif self[x][y] == self.TAG_BULLET_4:
+                elif self[x][y] == Board.TAG_BULLET_4:
                     currentBulletPoint = Point(x, y)
                     nextBulletPoint = currentBulletPoint.add_point(Point(1, 1))
-                elif self[x][y] == self.TAG_BULLET_5:
+                elif self[x][y] == Board.TAG_BULLET_5:
                     currentBulletPoint = Point(x, y)
                     nextBulletPoint = currentBulletPoint.add_point(Point(1, 0))
-                elif self[x][y] == self.TAG_BULLET_6:
+                elif self[x][y] == Board.TAG_BULLET_6:
                     currentBulletPoint = Point(x, y)
                     nextBulletPoint = currentBulletPoint.add_point(Point(1, -1))
-                elif self[x][y] == self.TAG_BULLET_7:
+                elif self[x][y] == Board.TAG_BULLET_7:
                     currentBulletPoint = Point(x, y)
                     nextBulletPoint = currentBulletPoint.add_point(Point(0, -1))
-                elif self[x][y] == self.TAG_BULLET_8:
+                elif self[x][y] == Board.TAG_BULLET_8:
                     currentBulletPoint = Point(x, y)
                     nextBulletPoint = currentBulletPoint.add_point(Point(-1, -1))
 
-                if (currentBulletPoint is not None):
+                if currentBulletPoint is not None:
                     if self.valid_position(nextBulletPoint):
                         toTag = self[nextBulletPoint.x][nextBulletPoint.y]
-                        if toTag == self.TAG_PLAYER2 or toTag == self.TAG_PLAYER1:
-                            self[nextBulletPoint.x][nextBulletPoint.y] = self.TAG_EMPTY  # Player killed
+                        if toTag == Board.TAG_PLAYER2 or toTag == Board.TAG_PLAYER1:
+                            self[nextBulletPoint.x][nextBulletPoint.y] = Board.TAG_EMPTY  # Player killed
                         else:
                             self[nextBulletPoint.x][nextBulletPoint.y] = self[currentBulletPoint.x][
                                 currentBulletPoint.y]  # Continue the bullet
-                    self[currentBulletPoint.x][currentBulletPoint.y] = self.TAG_EMPTY  # Remove bullet from current square
+                    self[currentBulletPoint.x][
+                        currentBulletPoint.y] = Board.TAG_EMPTY  # Remove bullet from current square
 
     def execute_move(self, move, color):
         """Perform the given move on the board; 
@@ -312,38 +312,41 @@ class Board:
         shootDir = None
         if direction == 1:
             vDif = Point(-1, 0)
-            shootDir = self.TAG_BULLET_1
+            shootDir = Board.TAG_BULLET_1
         elif direction == 2:
             vDif = Point(-1, 1)
-            shootDir = self.TAG_BULLET_2
+            shootDir = Board.TAG_BULLET_2
         elif direction == 3:
             vDif = Point(0, 1)
-            shootDir = self.TAG_BULLET_3
+            shootDir = Board.TAG_BULLET_3
         elif direction == 4:
             vDif = Point(1, 1)
-            shootDir = self.TAG_BULLET_4
+            shootDir = Board.TAG_BULLET_4
         elif direction == 5:
             vDif = Point(1, 0)
-            shootDir = self.TAG_BULLET_5
+            shootDir = Board.TAG_BULLET_5
         elif direction == 6:
             vDif = Point(1, -1)
-            shootDir = self.TAG_BULLET_6
+            shootDir = Board.TAG_BULLET_6
         elif direction == 7:
             vDif = Point(0, -1)
-            shootDir = self.TAG_BULLET_7
+            shootDir = Board.TAG_BULLET_7
         elif direction == 8:
             vDif = Point(-1, -1)
-            shootDir = self.TAG_BULLET_8
+            shootDir = Board.TAG_BULLET_8
 
-        affectedPoint = playerPos.add_point(vDif)
-        if action == self.ACTION_SHOOT:
+        if action == Board.ACTION_SHOOT:
+            affectedPoint = playerPos.add_point(vDif)
             self[affectedPoint.x][affectedPoint.y] = shootDir
-        elif action == self.ACTION_BREAK_WALL:
+        elif action == Board.ACTION_BREAK_WALL:
+            affectedPoint = playerPos.add_point(vDif)
             self[affectedPoint.x][affectedPoint.y] -= 1
-        elif action == self.ACTION_BUILD_WALL:
-            self[affectedPoint.x][affectedPoint.y] = self.TAG_WALL_1_HIT
-        elif action == self.ACTION_MOVE:
+        elif action == Board.ACTION_BUILD_WALL:
+            affectedPoint = playerPos.add_point(vDif)
+            self[affectedPoint.x][affectedPoint.y] = Board.TAG_WALL_1_HIT
+        elif action == Board.ACTION_MOVE:
+            affectedPoint = playerPos.add_point(vDif)
             if self[playerPos.x][playerPos.y] == color:
-                self[playerPos.x][playerPos.y] = self.TAG_EMPTY
+                self[playerPos.x][playerPos.y] = Board.TAG_EMPTY
             self[affectedPoint.x][affectedPoint.y] = color
         self.updateBullets()

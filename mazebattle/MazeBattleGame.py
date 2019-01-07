@@ -49,7 +49,7 @@ class MazeBattleGame(Game):
             direction = action - 16
         elif 25 <= action <= 32:
             actionType = Board.ACTION_SHOOT
-            direction = action - 16
+            direction = action - 24
 
         move = (actionType, direction)
         b.execute_move(move, player)
@@ -81,19 +81,20 @@ class MazeBattleGame(Game):
         return self.exchange_board(board, player)
 
     def exchange_board(self, board, color):
-        copied = board[:][:]
-        if color == 1:
-            return copied
-        for x in range(self.n):
-            for y in range(self.n):
-                if copied[x][y] == 1:
-                    copied[x][y] = -1
-                elif copied[x][y] == -1:
-                    copied[x][y] = 1
-                elif copied[x][y] == Board.TAG_PLAYER2_STARTING_POINT:
-                    copied[x][y] = Board.TAG_PLAYER1_STARTING_POINT
-                elif copied[x][y] == Board.TAG_PLAYER1_STARTING_POINT:
-                    copied[x][y] = Board.TAG_PLAYER2_STARTING_POINT
+        copied = board.copy()
+        if color != 1:
+            for x in range(self.n):
+                for y in range(self.n):
+                    if copied[x][y] == 1:
+                        copied[x][y] = -1
+                    elif copied[x][y] == -1:
+                        copied[x][y] = 1
+                    elif copied[x][y] == Board.TAG_PLAYER2_STARTING_POINT:
+                        copied[x][y] = Board.TAG_PLAYER1_STARTING_POINT
+                    elif copied[x][y] == Board.TAG_PLAYER1_STARTING_POINT:
+                        copied[x][y] = Board.TAG_PLAYER2_STARTING_POINT
+        return copied
+
 
     def getSymmetries(self, board, pi):
         # mirror, rotational
@@ -107,20 +108,20 @@ class MazeBattleGame(Game):
 
 def display(board):
     n = board.shape[0]
-    print("   ", end="")
+    print()
     for x in range(n):
         for y in range(n):
             tag = board[x][y]
             if tag == Board.TAG_EMPTY:
-                print("O", end='')
+                print(".", end='')
             elif tag == Board.TAG_WALL_0_HIT:
                 print("Ñ", end='')
             elif tag == Board.TAG_WALL_1_HIT:
                 print("#", end='')
             elif tag == Board.TAG_PLAYER1_STARTING_POINT:
-                print("º", end='')
+                print("S", end='')
             elif tag == Board.TAG_PLAYER2_STARTING_POINT:
-                print("ª", end='')
+                print("E", end='')
             elif tag == Board.TAG_PLAYER1:
                 print("1", end='')
             elif tag == Board.TAG_PLAYER2:

@@ -1,4 +1,4 @@
-import numpy as np
+import random
 
 
 class RandomPlayer:
@@ -6,10 +6,11 @@ class RandomPlayer:
         self.game = game
 
     def play(self, board):
-        a = np.random.randint(self.game.getActionSize() - 1)
+        a = random.randint(0, self.game.getActionSize() - 1)
         valids = self.game.getValidMoves(board, 1)
         while valids[a] != 1:
-            a = np.random.randint(self.game.getActionSize() - 1)
+            a = random.randint(0, self.game.getActionSize() - 1)
+        print("Random player played: " + str(a))
         return a
 
 
@@ -29,7 +30,6 @@ class HumanMazeBattlePlayer:
 
             move = int(a)
             if 0 <= move <= len(valids) and valids[move] == 1:
-                break
+                return move
             else:
                 print('Invalid')
-        return a
