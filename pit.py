@@ -11,7 +11,7 @@ g = MazeBattleGame(8)
 
 # all players
 rp = RandomPlayer(g).play
-hp = HumanMazeBattlePlayer(g).play
+rp2 = RandomPlayer(g).play
 
 # nnet players
 # n1 = NNet(g)
@@ -26,5 +26,5 @@ hp = HumanMazeBattlePlayer(g).play
 # mcts2 = MCTS(g, n2, args2)
 # n2p = lambda x: np.argmax(mcts2.getActionProb(x, temp=0))
 
-arena = Arena.Arena(rp, hp, g, display=display)
+arena = Arena.Arena(rp, rp2, g, display=display)
 print(arena.playGames(2, verbose=True))
