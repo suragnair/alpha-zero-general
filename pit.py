@@ -7,7 +7,7 @@ use this script to play any two agents against each other, or play manually with
 any agent.
 """
 
-g = MazeBattleGame(6)
+g = MazeBattleGame(8)
 
 # all players
 rp = RandomPlayer(g).play

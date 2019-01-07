@@ -6,10 +6,10 @@ class RandomPlayer:
         self.game = game
 
     def play(self, board):
-        a = np.random.randint(self.game.getActionSize())
+        a = np.random.randint(self.game.getActionSize() - 1)
         valids = self.game.getValidMoves(board, 1)
         while valids[a] != 1:
-            a = np.random.randint(self.game.getActionSize())
+            a = np.random.randint(self.game.getActionSize() - 1)
         return a
 
 
