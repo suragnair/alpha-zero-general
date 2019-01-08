@@ -34,5 +34,6 @@ I trained a Keras model for 3x3 TicTacToe (3 iterations, 25 episodes, 10 epochs 
 
 The implementation is based on the game of Othello (https://github.com/suragnair/alpha-zero-general/tree/master/othello).
 
-### AlphaGo / AlphaZero Events
-* February 8, 2018 - [Solving Alpha Go Zero + TensorFlow, Kubernetes-based Serverless AI Models on GPU](https://www.meetup.com/Advanced-Spark-and-TensorFlow-Meetup/events/245308722/)
+### AlphaGo / AlphaZero Talks
+* February 8, 2018 - [Advanced Spark/Tensorflow Meetup at Thumbtack](https://www.meetup.com/Advanced-Spark-and-TensorFlow-Meetup/events/245308722/): [Youtube](https://youtu.be/dhmBrTouCKk?t=1017) / [Slides](http://static.brettkoonce.com/presentations/go_v1.pdf)
+* March 6, 2018 - [Advanced Spark/Tensorflow Meetup at Strata San Jose](https://www.meetup.com/Advanced-Spark-and-TensorFlow-Meetup/events/246530339/): [Youtube](https://www.youtube.com/watch?time_continue=1257&v=hw9VccUyXdY) / [Slides](http://static.brettkoonce.com/presentations/go.pdf)
