@@ -33,7 +33,7 @@ class MazeBattleGame(Game):
     def getNextState(self, board, player, action):
         # if player takes action on board, return next (board,player)
         # action must be a valid move
-        b = Board(self.n, initialBoard=board)
+        b = Board(self.n, initialBoard=board.copy())
         actionType = None
         direction = None
         # [stay, move1, .. , move8, build1, .., build8, break1, .., break8, shoot1, .., shoot8]

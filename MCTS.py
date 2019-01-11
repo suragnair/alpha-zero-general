@@ -1,8 +1,9 @@
 import math
+import sys
 
 import numpy as np
 
-EPS = 1e-8
+sys.setrecursionlimit(100000)
 
 
 class MCTS:
@@ -32,22 +33,30 @@ class MCTS:
                    proportional to Nsa[(s,a)]**(1./temp)
         """
         for i in range(self.args.numMCTSSims):
-            self.search(canonicalBoard)
+            self.search(canonicalBoard, True)
 
         s = self.game.stringRepresentation(canonicalBoard)
         counts = [self.Nsa[(s, a)] if (s, a) in self.Nsa else 0 for a in range(self.game.getActionSize())]
 
         if temp == 0:
-            bestA = np.argmax(counts)
+            maxi = max(counts)
+            allBest = np.where(np.array(counts) == maxi)[0]
+            bestA = np.random.choice(allBest)
             probs = [0] * len(counts)
             probs[bestA] = 1
             return probs
 
         counts = [x ** (1. / temp) for x in counts]
-        probs = [x / float(sum(counts)) for x in counts]
+        countSum = sum(counts)
+        if countSum == 0:
+            # Random choice?
+            probs = [0] * len(counts)
+            probs[np.random.randint(0, len(probs))] = 1
+        else:
+            probs = [x / float(countSum) for x in counts]
         return probs
 
-    def search(self, canonicalBoard):
+    def search(self, canonicalBoard, isRootNode):
         """
         This function performs one iteration of MCTS. It is recursively called
         till a leaf node is found. The action chosen at each node is one that
@@ -98,26 +107,46 @@ class MCTS:
 
         valids = self.Vs[s]
         cur_best = -float('inf')
-        best_act = -1
+        # best_act = -1
+        allBest = []
+
+        # add Dirichlet noise for root node. set epsilon=0 for Arena competitions of trained models
+        e = self.args.epsilon
+        if isRootNode and e > 0:
+            noise = np.random.dirichlet([self.args.dirAlpha] * len(valids))
 
         # pick the action with the highest upper confidence bound
         for a in range(self.game.getActionSize()):
             if valids[a]:
                 if (s, a) in self.Qsa:
-                    u = self.Qsa[(s, a)] + self.args.cpuct * self.Ps[s][a] * math.sqrt(self.Ns[s]) / (
-                            1 + self.Nsa[(s, a)])
+                    q = self.Qsa[(s, a)]
+                    n_s_a = self.Nsa[(s, a)]
+                    # u = self.Qsa[(s, a)] + self.args.cpuct * self.Ps[s][a] * math.sqrt(self.Ns[s]) / (1 + self.Nsa[(s, a)])
                 else:
-                    u = self.args.cpuct * self.Ps[s][a] * math.sqrt(self.Ns[s] + EPS)  # Q = 0 ?
+                    q = 0
+                    n_s_a = 0
+                    # u = np.random.random_sample() + self.args.cpuct * self.Ps[s][a] * math.sqrt(self.Ns[s] + EPS)  # Q = 0 ?
+
+                p = self.Ps[s][a]
+                if isRootNode and e > 0:
+                    p = (1 - e) * p + e * noise[a]
+
+                u = q + self.args.cpuct * p * math.sqrt(self.Ns[s]) / (1 + n_s_a)
 
                 if u > cur_best:
                     cur_best = u
-                    best_act = a
+                    # best_act = a
+                    del allBest[:]
+                    allBest.append(a)
+                elif u == cur_best:
+                    allBest.append(a)
 
-        a = best_act
+        a = np.random.choice(allBest)
+
         next_s, next_player = self.game.getNextState(canonicalBoard, 1, a)
         next_s = self.game.getCanonicalForm(next_s, next_player)
 
-        v = self.search(next_s)
+        v = self.search(next_s, False)
 
         if (s, a) in self.Qsa:
             self.Qsa[(s, a)] = (self.Nsa[(s, a)] * self.Qsa[(s, a)] + v) / (self.Nsa[(s, a)] + 1)
