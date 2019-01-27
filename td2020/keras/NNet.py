@@ -14,6 +14,8 @@ from td2020.src.config import VERBOSE_MODEL_FIT
 NNet.py
 
 NNet wrapper uses defined nnet model to train and predict
+
+tensorflow.python.framework.errors_impl.NotFoundError: No algorithm worked! :)
 """
 
 
