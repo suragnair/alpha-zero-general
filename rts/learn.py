@@ -1,14 +1,14 @@
 import sys
 
-from td2020.src.config_class import CONFIG
+from rts.src.config_class import CONFIG
 
 sys.path.append('..')
-from td2020.Coach_Fixed import Coach
-# from td2020.configurations.ConfigWrapper import LearnArgs
-from td2020.TD2020Game import TD2020Game
-from td2020.keras.NNet import NNetWrapper as NN
+from Coach import Coach
+# from rts.configurations.ConfigWrapper import LearnArgs
+from rts.RTSGame import RTSGame as Game
+from rts.keras.NNet import NNetWrapper as nn
 
-# from td2020.src.config import grid_size
+# from rts.src.config import grid_size
 
 """
 learn.py
@@ -19,11 +19,10 @@ Teaches neural network playing of specified game configuration using self play
 if __name__ == "__main__":
 
     CONFIG.set_runner('learn')  # set visibility as learn
-    CONFIG.to_file()
 
     # create nnet for this game
-    g = TD2020Game()
-    nnet = NN(g, CONFIG.nnet_args.encoder)
+    g = Game()
+    nnet = nn(g, CONFIG.nnet_args.encoder)
 
     # If training examples should be loaded from file
     if CONFIG.learn_args.load_model:
@@ -35,4 +34,3 @@ if __name__ == "__main__":
         print("Load trainExamples from file")
         c.loadTrainExamples()
     c.learn()
-    exit(0)

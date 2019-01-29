@@ -1,5 +1,5 @@
 # noinspection PyUnresolvedReferences
-from td2020.src.config import Configuration
+from rts.src.config import Configuration
 
 # Basic config:
 # CONFIG = Configuration()

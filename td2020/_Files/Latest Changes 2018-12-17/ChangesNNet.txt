@@ -1,7 +1,0 @@
-changesNNet
-    DENSE(1024) -> Dense(256)
-    DENSE(512) -> Dense(128)
-    args.num_channels = 512 -> 128
-    batch size 512 - 256
-
-    learning rate- 0.001 -> 0.01

@@ -5,7 +5,7 @@ from typing import Any, Tuple, Optional
 import numpy as np
 
 sys.path.append('../..')
-from td2020.src.config import P_NAME_IDX, A_TYPE_IDX, d_a_color, d_type_rev, MONEY_IDX, TIME_IDX, CARRY_IDX, HEALTH_IDX
+from rts.src.config import P_NAME_IDX, A_TYPE_IDX, d_a_color, d_type_rev, MONEY_IDX, TIME_IDX, CARRY_IDX, HEALTH_IDX
 
 """
 Graphics.py

@@ -9,16 +9,16 @@
 
 \.idea/
 
-td2020/stats/actionExecuted/
+rts/stats/actionExecuted/
 
-td2020/stats/gameEndTurn/
+rts/stats/gameEndTurn/
 
-td2020/stats/sum/
+rts/stats/sum/
 
-td2020/stats/unitKilledBy/
+rts/stats/unitKilledBy/
 
 Py37_new/
 
-td2020/models/logsTD2020NNet/
+rts/models/logsTD2020NNet/
 
-td2020/models/TD2020NNet_model_plot\.png
+rts/models/TD2020NNet_model_plot\.png

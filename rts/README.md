@@ -1,4 +1,4 @@
-# TD2020 - RTS Game
+# RTS Game
 *Jernej Habjan 2018*
 
 This is a [diploma thesis project](https://github.com/JernejHabjan/Diploma-Thesis), which is an implementation of RTS game in Alpha Zero General wrapper created by Surag Nair in [suragnair/alpha-zero-general](https://github.com/suragnair/alpha-zero-general).
@@ -11,9 +11,9 @@ Game visualisation is also presented in PyGame and Unreal Engine 4.
 - Module can be connected via get_action.py to [UE4](https://github.com/JernejHabjan/TrumpDefense2020) 
 ## Files
 Main files to start learning and pitting:
-- td2020/learn.py
-- td2020/pit.py
-- td2020/src/config_class.py
+- rts/learn.py
+- rts/pit.py
+- rts/src/config_class.py
 
 # Install instructions
 download git cmd
@@ -23,7 +23,7 @@ open git bash cmd
 git clone https://github.com/JernejHabjan/alpha-zero-general.git
 ```
 run install script in 
-> alpha-zero-general/td2020/install.sh
+> alpha-zero-general/rts/install.sh
 
 ## Tensorflow-Gpu installation (Optional):
 ```pip install 'tensorflow-gpu==1.8'```
@@ -59,7 +59,7 @@ Add path to environmental variables and !important! restart Pycharm
 
 # Running
 ## Setup pit and learn config:
-- alpha_zero_general/td2020/config.py -> CONFIG
+- alpha_zero_general/rts/config.py -> CONFIG
 ## For pit:
 - download release:
 >https://github.com/JernejHabjan/alpha-zero-general/releases
@@ -67,13 +67,13 @@ Add path to environmental variables and !important! restart Pycharm
 - place extracted files in folder to
 >alpha_zero_general/temp/
 - and overwrite config file in
->alpha-zero-general/td2020/src/config_class.py
+>alpha-zero-general/rts/src/config_class.py
 - navigate to 
->C:\Users\USER\alpha-zero-general\td2020
+>C:\Users\USER\alpha-zero-general\rts
 - run ```python pit.py```
 ## for learn:
 - navigate to 
->C:\Users\USER\alpha-zero-general\td2020
+>C:\Users\USER\alpha-zero-general\rts
 - run > ```python learn.py```
 ## Ue4:
     download latest release https://github.com/JernejHabjan/TrumpDefense2020/releases

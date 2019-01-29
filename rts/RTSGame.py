@@ -3,18 +3,16 @@ from typing import Tuple
 
 import numpy as np
 
-from td2020.src.config_class import CONFIG
+from rts.src.config_class import CONFIG
 
 sys.path.append('..')
-from td2020.src.Board import Board
-from td2020.src.config import NUM_ENCODERS, NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, TIME_IDX, FPS
+from rts.src.Board import Board
+from rts.src.config import NUM_ENCODERS, NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, TIME_IDX, FPS
 
 """ USE_TIMEOUT, MAX_TIME, d_a_type, a_max_health, INITIAL_GOLD, TIMEOUT, visibility"""
 
 """
-TD2020Game.py
-
-Defined rules for RTS game TD2020
+RTSGame.pyefined rules for RTS game TD2020
 Includes: 
 - init - contains board configuration
 - getGameEnded - contains end game checking
@@ -22,7 +20,7 @@ Includes:
 
 
 # noinspection PyPep8Naming,PyMethodMayBeStatic
-class TD2020Game:
+class RTSGame:
 
     def __init__(self) -> None:
         self.n = CONFIG.grid_size
@@ -218,7 +216,7 @@ class TD2020Game:
 
 
 def display(board):
-    from td2020.visualization.Graphics import init_visuals, update_graphics
+    from rts.visualization.Graphics import init_visuals, update_graphics
 
     if not CONFIG.visibility:
         return

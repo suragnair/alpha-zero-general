@@ -1,4 +1,3 @@
-import datetime
 import os
 import sys
 from typing import List, Tuple
@@ -6,7 +5,7 @@ from typing import List, Tuple
 import numpy as np
 
 sys.path.append('../..')
-from td2020.src.encoders import OneHotEncoder, NumericEncoder
+from rts.src.encoders import OneHotEncoder, NumericEncoder
 from utils import dotdict
 
 # ####################################################################################
@@ -354,7 +353,7 @@ class Configuration:
             # this gets used by kill function that determines the end point
             self.MAX_TIME = max_time
 
-            # If timeout should be used. This causes game to finish after TIMEOUT number of actions. If timeout isnt used, Kill function is used, which is reducing number of hitpoints of units as seen in file "Graph.py"
+            # If timeout should be used. This causes game to finish after TIMEOUT number of actions. If timeout isnt used, Kill function is used, which is reducing number of hitpoints of units
             self.USE_TIMEOUT = use_timeout
 
             # Check if timeout is being used. Alternatively Kill function is used
@@ -442,7 +441,7 @@ class Configuration:
                            player_config: dict,
                            onehot_encoder: bool,
                            player_model_file: str):
-            from td2020.TD2020Players import RandomPlayer, GreedyTD2020Player, HumanTD2020Player
+            from rts.RTSPlayers import RandomPlayer, GreedyRTSPlayer, HumanRTSPlayer
 
             if player_type == 'nnet':
                 if player_config is None:
@@ -452,9 +451,9 @@ class Configuration:
             if player_type == 'random':
                 return RandomPlayer(game).play
             if player_type == 'greedy':
-                return GreedyTD2020Player(game).play
+                return GreedyRTSPlayer(game).play
             if player_type == 'human':
-                return HumanTD2020Player(game).play
+                return HumanRTSPlayer(game).play
             print("Invalid player type. Returning")
             exit(1)
 
@@ -464,7 +463,7 @@ class Configuration:
                          player_config,
                          onehot_encoder,
                          player_model_file):
-                from td2020.keras.NNet import NNetWrapper as NNet
+                from rts.keras.NNet import NNetWrapper as NNet
                 from MCTS import MCTS
 
                 if onehot_encoder:
@@ -503,7 +502,7 @@ class Configuration:
             self.cpuct = cpuct  # search parameter for MCTS
 
             self.checkpoint = checkpoint
-            self.load_model = load_model  # Load training examples from file - WARNING - this is disabled in TD2020Players.py because of memory errors received when loading data from file
+            self.load_model = load_model  # Load training examples from file - WARNING - this is disabled in RTSPlayers.py because of memory errors received when loading data from file
             self.load_folder_file = load_folder_file
             self.numItersForTrainExamplesHistory = num_iters_for_train_examples_history  # maximum number of 'iterations' that game episodes are kept in queue. After that last is popped and new one is added.
 
@@ -892,111 +891,3 @@ class Configuration:
         else:
             print("Unrecognised runner. Returning")
             exit(1)
-
-    @staticmethod
-    def _to_file_str(item, file_name):
-        with open(file_name, "a") as f:
-            f.write(item + "\n")
-
-    def _to_file_config(self, file_name):
-        with open(file_name, "w") as f:
-            f.write(
-                "Writing config:" + "\n"
-                + "\n"
-                + "Time started: " + str(datetime.datetime.now()) + "\n"
-                + "grid_size: " + str(self.grid_size) + " \n"
-                + "\n"
-                + "Player 1 config \n"
-                + "onehot_encoder: " + str(self.player1_config.encoder) + " \n"
-                + "money_increment: " + str(self.player1_config.MONEY_INC) + " \n"
-                + "initial_gold: " + str(self.player1_config.INITIAL_GOLD) + " \n"
-                + "maximum_gold: " + str(self.player1_config.MAX_GOLD) + " \n"
-                + "sacrificial_heal: " + str(self.player1_config.SACRIFICIAL_HEAL) + " \n"
-                + "heal_amount: " + str(self.player1_config.HEAL_AMOUNT) + " \n"
-                + "heal_cost: " + str(self.player1_config.HEAL_COST) + " \n"
-                + "use_timeout: " + str(self.player1_config.USE_TIMEOUT) + " \n"
-                + "max_time: " + str(self.player1_config.MAX_TIME) + " \n"
-                + "damage: " + str(self.player1_config.DAMAGE) + " \n"
-                + "a_max_health: " + str(self.player1_config.a_max_health) + " \n"
-                + "a_cost: " + str(self.player1_config.a_cost) + " \n"
-                + "acts_enabled: " + str(self.player1_config.acts_enabled) + " \n"
-                + "score_function_player1: " + str(self.player1_config.score_function) + " \n"
-                + "timeout_player1: " + str(self.player1_config.TIMEOUT) + " \n"
-                + "\n"
-                + "player 2 config \n"
-                + "onehot_encoder: " + str(self.player2_config.encoder) + " \n"
-                + "money_increment: " + str(self.player2_config.MONEY_INC) + " \n"
-                + "initial_gold: " + str(self.player2_config.INITIAL_GOLD) + " \n"
-                + "maximum_gold: " + str(self.player2_config.MAX_GOLD) + " \n"
-                + "sacrificial_heal: " + str(self.player2_config.SACRIFICIAL_HEAL) + " \n"
-                + "heal_amount: " + str(self.player2_config.HEAL_AMOUNT) + " \n"
-                + "heal_cost: " + str(self.player2_config.HEAL_COST) + " \n"
-                + "use_timeout: " + str(self.player2_config.USE_TIMEOUT) + " \n"
-                + "max_time: " + str(self.player2_config.MAX_TIME) + " \n"
-                + "damage: " + str(self.player2_config.DAMAGE) + " \n"
-                + "a_max_health: " + str(self.player2_config.a_max_health) + " \n"
-                + "a_cost: " + str(self.player2_config.a_cost) + " \n"
-                + "acts_enabled: " + str(self.player2_config.acts_enabled) + " \n"
-                + "score_function_player2: " + str(self.player2_config.score_function) + " \n"
-                + "timeout_player2: " + str(self.player2_config.TIMEOUT) + " \n"
-                + "\n"
-                + "Learn args \n"
-                + "num_iters: " + str(self.learn_args.numIters) + " \n"
-                + "num_eps: " + str(self.learn_args.numEps) + " \n"
-                + "temp_threshold: " + str(self.learn_args.tempThreshold) + " \n"
-                + "update_threshold: " + str(self.learn_args.updateThreshold) + " \n"
-                + "maxlen_of_queue: " + str(self.learn_args.maxlenOfQueue) + " \n"
-                + "num_mcts_sims: " + str(self.learn_args.numMCTSSims) + " \n"
-                + "arena_compare: " + str(self.learn_args.arenaCompare) + " \n"
-                + "cpuct: " + str(self.learn_args.cpuct) + " \n"
-                + "checkpoint: " + str(self.learn_args.checkpoint) + " \n"
-                + "load_model: " + str(self.learn_args.load_model) + " \n"
-                + "load_folder_file: " + str(self.learn_args.load_folder_file) + " \n"
-                + "num_iters_for_train_examples_history: " + str(self.learn_args.numItersForTrainExamplesHistory) + " \n"
-                + "save_train_examples: " + str(self.learn_args.save_train_examples) + " \n"
-                + "load_train_examples: " + str(self.learn_args.load_train_examples) + " \n"
-                + "\n"
-                + "Pit args \n"
-                + "player1_type: " + str(self.pit_args.player1_type) + " \n"
-                + "player2_type: " + str(self.pit_args.player2_type) + " \n"
-                + "player1_config: " + str(self.pit_args.player1_config) + " \n"
-                + "player2_config: " + str(self.pit_args.player2_config) + " \n"
-                + "num_games: " + str(self.pit_args.num_games) + " \n"
-                + "\n"
-                + "Nnet args \n"
-                + "use_one_hot_encoder: " + str(self.nnet_args.num_channels) + " \n"
-                + "lr: " + str(self.nnet_args.num_channels) + " \n"
-                + "dropout: " + str(self.nnet_args.num_channels) + " \n"
-                + "epochs: " + str(self.nnet_args.num_channels) + " \n"
-                + "batch_size: " + str(self.nnet_args.num_channels) + " \n"
-                + "cuda: " + str(self.nnet_args.num_channels) + " \n"
-                + "num_channels: " + str(self.nnet_args.num_channels) + " \n"
-                + "\n"
-                + "###################################################\n"
-                + "\n"
-            )
-
-    def to_file(self):
-        # output for game stats during playing games (game_episode, game iteration, player name, action executed, action_name, action_direction, player_score...
-
-        if self.runner == 'pit':
-            file = self.config_file_pit
-        elif self.runner == 'learn':
-            file = self.config_file_learn
-        else:
-            print("Unrecognised runner. Returning")
-            file = ""
-            exit(1)
-        self._to_file_config(file)
-        self.append_item("iteration,game_ep,player,x,y,action_index,act_rev,output_direction,score,it")
-
-    def append_item(self, item):
-        if self.runner == 'pit':
-            file = self.config_file_pit
-        elif self.runner == 'learn':
-            file = self.config_file_learn
-        else:
-            print("Unrecognised runner. Returning")
-            file = ""
-            exit(1)
-        self._to_file_str(item, file)

@@ -9,12 +9,12 @@ import pygame
 from pygame.rect import Rect
 
 sys.path.append('..')
-from td2020.src.config import NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, d_user_shortcuts, FPS, ACTS, d_a_type, ACTS_REV, d_user_shortcuts_rev
-from td2020.visualization.Graphics import init_visuals, update_graphics, message_display
+from rts.src.config import NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, d_user_shortcuts, FPS, ACTS, d_a_type, ACTS_REV, d_user_shortcuts_rev
+from rts.visualization.Graphics import init_visuals, update_graphics, message_display
 from utils import dotdict
 
 """
-TD2020Players.py
+RTSPlayers.py
 
 Contains 3 players (human player, random player, greedy player (if searching for nnet player, it is defined by pre-learnt model)
 Human player has defined input controls for Pygame and console
@@ -33,13 +33,13 @@ class RandomPlayer:
         return a
 
 
-class HumanTD2020Player:
+class HumanRTSPlayer:
     def __init__(self, game) -> None:
         self.game = game
         self.USER_PLAYER = 1  # used by Human Player - this does not change if human pit player is 1 or -1
 
     def play(self, board: np.ndarray) -> List:
-        from td2020.src.config_class import CONFIG
+        from rts.src.config_class import CONFIG
 
         n = board.shape[0]
         valid = self.game.getValidMoves(board, 1)
@@ -103,8 +103,8 @@ class HumanTD2020Player:
         return dotdict({"x": -1, "y": -1})
 
     def _manage_input(self, board: np.ndarray) -> list:
-        from td2020.src.Board import Board
-        from td2020.src.config_class import CONFIG
+        from rts.src.Board import Board
+        from rts.src.config_class import CONFIG
 
         n = board.shape[0]
 
@@ -240,7 +240,7 @@ class HumanTD2020Player:
                             print("First left click on actor to select it")
 
 
-class GreedyTD2020Player:
+class GreedyRTSPlayer:
     def __init__(self, game):
         self.game = game
 

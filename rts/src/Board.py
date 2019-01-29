@@ -4,8 +4,7 @@ from typing import Any
 import numpy as np
 
 sys.path.append('../..')
-from td2020.src.Graph import num_destroys, damage
-from td2020.src.config import d_a_type, d_acts, A_TYPE_IDX, P_NAME_IDX, CARRY_IDX, MONEY_IDX, NUM_ACTS, ACTS_REV, NUM_ENCODERS, HEALTH_IDX, TIME_IDX
+from rts.src.config import d_a_type, d_acts, A_TYPE_IDX, P_NAME_IDX, CARRY_IDX, MONEY_IDX, NUM_ACTS, ACTS_REV, NUM_ENCODERS, HEALTH_IDX, TIME_IDX
 
 """
 Board.py
@@ -25,7 +24,7 @@ class Board:
         return self.pieces[index]
 
     def execute_move(self, move, player) -> None:
-        from td2020.src.config_class import CONFIG
+        from rts.src.config_class import CONFIG
 
         if player == 1:
             config = CONFIG.player1_config
@@ -312,13 +311,21 @@ class Board:
                         return True
         return False
 
+    @staticmethod
+    def _num_destroys(time):
+        return int((time / 256) ** 2 + 1)
+
+    @staticmethod
+    def _damage(time):
+        return int((time / 8) ** 2.718 / (time * 8))
+
     def time_killer(self, player):
         # I can pass player through, because this board is canonical board that this action gets executed upon
 
         current_time = self[0][0][TIME_IDX]
 
-        destroys_per_round = num_destroys(current_time)
-        damage_amount = damage(current_time)
+        destroys_per_round = self._num_destroys(current_time)
+        damage_amount = self._damage(current_time)
 
         # Damage as many actors as "damage_amount" parameter provides
         currently_damaged_actors = 0

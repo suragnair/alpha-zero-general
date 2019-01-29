@@ -6,7 +6,7 @@ from tensorflow.python.keras.layers import Conv2D, BatchNormalization, Activatio
 from tensorflow.python.keras.optimizers import Adam
 
 sys.path.append('../..')
-from td2020.src.config import USE_TF_CPU, SHOW_TENSORFLOW_GPU
+from rts.src.config import USE_TF_CPU, SHOW_TENSORFLOW_GPU
 
 if USE_TF_CPU:
     print("Using TensorFlow CPU")
@@ -15,15 +15,15 @@ if not SHOW_TENSORFLOW_GPU:
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 """
-TD2020NNet.py
+RTSNNet
 
 Defined NNet model used for game TD2020
 """
 
 
-class TD2020NNet:
+class RTSNNet:
     def __init__(self, game, encoder):
-        from td2020.src.config_class import CONFIG
+        from rts.src.config_class import CONFIG
 
         # game params
         self.board_x, self.board_y, num_encoders = game.getBoardSize()
@@ -50,6 +50,3 @@ class TD2020NNet:
 
         self.model = Model(inputs=self.input_boards, outputs=[self.pi, self.v])
         self.model.compile(loss=['categorical_crossentropy', 'mean_squared_error'], optimizer=Adam(CONFIG.nnet_args.lr))
-
-        # num weights:
-        # 256*8*8*128 + 256*8*8*128 + 256*6*6*128 + 256*4*4*128 + 256 + 128 + 8*8*30+1 + 1
