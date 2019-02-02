@@ -67,6 +67,9 @@ class ResNet():
             self.isTraining = tf.placeholder(tf.bool, name="is_training")
 
             x_image = tf.reshape(self.input_boards, [-1, self.board_x, self.board_y, 1])                    # batch_size  x board_x x board_y x 1
+            x_image = tf.layers.conv2d(x_image, args.num_channels, kernel_size=(3, 3), strides=(1, 1),name='conv',padding='same',use_bias=False)
+            x_image = tf.layers.batch_normalization(x_image, axis=1, name='conv_bn', training=self.isTraining)
+            x_image = tf.nn.relu(x_image)
 
             residual_tower = self.residual_block(inputLayer=x_image, kernel_size=3, filters=args.num_channels, stage=1, block='a')
             residual_tower = self.residual_block(inputLayer=residual_tower, kernel_size=3, filters=args.num_channels, stage=2, block='b')
