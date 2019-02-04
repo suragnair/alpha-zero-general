@@ -1,24 +1,13 @@
 *.pyc
 .DS_Store
 
-/temp/*
-!/temp/.gitkeep
-
+/temp/
 /.project
 /.pydevproject
 
-\.idea/
+# checkpoint
+checkpoints/
 
-rts/stats/actionExecuted/
+# For PyCharm users
+.idea/
 
-rts/stats/gameEndTurn/
-
-rts/stats/sum/
-
-rts/stats/unitKilledBy/
-
-Py37_new/
-
-rts/models/logsTD2020NNet/
-
-rts/models/TD2020NNet_model_plot\.png
