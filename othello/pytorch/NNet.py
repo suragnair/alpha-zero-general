@@ -117,7 +117,7 @@ class NNetWrapper(NeuralNet):
         if args.cuda: board = board.contiguous().cuda()
         board = board.view(1, self.board_x, self.board_y)
         self.nnet.eval()
-        with torch.no_grad():
+        with torch.no_grad():            
             pi, v = self.nnet(board)
 
         #print('PREDICTION TIME TAKEN : {0:03f}'.format(time.time()-start))
@@ -145,6 +145,5 @@ class NNetWrapper(NeuralNet):
         filepath = os.path.join(folder, filename)
         if not os.path.exists(filepath):
             raise("No model in path {}".format(filepath))
-        map_location = None if args.cuda else 'cpu'
-        checkpoint = torch.load(filepath, map_location=map_location)
+        checkpoint = torch.load(filepath)
         self.nnet.load_state_dict(checkpoint['state_dict'])
