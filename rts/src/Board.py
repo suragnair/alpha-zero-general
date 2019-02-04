@@ -24,6 +24,12 @@ class Board:
         return self.pieces[index]
 
     def execute_move(self, move, player) -> None:
+        """
+        Executes move on this board for specified player
+        :param move: (x, y, action_index), that define which action should be executed on which tile
+        :param player: int - player that is executing action
+        :return: /
+        """
         from rts.src.config_class import CONFIG
 
         if player == 1:
@@ -153,11 +159,22 @@ class Board:
             return
 
     def _move(self, x, y, new_x, new_y):
+        """
+        Move actor to new location
+        :param x: int - coordinate x where actor is located
+        :param y: int - coordinate y where actor is located
+        :param new_x: int - coordinate x where actor needs to be moved to
+        :param new_y: int - coordinate y where actor needs to be moved to
+        """
         self[new_x][new_y] = self[x][y]
         self[x][y] = [0] * NUM_ENCODERS
         self[x][y][TIME_IDX] = self[new_x][new_y][TIME_IDX]  # set time back to empty tile
 
     def _update_money(self, player, money_update):
+        """
+        :param player: int - player to which money gets appended/ decreased
+        :param money_update: int - amount of money
+        """
         for y in range(self.n):
             for x in range(self.n):
                 if self[x][y][P_NAME_IDX] == player:
@@ -165,16 +182,40 @@ class Board:
                     self[x][y][MONEY_IDX] = self[x][y][MONEY_IDX] + money_update
 
     def _attack(self, x, y, n_x, n_y, config):
+        """
+        Actor attacks new actor on other coordinate
+        :param x: actor on coordinate x
+        :param y: actor on coordinate y
+        :param n_x: attack new actor on coordinate n_x
+        :param n_y: attack new actor on coordinate n_x
+        :param config: config that specifies damage - different config can be used for each player
+        """
         self[n_x][n_y][HEALTH_IDX] -= config.DAMAGE
         if self[n_x][n_y][HEALTH_IDX] <= 0:
             self[n_x][n_y] = [0] * NUM_ENCODERS
             self[n_x][n_y][TIME_IDX] = self[x][y][TIME_IDX]  # set time back to empty tile just in case
 
     def _spawn(self, x, y, n_x, n_y, a_type, config):
+        """
+        Actor spawns actor on other coordinate
+        :param x: coordinate of building that is spawning new actor
+        :param y: coordinate of building that is spawning new actor
+        :param n_x: coordinate where new actor will spawn to
+        :param n_y: coordinate where new actor will spawn to
+        :param a_type: type of unit to spawn on new coordinate
+        :param config: additional config that is separate for each player (maximum actor health for this type)
+        """
         self[n_x][n_y] = [self[x][y][P_NAME_IDX], a_type, config.a_max_health[a_type], 0, self[x][y][MONEY_IDX], self[x][y][TIME_IDX]]
 
     def _heal(self, x, y, n_x, n_y, config):
-
+        """
+        Actor heals actor on other coordinate
+        :param x: coordinate of actor executing heal action
+        :param y: oordinate of actor executing heal action
+        :param n_x: coordinate of actor that will receive heal
+        :param n_y: coordinate of actor that will receive heal
+        :param config: additional config that is separate for each player (heal_cost, heal_amount, max_actor_health)
+        """
         if config.SACRIFICIAL_HEAL:
             self[x][x][HEALTH_IDX] -= config.HEAL_COST
             if self[x][y][HEALTH_IDX] <= 0:
@@ -188,7 +229,13 @@ class Board:
         self[n_x][n_y][HEALTH_IDX] = self.clamp(self[n_x][n_y][HEALTH_IDX] + config.HEAL_AMOUNT, 0, config.a_max_health[self[n_x][n_y][A_TYPE_IDX]])
 
     def get_moves_for_square(self, x, y, config) -> Any:
-
+        """
+        Returns all valid actions for specific tile
+        :param x: x coordinate of tile
+        :param y: y coordinate of tile
+        :param config: additional config that is separate for each player
+        :return: array of valid actions
+        """
         # determine the color of the piece.
         player = self[x][y][P_NAME_IDX]
 
@@ -209,6 +256,14 @@ class Board:
         return moves
 
     def _valid_act(self, x, y, act, config):
+        """
+        Returns true if action on specific tile is valid, false otherwise
+        :param x: tile x that action will be executing upon
+        :param y: tile y that action will be executing upon
+        :param act: str: action that will be executing on this tile
+        :param config: additional config that gets passed to functions
+        :return: true/false
+        """
         money = self[x][y][MONEY_IDX]
         if act == "idle":
             return config.acts_enabled.idle
@@ -283,17 +338,46 @@ class Board:
         sys.exit(0)
 
     def _check_if_empty(self, x, y):
+        """
+        Checks if tile is empty
+        :param x: if x coordinate is empty
+        :param y: if y coordinate is empty
+        :return: true/false
+        """
         # noinspection PyChainedComparisons
         return self.n > x >= 0 and 0 <= y < self.n and self[x][y][P_NAME_IDX] == 0
 
     def _check_if_attack(self, x, y, n_x, n_y):
+        """
+        Check if actor on x,y can attack actor on n_x,n_y
+        :param x: actor on coordinate x
+        :param y: actor on coordinate y
+        :param n_x: can attack actor on coordinate n_x
+        :param n_y: can attack actor on coordinate n_y
+        :return: true/false
+        """
         return 0 <= n_x < self.n and 0 <= n_y < self.n and self[x][y][P_NAME_IDX] == -self[n_x][n_y][P_NAME_IDX] and self[n_x][n_y][A_TYPE_IDX] != d_a_type['Gold']
 
     def _check_if_heal(self, x, y, config):
+        """
+        Check if actor on x,y can be healed
+        :param x: coordinate of actor that is getting to be healed
+        :param y: coordinate of actor that is getting to be healed
+        :param config: special config specific for each player (max_health, heal_cost)
+        :return: true/false
+        """
         return 0 <= x < self.n and 0 <= y < self.n and self[x][y][P_NAME_IDX] == self[x][y][P_NAME_IDX] and self[x][y][A_TYPE_IDX] != d_a_type['Gold'] and self[x][y][A_TYPE_IDX] > 0 and self[x][y][HEALTH_IDX] < config.a_max_health[self[x][y][A_TYPE_IDX]] and (
                 config.SACRIFICIAL_HEAL or self[x][y][MONEY_IDX] - config.HEAL_COST >= 0)
 
     def _check_if_nearby(self, x, y, a_type, check_friendly=False):
+        """
+        Checks if actor is nearby - friendly or foe
+        :param x: coordinate of current actor
+        :param y: coordinate of current actor
+        :param a_type: type of nearby actor
+        :param check_friendly: check if nearby actor should be friendly
+        :return: true/false
+        """
         coordinates = [(x - 1, y + 1),
                        (x, y + 1),
                        (x + 1, y + 1),
@@ -313,13 +397,29 @@ class Board:
 
     @staticmethod
     def _num_destroys(time):
+        """
+        Defines parameter in time_killer function, how many actors should be damaged each round
+        :param time: current time frame
+        :return: amount of damaged actors
+        """
         return int((time / 256) ** 2 + 1)
 
     @staticmethod
     def _damage(time):
+        """
+        Defines parameter in time_killer function, how much each damaged actor should receive damage
+        :param time: current time frame
+        :return: damage to each actor
+        """
         return int((time / 8) ** 2.718 / (time * 8))
 
     def time_killer(self, player):
+        """
+        Additional function that can be used to stop players from looping in game. It is defined using _damage and _num_destroys functions, which define how much and how many actors should be damaged each round.
+        This prevents players playing games too long, as its starting to kill them. Better players should gather more gold and therefore create more advanced actors prolonging their lives.
+        :param player: which player is currently executing action
+        :return: /
+        """
         # I can pass player through, because this board is canonical board that this action gets executed upon
 
         current_time = self[0][0][TIME_IDX]
@@ -347,11 +447,26 @@ class Board:
         return max(min(num, max_value), min_value)
 
     def get_money_score(self, player) -> int:
+        """
+        1. of 3 functions that define elo rating of specified player. This one takes into account only players money count
+        :param player: player that requires to know his money count
+        :return: money count for specified player
+        """
         return sum([self[x][y][MONEY_IDX] for x in range(self.n) for y in range(self.n) if self[x][y][P_NAME_IDX] == player])
 
     def get_health_score(self, player) -> int:
+        """
+        2. of 3 functions that define elo rating for specified player. This one takes into account only total current health of units. Players with more units, which have more health should win.
+        :param player: player that requires to know sum of health for his units
+        :return: sum of health for specified player
+        """
         return sum([self[x][y][HEALTH_IDX] for x in range(self.n) for y in range(self.n) if self[x][y][P_NAME_IDX] == player])
 
     def get_combined_score(self, player) -> int:
+        """
+        3. of 3 functions that define elo rating for specified player. This takes into account both 1. and 2. functions and joins them together.
+        :param player: player that requires to know his money count + sum of health of his units
+        :return: count of money + sum of health of specified players' units
+        """
         # money is not worth more than 1hp because this forces players to spend money in order to create new units
         return sum([self[x][y][HEALTH_IDX] + self[x][y][MONEY_IDX] for x in range(self.n) for y in range(self.n) if self[x][y][P_NAME_IDX] == player])

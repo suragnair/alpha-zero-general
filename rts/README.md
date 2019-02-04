@@ -1,5 +1,5 @@
 # RTS Game
-*Jernej Habjan 2018*
+*Jernej Habjan 2019*
 
 This is a [diploma thesis project](https://github.com/JernejHabjan/Diploma-Thesis), which is an implementation of RTS game in Alpha Zero General wrapper created by Surag Nair in [suragnair/alpha-zero-general](https://github.com/suragnair/alpha-zero-general).
 Game visualisation is also presented in PyGame and Unreal Engine 4.
@@ -8,7 +8,7 @@ Game visualisation is also presented in PyGame and Unreal Engine 4.
 - Recommended Python 3.6 (3.7 is not supported by TensorFlow by the time of writing(December 2018))
 - Required TensorFlow (recommended 1.9)
 - Optional Pygame (board outputs can be displayed also in console if Pygame is not used)
-- Module can be connected via get_action.py to [UE4](https://github.com/JernejHabjan/TrumpDefense2020) 
+- Module can be connected via rts/visualization/rts_ue4.py to [UE4](https://github.com/JernejHabjan/TrumpDefense2020) using Tensorflow-ue4 v0.8.0 for UE4.19 https://github.com/getnamo/tensorflow-ue4/releases/tag/0.8.0
 ## Files
 Main files to start learning and pitting:
 - rts/learn.py

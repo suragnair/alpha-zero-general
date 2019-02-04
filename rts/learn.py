@@ -11,9 +11,10 @@ from rts.keras.NNet import NNetWrapper as nn
 # from rts.src.config import grid_size
 
 """
-learn.py
+rts/learn.py
 
 Teaches neural network playing of specified game configuration using self play
+This configuration needs to be kept seperate, as different nnet and game configs are set
 """
 
 if __name__ == "__main__":

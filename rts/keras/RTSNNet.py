@@ -23,6 +23,11 @@ Defined NNet model used for game TD2020
 
 class RTSNNet:
     def __init__(self, game, encoder):
+        """
+        NNet model, copied from Othello NNet, with reduced fully connected layers fc1 and fc2 and reduced nnet_args.num_channels
+        :param game: game configuration
+        :param encoder: Encoder, used to encode game boards
+        """
         from rts.src.config_class import CONFIG
 
         # game params

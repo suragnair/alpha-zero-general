@@ -8,12 +8,11 @@ encoders.py
 Defines 'numeric' and one-hot encoder
 
 Numeric encoder uses integers to encode game state (also negative numbers for player names)
-One-hot encoder uses binary representation of integer numbers, with exception of player name, which is processed seperately
+One-hot encoder uses binary representation of integer numbers, with exception of player name, which is processed separately
 """
 
 
 class Encoder:
-
     def __init__(self):
         self.NUM_ENCODERS = None
 
@@ -35,9 +34,19 @@ class NumericEncoder(Encoder):
         self.NUM_ENCODERS = 6  # player_name, act_type, health, carrying, money, remaining_time
 
     def encode_multiple(self, boards: np.ndarray) -> np.ndarray:
+        """
+        Do nothing - already encoded numerically
+        :param boards: just boards
+        :return: same boards
+        """
         return boards
 
     def encode(self, board) -> np.ndarray:
+        """
+        Do nothing - already encoded numerically
+        :param board: just board
+        :return: same board
+        """
         return board
 
 
@@ -47,7 +56,10 @@ class OneHotEncoder(Encoder):
         self._build_indexes()
 
     def _build_indexes(self):
-
+        """
+        Defines encoding indexes - you may change them as you would like, but do not reduce them below their actual encoders.
+        For example - if health is represented using 5 bits, don't set max_health_amount of actor to >2^5 - 1
+        """
         self.P_NAME_IDX_INC_OH = 2  # playerName 2 bit - 00(neutral), 01(1) or 10(-1),
         self.A_TYPE_IDX_INC_OH = 3  # actor type -> 3 bit,
         self.HEALTH_IDX_INC_OH = 5  # health-> 5 bit,
@@ -77,14 +89,14 @@ class OneHotEncoder(Encoder):
         self.NUM_ENCODERS = self.REMAIN_IDX_MAX_OH
 
     @staticmethod
-    def bti(num: List[int]) -> int:
-        """
-        example ->  print(bti(itb(6,13)))
-        """
-        return int("".join([str(i) for i in num]), 2)
-
-    @staticmethod
     def itb(num: int, length: int) -> List[int]:
+        """
+        Converts integer to bit array
+        Someone fix this please :D - it's horrible
+        :param num: number to convert to bits
+        :param length: length of bits to convert to
+        :return: bit array
+        """
         num = int(num)
         if length == 1:
             return [int(i) for i in '{0:01b}'.format(num)]
@@ -103,12 +115,22 @@ class OneHotEncoder(Encoder):
         raise TypeError("Length not supported:", length)
 
     def encode_multiple(self, boards: np.ndarray) -> np.ndarray:
+        """
+        Encodes and returns multiple boards using onehot encoder
+        :param boards: array of boards to encode
+        :return: new boards, encoded using onehot encoder
+        """
         new_boards = []
         for board in boards:
             new_boards.append(self.encode(board))
         return np.asarray(new_boards)
 
     def encode(self, board) -> np.ndarray:
+        """
+        Encode single board using onehot encoder
+        :param board: normal board
+        :return: new encoded board
+        """
         from rts.src.config import P_NAME_IDX, A_TYPE_IDX, HEALTH_IDX, CARRY_IDX, MONEY_IDX, TIME_IDX
 
         n = board.shape[0]

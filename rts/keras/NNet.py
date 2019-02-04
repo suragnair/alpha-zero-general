@@ -13,13 +13,18 @@ NNet.py
 
 NNet wrapper uses defined nnet model to train and predict
 
-tensorflow.python.framework.errors_impl.NotFoundError: No algorithm worked! :)
+funny error message from tf :) - tensorflow.python.framework.errors_impl.NotFoundError: No algorithm worked!
 """
 
 
 # noinspection PyMissingConstructor
 class NNetWrapper(NeuralNet):
     def __init__(self, game, encoder=None):
+        """
+        Creates nnet wrapper with game configuration and encoder
+        :param game: game configuration
+        :param encoder: encoded that will be used for training and later predictions
+        """
         from rts.src.config_class import CONFIG
 
         # default
@@ -32,11 +37,12 @@ class NNetWrapper(NeuralNet):
         self.encoder = encoder
 
     def train(self, examples):
+        """
+        Encodes examples using one of 2 encoders and starts fitting.
+        :param examples: list of examples, each example is of form (board, pi, v)
+        """
         from rts.src.config_class import CONFIG
 
-        """
-        examples: list of examples, each example is of form (board, pi, v)
-        """
         input_boards, target_pis, target_vs = list(zip(*examples))
         input_boards = np.asarray(input_boards)
         target_pis = np.asarray(target_pis)
@@ -50,20 +56,12 @@ class NNetWrapper(NeuralNet):
         self.nnet.model.fit(x=input_boards, y=[target_pis, target_vs], batch_size=CONFIG.nnet_args.batch_size, epochs=CONFIG.nnet_args.epochs, verbose=VERBOSE_MODEL_FIT)
 
     def predict(self, board, player=None):
-
         """
-        board: np array with board
-        """
-
-        # If we are learning model, use only 1 encoder on both players, else use player, specific encoder, as we might be comparing 2 different encoders using 'pit'
-        """
-        if CONFIG.runner == "learn":
-            board = CONFIG.nnet_args.encoder.encode(board)
-        else:
-            if player == 1:
-                board = CONFIG.player1_config.encoder.encode(board)
-            else:
-                board = CONFIG.player2_config.encoder.encode(board)
+        Predicts action.
+        It encodes board with encoder, that has been used for learning.
+        :param board: specific board
+        :param player: specific player
+        :return: vector of predicted actions and win prediction (Pi, V)
         """
         board = self.encoder.encode(board)
 

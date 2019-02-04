@@ -10,7 +10,7 @@ from pygame.rect import Rect
 
 sys.path.append('..')
 from rts.src.config import NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, d_user_shortcuts, FPS, ACTS, d_a_type, ACTS_REV, d_user_shortcuts_rev
-from rts.visualization.Graphics import init_visuals, update_graphics, message_display
+from rts.visualization.rts_pygame import init_visuals, update_graphics, message_display
 from utils import dotdict
 
 """
@@ -39,6 +39,11 @@ class HumanRTSPlayer:
         self.USER_PLAYER = 1  # used by Human Player - this does not change if human pit player is 1 or -1
 
     def play(self, board: np.ndarray) -> List:
+        """
+        Manages input using PyGame canvas/ console input
+        :param board: current board
+        :return: action to execute on current board
+        """
         from rts.src.config_class import CONFIG
 
         n = board.shape[0]
@@ -71,6 +76,11 @@ class HumanRTSPlayer:
         return a
 
     def display_valid_moves(self, board, valid) -> None:
+        """
+        Displays all valid moves in console for specific board
+        :param board: board to display moves upon
+        :param valid: vector of valid moves
+        """
         if valid is None:
             valid = self.game.getValidMoves(board, 1)
         n = board.shape[0]
@@ -83,7 +93,12 @@ class HumanRTSPlayer:
 
     @staticmethod
     def select_object(board: np.ndarray, click_location: tuple) -> dotdict:
-
+        """
+        Selects object on PyGame canvas using mouse click
+        :param board: game state board
+        :param click_location: tuple (x,y) that represents canvas click location
+        :return: game tile coordinate (x,y)
+        """
         n = board.shape[0]
         canvas_scale = int(ctypes.windll.user32.GetSystemMetrics(1) * (16 / 30) / n)  # for drawing - it takes 2 thirds of screen height
 
@@ -103,6 +118,11 @@ class HumanRTSPlayer:
         return dotdict({"x": -1, "y": -1})
 
     def _manage_input(self, board: np.ndarray) -> list:
+        """
+        Manages click and keyboard selections on PyGame canvas
+        :param board: game state
+        :return: /
+        """
         from rts.src.Board import Board
         from rts.src.config_class import CONFIG
 
