@@ -6,6 +6,31 @@ import numpy as np
 sys.setrecursionlimit(100000)
 
 
+class Node:
+
+    def __init__(self, board):
+        self.board = board
+        self.edges = []
+
+    def isLeaf(self):
+        return len(self.edges) == 0
+
+
+class Edge:
+
+    def __init__(self, inNode, outNode, prior, action):
+        self.inNode = inNode
+        self.outNode = outNode
+        self.action = action
+
+        self.stats = {
+            'N': 0,
+            'W': 0,
+            'Q': 0,
+            'P': prior,
+        }
+
+
 class MCTS:
     """
     This class handles the MCTS tree.
@@ -15,7 +40,6 @@ class MCTS:
         self.game = game
         self.nnet = nnet
         self.args = args
-        self.tree = {}
         self.Qsa = {}  # stores Q values for s,a (as defined in the paper)
         self.Nsa = {}  # stores #times edge s,a was visited
         self.Ns = {}  # stores #times board s was visited
@@ -33,7 +57,6 @@ class MCTS:
             probs: a policy vector where the probability of the ith action is
                    proportional to Nsa[(s,a)]**(1./temp)
         """
-
         for i in range(self.args.numMCTSSims):
             self.search(canonicalBoard, True)
 
@@ -57,6 +80,10 @@ class MCTS:
         else:
             probs = [x / float(countSum) for x in counts]
         return probs
+
+    def search2(self, canonicalBoard, isRootNode):
+        # Need to create node from this status
+        while not currentNode.isLeaf():
 
     def search(self, canonicalBoard, isRootNode):
         """
@@ -98,7 +125,7 @@ class MCTS:
                 # if all valid moves were masked make all valid moves equally probable
 
                 # NB! All valid moves may be masked if either your NNet architecture is insufficient or you've get overfitting or something else.
-                # If you have got dozens or hundreds of these messages you should pay attention to your NNet and/or training process.   
+                # If you have got dozens or hundreds of these messages you should pay attention to your NNet and/or training process.
                 print("All valid moves were masked, do workaround.")
                 self.Ps[s] = self.Ps[s] + valids
                 self.Ps[s] /= np.sum(self.Ps[s])
@@ -112,7 +139,7 @@ class MCTS:
         # best_act = -1
         allBest = []
 
-        # add Dirichlet noise for root node. set epsilon=0 for Arena competitions of trained models
+        # Add Dirichlet noise for root node.
         e = self.args.epsilon
         if isRootNode and e > 0:
             noise = np.random.dirichlet([self.args.dirAlpha] * len(valids))

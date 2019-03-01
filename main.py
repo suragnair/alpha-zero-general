@@ -6,12 +6,12 @@ from utils import *
 args = dotdict({
     'numIters': 1000,
     'numEps': 200,
-    'tempThreshold': 15,
+    'tempThreshold': 20000,
     'updateThreshold': 0.55,
     'maxlenOfQueue': 200000,
     'numMCTSSims': 50,
     'arenaCompare': 40,
-    'cpuct': 1,
+    'cpuct': 1.2,
     'epsilon': 0.25,
     'dirAlpha': 0.03,
 
@@ -23,7 +23,7 @@ args = dotdict({
 })
 
 if __name__ == "__main__":
-    g = Game(8)
+    g = Game(15)
     nnet = nn(g)
 
     if args.load_model:
