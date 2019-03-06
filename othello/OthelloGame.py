@@ -5,8 +5,17 @@ from Game import Game
 from .OthelloLogic import Board
 import numpy as np
 
-
 class OthelloGame(Game):
+    square_content = {
+        -1: "X",
+        +0: "-",
+        +1: "O"
+    }
+
+    @staticmethod
+    def getSquarePiece(piece):
+        return OthelloGame.square_content[piece]
+
     def __init__(self, n):
         self.n = n
 
@@ -81,32 +90,30 @@ class OthelloGame(Game):
         return l
 
     def stringRepresentation(self, board):
-        # 8x8 numpy array (canonical board)
         return board.tostring()
+
+    def stringRepresentationReadable(self, board):
+        board_s = "".join(self.square_content[square] for row in board for square in row)
+        return board_s
 
     def getScore(self, board, player):
         b = Board(self.n)
         b.pieces = np.copy(board)
         return b.countDiff(player)
 
-def display(board):
-    n = board.shape[0]
+    @staticmethod
+    def display(board):
+        n = board.shape[0]
+        print("   ", end="")
+        for y in range(n):
+            print(y, end=" ")
+        print("")
+        print("-----------------------")
+        for y in range(n):
+            print(y, "|", end="")    # print the row #
+            for x in range(n):
+                piece = board[y][x]    # get the piece to print
+                print(OthelloGame.square_content[piece], end=" ")
+            print("|")
 
-    for y in range(n):
-        print (y,"|",end="")
-    print("")
-    print(" -----------------------")
-    for y in range(n):
-        print(y, "|",end="")    # print the row #
-        for x in range(n):
-            piece = board[y][x]    # get the piece to print
-            if piece == -1: print("b ",end="")
-            elif piece == 1: print("W ",end="")
-            else:
-                if x==n:
-                    print("-",end="")
-                else:
-                    print("- ",end="")
-        print("|")
-
-    print("   -----------------------")
+        print("-----------------------")

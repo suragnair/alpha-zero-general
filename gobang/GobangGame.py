@@ -100,27 +100,26 @@ class GobangGame(Game):
         # 8x8 numpy array (canonical board)
         return board.tostring()
 
+    @staticmethod
+    def display(board):
+        n = board.shape[0]
 
-def display(board):
-    n = board.shape[0]
-
-    for y in range(n):
-        print(y, "|", end="")
-    print("")
-    print(" -----------------------")
-    for y in range(n):
-        print(y, "|", end="")    # print the row #
-        for x in range(n):
-            piece = board[y][x]    # get the piece to print
-            if piece == -1:
-                print("b ", end="")
-            elif piece == 1:
-                print("W ", end="")
-            else:
-                if x == n:
-                    print("-", end="")
+        for y in range(n):
+            print(y, "|", end="")
+        print("")
+        print(" -----------------------")
+        for y in range(n):
+            print(y, "|", end="")    # print the row #
+            for x in range(n):
+                piece = board[y][x]    # get the piece to print
+                if piece == -1:
+                    print("b ", end="")
+                elif piece == 1:
+                    print("W ", end="")
                 else:
-                    print("- ", end="")
-        print("|")
-
-    print("   -----------------------")
+                    if x == n:
+                        print("-", end="")
+                    else:
+                        print("- ", end="")
+            print("|")
+        print("   -----------------------")
