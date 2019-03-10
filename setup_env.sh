@@ -4,7 +4,7 @@ VISDOM_PORT=${3:-8097}
 PYTORCH_IMAGE=pytorch:0.4.0-py3-gpu
 
 if [ ${DL_ENV}=="pytorch" ]; then
-    if [[ ! $(docker images -q ${pytorch:0.4.0-py3-gpu}) ]]; then
+    if [[ ! $(docker images -q ${PYTORCH_IMAGE}) ]]; then
            docker build . -t ${PYTORCH_IMAGE} -f ./docker/Dockerfile.pytorch
     fi
     # this should run a pytorch notebook container
