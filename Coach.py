@@ -103,7 +103,7 @@ class Coach():
             # NB! the examples were collected using the model from the previous iteration, so (i-1)  
             self.saveTrainExamples(i-1)
             
-            # shuffle examlpes before training
+            # shuffle examples before training
             trainExamples = []
             for e in self.trainExamplesHistory:
                 trainExamples.extend(e)
