@@ -17,7 +17,7 @@ g = OthelloGame(6)
 # all players
 rp = RandomPlayer(g).play
 gp = GreedyOthelloPlayer(g).play
-hp = HumanOthelloPlayer(g).play
+hp = HumanOthelloPlayer(g)
 
 # nnet players
 n1 = NNet(g)
@@ -33,5 +33,5 @@ n1p = lambda x: np.argmax(mcts1.getActionProb(x, temp=0))
 #mcts2 = MCTS(g, n2, args2)
 #n2p = lambda x: np.argmax(mcts2.getActionProb(x, temp=0))
 
-arena = Arena.Arena(n1p, hp, g, display=display)
+arena = Arena.Arena(n1p, hp.play, g, display=hp.refresh)
 print(arena.playGames(2, verbose=True))
