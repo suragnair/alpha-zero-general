@@ -6,6 +6,7 @@ from pytorch_classification.utils import Bar, AverageMeter
 import time, os, sys
 from pickle import Pickler, Unpickler
 from random import shuffle
+from multiprocessing.pool import ThreadPool
 
 
 class Coach():
@@ -21,8 +22,10 @@ class Coach():
         self.mcts = MCTS(self.game, self.nnet, self.args)
         self.trainExamplesHistory = []    # history of examples from args.numItersForTrainExamplesHistory latest iterations
         self.skipFirstSelfPlay = False # can be overriden in loadTrainExamples()
+        self.pool = ThreadPool(processes=4)
+        self.evalResults = []
 
-    def executeEpisode(self):
+    def executeEpisode(self, mcts):
         """
         This function executes one episode of self-play, starting with player 1.
         As the game is played, each turn is added as a training example to
@@ -40,27 +43,47 @@ class Coach():
         """
         trainExamples = []
         board = self.game.getInitBoard()
-        self.curPlayer = 1
+        curPlayer = 1
         episodeStep = 0
 
         while True:
             episodeStep += 1
-            canonicalBoard = self.game.getCanonicalForm(board,self.curPlayer)
+            canonicalBoard = self.game.getCanonicalForm(board,curPlayer)
             temp = int(episodeStep < self.args.tempThreshold)
 
-            pi = self.mcts.getActionProb(canonicalBoard, temp=temp)
+            pi = mcts.getActionProb(canonicalBoard, temp=temp)
             sym = self.game.getSymmetries(canonicalBoard, pi)
             for b,p in sym:
-                trainExamples.append([b, self.curPlayer, p, None])
+                trainExamples.append([b, curPlayer, p, None])
 
             action = np.random.choice(len(pi), p=pi)
-            board, self.curPlayer = self.game.getNextState(board, self.curPlayer, action)
+            board, curPlayer = self.game.getNextState(board, curPlayer, action)
 
-            r = self.game.getGameEnded(board, self.curPlayer)
+            r = self.game.getGameEnded(board, curPlayer)
 
             if r!=0:
-                return [(x[0],x[2],r*((-1)**(x[1]!=self.curPlayer))) for x in trainExamples]
+                return [(x[0],x[2],r*((-1)**(x[1]!=curPlayer))) for x in trainExamples]
 
+    def eval(self, iter):
+        print('Evaluating against random play...')
+        def mplay(board):
+            mcts = MCTS(self.game, self.nnet, self.args)
+            return np.argmax(mcts.getActionProb(board, temp=0))
+            
+        def rplay(board):
+            a = np.random.randint(self.game.getActionSize())
+            valids = self.game.getValidMoves(board, 1)
+            while valids[a]!=1:
+                a = np.random.randint(self.game.getActionSize())
+            return a
+
+        arena = Arena(mplay, rplay, self.game)
+        mwins, rwins, draws = arena.playGames(20)
+        self.evalResults.append((wins/20.0, iter))
+        print('Saving eval results:')
+        print(self.evalResults)
+        self.saveEvalResults()
+        
     def learn(self):
         """
         Performs numIters iterations with numEps episodes of self-play in each
@@ -81,10 +104,11 @@ class Coach():
                 bar = Bar('Self Play', max=self.args.numEps)
                 end = time.time()
     
+                results = [self.pool.apply_async(self.executeEpisode, (MCTS(self.game, self.nnet, self.args),)) for i in range(self.args.numEps)]
                 for eps in range(self.args.numEps):
-                    self.mcts = MCTS(self.game, self.nnet, self.args)   # reset search tree
-                    iterationTrainExamples += self.executeEpisode()
-    
+                    #self.mcts = MCTS(self.game, self.nnet, self.args)   # reset search tree
+                    #iterationTrainExamples += self.executeEpisode(MCTS(self.game, self.nnet, self.args))
+                    iterationTrainExamples += results[eps].get()
                     # bookkeeping + plot progress
                     eps_time.update(time.time() - end)
                     end = time.time()
@@ -129,10 +153,20 @@ class Coach():
             else:
                 print('ACCEPTING NEW MODEL')
                 self.nnet.save_checkpoint(folder=self.args.checkpoint, filename=self.getCheckpointFile(i))
-                self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')                
+                self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')
+                self.eval(i)       
 
     def getCheckpointFile(self, iteration):
         return 'checkpoint_' + str(iteration) + '.pth.tar'
+    
+    def saveEvalResults(self):
+        folder = self.args.checkpoint
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+        filename = os.path.join(folder, "eval.results")
+        with open(filename, "wb+") as f:
+            Pickler(f).dump(self.evalResults)
+        f.closed
 
     def saveTrainExamples(self, iteration):
         folder = self.args.checkpoint

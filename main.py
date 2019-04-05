@@ -4,7 +4,8 @@ from othello.pytorch.NNet import NNetWrapper as nn
 from utils import *
 
 args = dotdict({
-    'numIters': 1000,
+    #'numIters': 1000,
+    'numIters': 10,
     'numEps': 100,
     'tempThreshold': 15,
     'updateThreshold': 0.6,
@@ -15,7 +16,7 @@ args = dotdict({
 
     'checkpoint': './temp/',
     'load_model': False,
-    'load_folder_file': ('/dev/models/8x100x50','best.pth.tar'),
+    'load_folder_file': ('./temp/','best.pth.tar'),
     'numItersForTrainExamplesHistory': 20,
 
 })
