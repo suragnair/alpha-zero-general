@@ -42,9 +42,10 @@ class TaflGame(Game):
 
     def getValidMoves(self, board, player):
         # return a fixed size binary vector
+        #Note: Ignoreing the passed in player variable since we are not inverting colors for getCanonicalForm and Arena calls with constant 1.
         valids = [0]*self.getActionSize()
         b = board.getCopy()
-        legalMoves =  b.get_legal_moves(player)
+        legalMoves =  b.get_legal_moves(board.getPlayerToMove())
         if len(legalMoves)==0:
             valids[-1]=1
             return np.array(valids)
@@ -57,9 +58,8 @@ class TaflGame(Game):
         return board.done*player
 
     def getCanonicalForm(self, board, player):
-        # return state if player==1, else return -state if player==-1
         b = board.getCopy()
-        #for p in b.pieces: p[2]=p[2]*player
+        # rules and objectives are different for the different players, so inverting board results in an invalid state.
         return b
 
     def getSymmetries(self, board, pi):
@@ -100,7 +100,6 @@ def display(board):
              "22": "x",
        }
        print("---------------------")
-       print("Time: ",board.time)    
        image=board.getImage()
        for i in range(len(image)-1,-1,-1):
            row=image[i]
@@ -108,7 +107,7 @@ def display(board):
                c = render_chars[str(col)]
                sys.stdout.write(c)
            print(" ") 
-       if (board.done!=0): print("***** Done: ",board.done)  
+       #if (board.done!=0): print("***** Done: ",board.done)  
        print("---------------------")
 
 
