@@ -1,6 +1,6 @@
 from Coach import Coach
 from tafl.TaflGame import TaflGame as Game
-from tafl.keras.NNet import NNetWrapper as nn
+from tafl.pytorch.NNet import NNetWrapper as nn
 from utils import *
 
 args = dotdict({

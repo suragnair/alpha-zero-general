@@ -20,6 +20,8 @@ class Board():
     def __getitem__(self, index): 
         return np.array(self.getImage())[index]
 
+    def astype(self,t):
+        return np.array(self.getImage()).astype(t)
 
     def getCopy(self):
       gv=Tafl()
