@@ -1,3 +1,4 @@
+
 # Note: Run this file from Arena directory (the one above /tafl)
 
 import Arena
