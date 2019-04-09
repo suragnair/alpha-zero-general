@@ -13,6 +13,14 @@ class Board():
       self.time=0
       self.done=0
 
+    def __str__(self):
+        return str(self.getPlayerToMove()) + ''.join(str(r) for v in self.getImage() for r in v) 
+
+    # add [][] indexer syntax to the Board
+    def __getitem__(self, index): 
+        return np.array(self.getImage())[index]
+
+
     def getCopy(self):
       gv=Tafl()
       gv.size=self.size

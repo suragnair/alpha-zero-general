@@ -11,9 +11,10 @@ class TaflGame(Game):
 
     def __init__(self, name):
         self.name = name
+        self.getInitBoard()
 
     def getInitBoard(self):    
-        board=Board(Tafl())
+        board=Board(Brandubh())
         if self.name=="Brandubh": board=Board(Brandubh())
         if self.name=="ArdRi": board=Board(ArdRi())
         if self.name=="Tablut": board=Board(Tablut())
@@ -63,24 +64,25 @@ class TaflGame(Game):
         return b
 
     def getSymmetries(self, board, pi):
+        return [(board,pi)]
         # mirror, rotational
-        assert(len(pi) == self.n**2)  
-        pi_board = np.reshape(pi[:-1], (self.n, self.n))
-        l = []
+        #assert(len(pi) == self.n**4)  
+        #pi_board = np.reshape(pi[:-1], (self.n, self.n))
+        #l = []
 
-        for i in range(1, 5):
-            for j in [True, False]:
-                newB = np.rot90(board, i)
-                newPi = np.rot90(pi_board, i)
-                if j:
-                    newB = np.fliplr(newB)
-                    newPi = np.fliplr(newPi)
-                l += [(newB, list(newPi.ravel()) + [pi[-1]])]
-        return l
+        #for i in range(1, 5):
+        #    for j in [True, False]:
+        #        newB = np.rot90(board, i)
+        #        newPi = np.rot90(pi_board, i)
+        #        if j:
+        #            newB = np.fliplr(newB)
+        #            newPi = np.fliplr(newPi)
+        #        l += [(newB, list(newPi.ravel()) + [pi[-1]])]
+        #return l
 
     def stringRepresentation(self, board):
-        # numpy array (canonical board)
-        return board.tostring()
+        #print("->",str(board))
+        return str(board)
 
     def getScore(self, board, player):
         if board.done: return 1000*board.done*player
