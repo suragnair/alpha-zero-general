@@ -154,7 +154,7 @@ class Board():
 
 
     def _getWinLose(self):
-       if self.time > 500: return -1
+       if self.time > 50: return -1
        for apiece in self.pieces:
            if apiece[2]==2 and apiece[0] > -1:
                for item in self.board:
