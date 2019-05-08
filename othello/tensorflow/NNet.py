@@ -20,7 +20,7 @@ args = dotdict({
     'dropout': 0.3,
     'epochs': 10,
     'batch_size': 64,
-    'num_channels': 512,
+    'num_channels': 32,
 })
 
 class NNetWrapper(NeuralNet):
