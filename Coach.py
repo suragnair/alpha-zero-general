@@ -9,10 +9,7 @@ import tensorflow as tf
 import multiprocessing
 from othello.tensorflow.NNet import NNetWrapper as nn
 
-def AsyncSelfPlay(game,args,iter_num,iterr,bar):
-    bar.suffix = "iter:{i}/{x} | Total: {total:} | ETA: {eta:}".format(i=iter_num+1,x=iterr,total=bar.elapsed_td, eta=bar.eta_td)
-    bar.next()
-
+def AsyncSelfPlay(game,args,iter_num,bar):
     #set gpu
     if(args.multiGPU):
         if(iter_num%2==0):
@@ -27,38 +24,51 @@ def AsyncSelfPlay(game,args,iter_num,iterr,bar):
     config.gpu_options.allow_growth=True  
     sess = tf.Session(config=config)
 
-    #create nn and load
+    #create nn and load weight
     net = nn(game)
-    mcts = MCTS(game,net,args)
     try:
         net.load_checkpoint(folder=args.checkpoint, filename='best.pth.tar')
     except:
         pass
+    mcts = MCTS(game, net,args)
 
-    trainExamples = []
-    board = game.getInitBoard()
-    curPlayer = 1
-    episodeStep = 0
+    # create a list for store game state
+    returnlist = []
+    for i in range(args.numPerProcessSelfPlay):
+        # Each process play many games, so do not need initial NN every times when process created.
 
-    while True:
-        episodeStep += 1
-        canonicalBoard = game.getCanonicalForm(board,curPlayer)
-        temp = int(episodeStep < args.tempThreshold)
+        bar.suffix = "iter:{i}/{x} | Total: {total:} | ETA: {eta:}".format(i=i+1,x=args.numPerProcessSelfPlay,total=bar.elapsed_td, eta=bar.eta_td)
+        bar.next()
 
-        pi = mcts.getActionProb(canonicalBoard, temp=temp)
-        sym = game.getSymmetries(canonicalBoard, pi)
-        for b,p in sym:
-            trainExamples.append([b, curPlayer, p, None])
+        trainExamples = []
+        board = game.getInitBoard()
+        curPlayer = 1
+        episodeStep = 0
 
-        action = np.random.choice(len(pi), p=pi)
-        board, curPlayer = game.getNextState(board, curPlayer, action)
+        while True:
+            templist = []
+            episodeStep += 1
+            canonicalBoard = game.getCanonicalForm(board,curPlayer)
+            temp = int(episodeStep < args.tempThreshold)
 
-        r = game.getGameEnded(board, curPlayer)
+            pi = mcts.getActionProb(canonicalBoard, temp=temp)
+            sym = game.getSymmetries(canonicalBoard, pi)
+            for b,p in sym:
+                trainExamples.append([b, curPlayer, p, None])
 
-        if r!=0:
-            return [(x[0],x[2],r*((-1)**(x[1]!=curPlayer))) for x in trainExamples]
+            action = np.random.choice(len(pi), p=pi)
+            board, curPlayer = game.getNextState(board, curPlayer, action)
 
-def AsyncTrainNetwork(game,args,iter_num,trainhistory):
+            r = game.getGameEnded(board, curPlayer)
+
+            if r!=0:
+                templist.append(list((x[0],x[2],r*((-1)**(x[1]!=curPlayer))) for x in trainExamples))
+                returnlist.append(templist)
+                break
+
+    return returnlist
+
+def AsyncTrainNetwork(game,args,trainhistory):
     #set gpu
     os.environ["CUDA_VISIBLE_DEVICES"] = args.setGPU
     #create network for training
@@ -101,7 +111,7 @@ def AsyncTrainNetwork(game,args,iter_num,trainhistory):
     nnet.save_checkpoint(folder=args.checkpoint, filename='train.pth.tar')
 
 def AsyncAgainst(game,args,iter_num,bar):
-    bar.suffix = "iter:{i}/{x} | Total: {total:} | ETA: {eta:}".format(i=iter_num+1,x=args.arenaCompare,total=bar.elapsed_td, eta=bar.eta_td)
+    bar.suffix = "iter:{i}/{x} | Total: {total:} | ETA: {eta:}".format(i=iter_num+1,x=args.numAgainstPlayProcess,total=bar.elapsed_td, eta=bar.eta_td)
     bar.next()
 
     #set gpu
@@ -136,8 +146,9 @@ def AsyncAgainst(game,args,iter_num,bar):
 
     arena = Arena(lambda x: np.argmax(pmcts.getActionProb(x, temp=0)),
                     lambda x: np.argmax(nmcts.getActionProb(x, temp=0)), game)
-    arena.displayBar = False
-    pwins, nwins, draws = arena.playGames(2)
+    arena.displayBar = True
+    # each against process play the number of numPerProcessAgainst games.
+    pwins, nwins, draws = arena.playGames(args.numPerProcessAgainst)
     return pwins, nwins, draws
 
 def CheckResultAndSaveNetwork(pwins,nwins,draws,game,args,iter_num):
@@ -164,35 +175,37 @@ class Coach():
         self.trainExamplesHistory = []
 
     def parallel_self_play(self):
-        pool = multiprocessing.Pool(processes=self.args.numSelfPlayPool)
+        pool = multiprocessing.Pool(processes=self.args.numSelfPlayProcess)
         temp = []
         res = []
         result = []
-        bar = Bar('Self Play', max=self.args.numEps)
-        for i in range(self.args.numEps):
-            res.append(pool.apply_async(AsyncSelfPlay,args=(self.game,self.args,i,self.args.numEps,bar,)))
+        bar = Bar('Self Play(each process)', max=self.args.numPerProcessSelfPlay)
+        for i in range(self.args.numSelfPlayProcess):
+            res.append(pool.apply_async(AsyncSelfPlay,args=(self.game,self.args,i,bar,)))
         pool.close()
         pool.join()
         for i in res:
             result.append(i.get())
         for i in result:
-            temp += i
+            for j in i:
+                for trainData in j:
+                    temp += trainData
         return temp
 
     def parallel_train_network(self,iter_num):
         print("Start train network")
         pool = multiprocessing.Pool(processes=1)
-        pool.apply_async(AsyncTrainNetwork,args=(self.game,self.args,iter_num,self.trainExamplesHistory,))
+        pool.apply_async(AsyncTrainNetwork,args=(self.game,self.args,self.trainExamplesHistory,))
         pool.close()
         pool.join()
 
     def parallel_self_test_play(self,iter_num):
-        pool = multiprocessing.Pool(processes=self.args.numTestPlayPool)
+        pool = multiprocessing.Pool(processes=self.args.numAgainstPlayProcess)
         print("Start test play")
-        bar = Bar('Test Play', max=self.args.arenaCompare)
+        bar = Bar('Test Play', max=self.args.numAgainstPlayProcess)
         res = []
         result = []
-        for i in range(self.args.arenaCompare):
+        for i in range(self.args.numAgainstPlayProcess):
             res.append(pool.apply_async(AsyncAgainst,args=(self.game,self.args,i,bar)))
         pool.close()
         pool.join()
