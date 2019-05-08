@@ -246,4 +246,3 @@ class Coach():
             self.parallel_train_network(i)
             self.trainExamplesHistory.clear()
             self.parallel_self_test_play(i)
-
