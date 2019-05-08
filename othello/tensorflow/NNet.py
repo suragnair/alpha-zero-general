@@ -12,18 +12,20 @@ from NeuralNet import NeuralNet
 
 import tensorflow as tf
 from .OthelloNNet import OthelloNNet as onnet
+from .OthelloNNet import ResNet as resnnet
+
 
 args = dotdict({
     'lr': 0.001,
     'dropout': 0.3,
     'epochs': 10,
     'batch_size': 64,
-    'num_channels': 512,
+    'num_channels': 32,
 })
 
 class NNetWrapper(NeuralNet):
     def __init__(self, game):
-        self.nnet = onnet(game, args)
+        self.nnet = resnnet(game, args)
         self.board_x, self.board_y = game.getBoardSize()
         self.action_size = game.getActionSize()
 
