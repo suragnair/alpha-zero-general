@@ -11,9 +11,10 @@ class TaflGame(Game):
 
     def __init__(self, name):
         self.name = name
+        self.getInitBoard()
 
     def getInitBoard(self):    
-        board=Board(Tafl())
+        board=Board(Brandubh())
         if self.name=="Brandubh": board=Board(Brandubh())
         if self.name=="ArdRi": board=Board(ArdRi())
         if self.name=="Tablut": board=Board(Tablut())
@@ -42,9 +43,10 @@ class TaflGame(Game):
 
     def getValidMoves(self, board, player):
         # return a fixed size binary vector
+        #Note: Ignoreing the passed in player variable since we are not inverting colors for getCanonicalForm and Arena calls with constant 1.
         valids = [0]*self.getActionSize()
         b = board.getCopy()
-        legalMoves =  b.get_legal_moves(player)
+        legalMoves =  b.get_legal_moves(board.getPlayerToMove())
         if len(legalMoves)==0:
             valids[-1]=1
             return np.array(valids)
@@ -57,30 +59,30 @@ class TaflGame(Game):
         return board.done*player
 
     def getCanonicalForm(self, board, player):
-        # return state if player==1, else return -state if player==-1
         b = board.getCopy()
-        #for p in b.pieces: p[2]=p[2]*player
+        # rules and objectives are different for the different players, so inverting board results in an invalid state.
         return b
 
     def getSymmetries(self, board, pi):
+        return [(board,pi)]
         # mirror, rotational
-        assert(len(pi) == self.n**2)  
-        pi_board = np.reshape(pi[:-1], (self.n, self.n))
-        l = []
+        #assert(len(pi) == self.n**4)  
+        #pi_board = np.reshape(pi[:-1], (self.n, self.n))
+        #l = []
 
-        for i in range(1, 5):
-            for j in [True, False]:
-                newB = np.rot90(board, i)
-                newPi = np.rot90(pi_board, i)
-                if j:
-                    newB = np.fliplr(newB)
-                    newPi = np.fliplr(newPi)
-                l += [(newB, list(newPi.ravel()) + [pi[-1]])]
-        return l
+        #for i in range(1, 5):
+        #    for j in [True, False]:
+        #        newB = np.rot90(board, i)
+        #        newPi = np.rot90(pi_board, i)
+        #        if j:
+        #            newB = np.fliplr(newB)
+        #            newPi = np.fliplr(newPi)
+        #        l += [(newB, list(newPi.ravel()) + [pi[-1]])]
+        #return l
 
     def stringRepresentation(self, board):
-        # numpy array (canonical board)
-        return board.tostring()
+        #print("->",str(board))
+        return str(board)
 
     def getScore(self, board, player):
         if board.done: return 1000*board.done*player
@@ -100,7 +102,6 @@ def display(board):
              "22": "x",
        }
        print("---------------------")
-       print("Time: ",board.time)    
        image=board.getImage()
        for i in range(len(image)-1,-1,-1):
            row=image[i]
@@ -108,7 +109,7 @@ def display(board):
                c = render_chars[str(col)]
                sys.stdout.write(c)
            print(" ") 
-       if (board.done!=0): print("***** Done: ",board.done)  
+       #if (board.done!=0): print("***** Done: ",board.done)  
        print("---------------------")
 
 

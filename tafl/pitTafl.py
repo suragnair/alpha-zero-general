@@ -1,3 +1,6 @@
+
+# Note: Run this file from Arena directory (the one above /tafl)
+
 import Arena
 from MCTS import MCTS
 from tafl.TaflGame import TaflGame, display
