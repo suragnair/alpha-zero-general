@@ -1,6 +1,6 @@
 cffi==1.11.5
 cython==0.28.3
-flask==0.12.3
+flask==1.0
 gitpython==2.1.11
 matplotlib==2.1.1
 numpy==1.14.5
