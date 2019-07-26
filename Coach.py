@@ -34,7 +34,7 @@ class Coach():
         uses temp=0.
 
         Returns:
-            trainExamples: a list of examples of the form (canonicalBoard,pi,v)
+            trainExamples: a list of examples of the form (canonicalBoard, currPlayer, pi,v)
                            pi is the MCTS informed policy vector, v is +1 if
                            the player eventually won the game, else -1.
         """
