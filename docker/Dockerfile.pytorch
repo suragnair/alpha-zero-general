@@ -24,18 +24,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN curl -o ~/miniconda.sh -O  https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh  && \
 chmod +x ~/miniconda.sh && \
 ~/miniconda.sh -b -p /opt/conda && \
-rm ~/miniconda.sh && \
-/opt/conda/bin/conda install numpy pyyaml scipy cython jupyter ipython mkl mkl-include && \
-/opt/conda/bin/conda install -c soumith magma-cuda90 && \
-/opt/conda/bin/conda install pytorch=0.4.0 -c pytorch && \
-/opt/conda/bin/conda clean -ya
-
+rm ~/miniconda.sh
 ENV PATH /opt/conda/bin:$PATH
+RUN conda install numpy pyyaml scipy cython jupyter ipython mkl mkl-include && \
+conda install -c soumith magma-cuda90 && \
+conda install pytorch=0.4.0 cuda90 -c pytorch && \
+conda clean -ya
+# conda install pytorch torchvision cuda90 -c pytorch &&\
+
 
 # This must be done before pip so that requirements.txt is available.
 WORKDIR /opt/pytorch
 # pip install custom module listed in requirements.txt
-COPY ./docker/requirements.txt .
+COPY requirements.txt .
 RUN pip install -U pip && pip install -r requirements.txt
 
 WORKDIR /workspace
@@ -47,12 +48,12 @@ EXPOSE 8888
 EXPOSE 8097
 
 # Set up our notebook config.
-COPY ./docker/jupyter_notebook_config.py /root/.jupyter/
+COPY jupyter_notebook_config.py /root/.jupyter/
 
 # Jupyter has issues with being run directly:
 #   https://github.com/ipython/ipython/issues/7062
 # We just add a little wrapper script.
-COPY ./docker/run_jupyter.sh /
+COPY run_jupyter.sh /
 RUN chmod +x /run_jupyter.sh
 
 CMD ["/run_jupyter.sh", "--allow-root"]
