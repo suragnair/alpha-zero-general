@@ -1,0 +1,19 @@
+version: '2.3'
+services:
+  pytorch_notebook:
+    image: pytorch:0.4.0-py3-gpu
+    runtime: nvidia
+    build:
+      context: docker
+      dockerfile: Dockerfile.pytorch
+      shm_size: '8G'
+    volumes:
+      - .:/workspace
+      - ./docker/jupyter_notebook_config.py:/root/.jupyter/jupyter_notebook_config.py
+    ports:
+      - ${NOTEBOOK_PORT:-8888}:8888
+      - ${VISDOM_PORT:-8097}:8097
+    environment:
+      - JUPYTER_ENABLE_LAB=1
+      - NOTEBOOK_PORT=
+      - VISDOM_PORT=${VISDOM_PORT:-8097}
