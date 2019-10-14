@@ -27,7 +27,7 @@ chmod +x ~/miniconda.sh && \
 rm ~/miniconda.sh && \
 /opt/conda/bin/conda install numpy pyyaml scipy cython jupyter ipython mkl mkl-include && \
 /opt/conda/bin/conda install -c soumith magma-cuda90 && \
-/opt/conda/bin/conda install pytorch=0.4.0 -c pytorch && \
+/opt/conda/bin/conda install pytorch=0.4.1 -c pytorch && \
 /opt/conda/bin/conda clean -ya
 
 ENV PATH /opt/conda/bin:$PATH
