@@ -94,6 +94,7 @@ class TicTacToeGame(Game):
         # 8x8 numpy array (canonical board)
         return board.tostring()
 
+    @staticmethod
     def display(board):
         n = board.shape[0]
 
