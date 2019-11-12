@@ -62,9 +62,9 @@ class Connect4Game(Game):
     def stringRepresentation(self, board):
         return str(self._base_board.with_np_pieces(np_pieces=board))
 
-
-def display(board):
-    print(" -----------------------")
-    print(' '.join(map(str, range(len(board[0])))))
-    print(board)
-    print(" -----------------------")
+    @staticmethod
+    def display(board):
+        print(" -----------------------")
+        print(' '.join(map(str, range(len(board[0])))))
+        print(board)
+        print(" -----------------------")
