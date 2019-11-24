@@ -13,8 +13,8 @@ use this script to play any two agents against each other, or play manually with
 any agent.
 """
 
-mini_othello = True  # Play in 6x6 instead of the normal 8x8.
-opponent_type = "random"  # Possible opponent types: "random", "greedy", "human", "neural-net"
+mini_othello  = False    # Play in 6x6 instead of the normal 8x8.
+opponent_type = "human"  # Possible opponent types: "random", "greedy", "human", "neural-net"
 
 
 def create_nn_player(mini):
