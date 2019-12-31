@@ -15,9 +15,17 @@ class Game():
         """
         Returns:
             startBoard: a representation of the board (ideally this is the form
-                        that will be the input to your neural network)
+                        that will be the input to your neural network, if not
+                        overwrite toArray)
         """
         pass
+
+    def toArray(self, board):
+        """
+        Returns:
+            a board representation suitable as the input to your neural network
+        """
+        return board
 
     def getBoardSize(self):
         """
@@ -63,7 +71,7 @@ class Game():
         """
         Input:
             board: current board
-            player: current player (1 or -1)
+            player: (not necessarily current) player (1 or -1)
 
         Returns:
             r: 0 if game has not ended. 1 if player won, -1 if player lost,

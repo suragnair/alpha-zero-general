@@ -1,11 +1,15 @@
 from Coach import Coach
-from othello.OthelloGame import OthelloGame as Game
-from othello.pytorch.NNet import NNetWrapper as nn
+#from othello.OthelloGame import OthelloGame as Game
+#from othello.pytorch.NNet import NNetWrapper as nn
+#from tictactoe.TicTacToeGame import TicTacToeGame as Game
+#from tictactoe.keras.NNet import NNetWrapper as nn
+from _chess.ChessGame import ChessGame as Game
+from _chess.pytorch.NNet import NNetWrapper as nn
 from utils import *
 
 args = dotdict({
-    'numIters': 1000,
-    'numEps': 100,              # Number of complete self-play games to simulate during a new iteration.
+    'numIters': 3,#1000,
+    'numEps': 10,#100,          # Number of complete self-play games to simulate during a new iteration.
     'tempThreshold': 15,        #
     'updateThreshold': 0.6,     # During arena playoff, new neural net will be accepted if threshold or more of games are won.
     'maxlenOfQueue': 200000,    # Number of game examples to train the neural networks.

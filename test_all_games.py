@@ -8,6 +8,7 @@
 
      [ Games ]      Pytorch     Tensorflow  Keras
       -----------   -------     ----------  -----
+    - Chess         [Yes]
     - Othello       [Yes]       [Yes]       [Yes]
     - TicTacToe                             [Yes]
     - Connect4                  [Yes]
@@ -19,6 +20,9 @@ import unittest
 
 import Arena
 from MCTS import MCTS
+
+from _chess.ChessGame import ChessGame
+from _chess.pytorch.NNet import NNetWrapper as ChessPytorchNNet
 
 from tictactoe.TicTacToeGame import TicTacToeGame
 from tictactoe.TicTacToePlayers import *
@@ -54,6 +58,9 @@ class TestAllGames(unittest.TestCase):
 
         arena = Arena.Arena(n1p, rp, game)
         print(arena.playGames(2, verbose=False))
+
+    def test_chess_pytorch(self):
+        self.execute_game_test(ChessGame(), ChessPytorchNNet)
 
     def test_othello_pytorch(self):
         self.execute_game_test(OthelloGame(6), OthelloPytorchNNet)
