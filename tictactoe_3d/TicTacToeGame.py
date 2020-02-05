@@ -6,13 +6,12 @@ from .TicTacToeLogic import Board
 import numpy as np
 
 """
-Game class implementation for the game of TicTacToe.
-Based on the OthelloGame then getGameEnded() was adapted to new rules.
+Game class implementation for the game of 3D TicTacToe or Qubic.
 
-Author: Evgeny Tyurin, github.com/evg-tyurin
-Date: Jan 5, 2018.
+Author: Adam Lawson, github.com/goshawk22
+Date: Feb 05, 2020
 
-Based on the OthelloGame by Surag Nair.
+Based on the TicTacToeGame by Evgeny Tyurin.
 """
 class TicTacToeGame(Game):
     def __init__(self, n=3):
