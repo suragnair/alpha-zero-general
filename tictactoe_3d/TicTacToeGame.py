@@ -78,15 +78,22 @@ class TicTacToeGame(Game):
     def getSymmetries(self, board, pi):
         # mirror, rotational
         pi_board = np.reshape(pi[:-1], (self.n, self.n, self.n))
+        print(pi_board)
         l = []
-
-        for i in range(1, 5):
+        board2d = np.reshape(board, (self.n*self.n, self.n))
+        
+        
+        for z in [True, False]:
             for j in [True, False]:
-                newB = np.rot90(board, i)
-                newPi = np.rot90(pi_board, i)
                 if j:
                     newB = np.fliplr(newB)
                     newPi = np.fliplr(newPi)
+                if z:
+                    newB = np.flipud(newB)
+                    newPi = np.flipud(newPi)
+                    
+                newB = np.reshape(newB, (self.n,self.n,self.n))
+                newPi = np.reshape(newPi, (self.n,self.n,self.n))
                 l += [(newB, list(newPi.ravel()) + [pi[-1]])]
         return l
 
