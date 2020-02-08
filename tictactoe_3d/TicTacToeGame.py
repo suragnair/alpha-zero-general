@@ -97,29 +97,29 @@ class TicTacToeGame(Game):
     @staticmethod
     def display(board):
         n = board.shape[0]
-
-        print("   ", end="")
-        for y in range(n):
-            print (y,"", end="")
-        print("")
-        print("  ", end="")
-        for _ in range(n):
-            print ("-", end="-")
-        print("--")
-        for y in range(n):
-            print(y, "|",end="")    # print the row #
-            for x in range(n):
-                piece = board[y][x]    # get the piece to print
-                if piece == -1: print("X ",end="")
-                elif piece == 1: print("O ",end="")
-                else:
-                    if x==n:
-                        print("-",end="")
+        for z in range(n):
+            print("   ", end="")
+            for y in range(n):
+                print (y,"", end="")
+            print("")
+            print("  ", end="")
+            for _ in range(n):
+                print ("-", end="-")
+            print("--")
+            for y in range(n):
+                print(y, "|",end="")    # print the row #
+                for x in range(n):
+                    piece = board[z][y][x]    # get the piece to print
+                    if piece == -1: print("X ",end="")
+                    elif piece == 1: print("O ",end="")
                     else:
-                        print("- ",end="")
-            print("|")
+                        if x==n:
+                            print("-",end="")
+                        else:
+                            print("- ",end="")
+                print("|")
 
-        print("  ", end="")
-        for _ in range(n):
-            print ("-", end="-")
-        print("--")
+            print("  ", end="")
+            for _ in range(n):
+                print ("-", end="-")
+            print("--")

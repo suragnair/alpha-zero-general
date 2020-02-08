@@ -37,8 +37,9 @@ class HumanTicTacToePlayer():
             # Python 2.x 
             # a = raw_input()
 
-            x,y = [int(x) for x in a.split(' ')]
-            a = self.game.n * x + y if x!= -1 else self.game.n ** 2
+            z,x,y = [int(x) for x in a.split(' ')]
+            boardvalues = np.arange(0,27).reshape(3,3,3)
+            a = boardvalues[z][x][y]
             if valid[a]:
                 break
             else:
