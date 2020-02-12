@@ -202,7 +202,7 @@ class Board():
                 count += 1
                 if self.pieces[2,2,2] == color:
                     count += 1
-                    if count == 3:
+                    if count == win:
                         return True
             
         count = 0
@@ -212,7 +212,7 @@ class Board():
                 count += 1
                 if self.pieces[0,2,2] == color:
                     count += 1
-                    if count == 3:
+                    if count == win:
                         return True
         
         count = 0
@@ -222,7 +222,7 @@ class Board():
                 count += 1
                 if self.pieces[0,0,2] == color:
                     count += 1
-                    if count == 3:
+                    if count == win:
                         return True
         
         count = 0
@@ -230,9 +230,9 @@ class Board():
             count += 1
             if self.pieces[1,1,1] == color:
                 count += 1
-                if self.pieces[2,2,0] == color:
+                if self.pieces[2,0,2] == color:
                     count += 1
-                    if count == 3:
+                    if count == win:
                         return True
 
         # return false if no 3 is reached
