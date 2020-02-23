@@ -25,9 +25,7 @@ To start a tournament of 100 episodes with the model-based player against a rand
 python pit.py
 ```
 You can play againt the model by switching to HumanPlayer in ```pit.py```
-
-### Experiments
-
+The input is in the form z x y
 
 ### Contributors and Credits
 * [Evgeny Tyurin](https://github.com/evg-tyurin)

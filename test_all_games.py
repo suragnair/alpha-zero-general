@@ -14,7 +14,7 @@
     - Gobang                    [Yes]       [Yes]
 
 """
-import tensorflow as tf
+
 import unittest
 
 import Arena
