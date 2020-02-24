@@ -14,7 +14,7 @@ Date: Feb 05, 2020
 Based on the TicTacToeGame by Evgeny Tyurin.
 """
 class TicTacToeGame(Game):
-    def __init__(self, n=3):
+    def __init__(self, n):
         self.n = n
 
     def getInitBoard(self):
@@ -37,7 +37,8 @@ class TicTacToeGame(Game):
             return (board, -player)
         b = Board(self.n)
         b.pieces = np.copy(board)
-        boardvalues = np.arange(0,27).reshape(3,3,3)
+        boardvalues = np.arange(0,(self.n*self.n*self.n)).reshape(self.n,self.n,self.n)
+        
         move = np.argwhere(boardvalues==action)[0]
         b.execute_move(move, player)
         return (b.pieces, -player)
@@ -52,7 +53,7 @@ class TicTacToeGame(Game):
             valids[-1]=1
             return np.array(valids)
         for z, x, y in legalMoves:
-            boardvalues = np.arange(0,27).reshape(3,3,3)
+            boardvalues = np.arange(0,(self.n*self.n*self.n)).reshape(self.n,self.n,self.n)
             valids[boardvalues[z][x][y]] = 1
         return np.array(valids)
 

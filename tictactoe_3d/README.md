@@ -12,7 +12,11 @@ from utils import *
 
 and the first line of ```__main__``` to
 ```python
-g = Game()
+g = Game(3)
+```
+or
+```python
+g = Game(4)
 ```
  Make similar changes to ```pit.py```.
 
