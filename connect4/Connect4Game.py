@@ -34,7 +34,7 @@ class Connect4Game(Game):
         "Any zero value in top row in a valid move"
         return self._base_board.with_np_pieces(np_pieces=board).get_valid_moves()
 
-    def getGameEnded(self, board, player):
+    def getGameEnded(self, board, player, episodeStep):
         b = self._base_board.with_np_pieces(np_pieces=board)
         winstate = b.get_win_state()
         if winstate.is_ended:
@@ -42,9 +42,9 @@ class Connect4Game(Game):
                 # draw has very little value.
                 return 1e-4
             elif winstate.winner == player:
-                return +1
+                return (+1-(episodeStep*1e-4))
             elif winstate.winner == -player:
-                return -1
+                return (-1+(episodeStep*1e-4))
             else:
                 raise ValueError('Unexpected winstate found: ', winstate)
         else:

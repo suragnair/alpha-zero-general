@@ -19,7 +19,7 @@ class MCTS():
         self.Es = {}        # stores game.getGameEnded ended for board s
         self.Vs = {}        # stores game.getValidMoves for board s
 
-    def getActionProb(self, canonicalBoard, temp=1):
+    def getActionProb(self, canonicalBoard, episodeStep, temp=1):
         """
         This function performs numMCTSSims simulations of MCTS starting from
         canonicalBoard.
@@ -29,7 +29,7 @@ class MCTS():
                    proportional to Nsa[(s,a)]**(1./temp)
         """
         for i in range(self.args.numMCTSSims):
-            self.search(canonicalBoard)
+            self.search(canonicalBoard, episodeStep)
 
         s = self.game.stringRepresentation(canonicalBoard)
         counts = [self.Nsa[(s,a)] if (s,a) in self.Nsa else 0 for a in range(self.game.getActionSize())]
@@ -46,7 +46,7 @@ class MCTS():
         return probs
 
 
-    def search(self, canonicalBoard):
+    def search(self, canonicalBoard, episodeStep):
         """
         This function performs one iteration of MCTS. It is recursively called
         till a leaf node is found. The action chosen at each node is one that
@@ -69,7 +69,7 @@ class MCTS():
         s = self.game.stringRepresentation(canonicalBoard)
 
         if s not in self.Es:
-            self.Es[s] = self.game.getGameEnded(canonicalBoard, 1)
+            self.Es[s] = self.game.getGameEnded(canonicalBoard, 1, episodeStep)
         if self.Es[s]!=0:
             # terminal node
             return -self.Es[s]
@@ -115,7 +115,7 @@ class MCTS():
         next_s, next_player = self.game.getNextState(canonicalBoard, 1, a)
         next_s = self.game.getCanonicalForm(next_s, next_player)
 
-        v = self.search(next_s)
+        v = self.search(next_s, episodeStep)
 
         if (s,a) in self.Qsa:
             self.Qsa[(s,a)] = (self.Nsa[(s,a)]*self.Qsa[(s,a)] + v)/(self.Nsa[(s,a)]+1)
