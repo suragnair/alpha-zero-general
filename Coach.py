@@ -49,7 +49,7 @@ class Coach():
             temp = int(episodeStep < self.args.tempThreshold)
 
             pi = self.mcts.getActionProb(canonicalBoard, temp=temp)
-            sym = self.game.getSymmetries(canonicalBoard, pi)
+            valids = self.game.getValidMoves(canonicalBoard, 1)
             
             # ideally these should be combined so that getSymmetries takes valids as well 
             bs, ps = zip(*self.game.getSymmetries(canonicalBoard, pi))
