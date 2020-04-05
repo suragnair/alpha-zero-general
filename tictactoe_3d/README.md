@@ -32,7 +32,7 @@ You can play againt the model by switching to HumanPlayer in ```pit.py```
 The input is in the form z x y
 
 ### Contributors and Credits
-* [Evgeny Tyurin](https://github.com/evg-tyurin)
+* [Adam Lawson](https://github.com/goshawk22)
 
 The implementation is based on the game of Othello (https://github.com/suragnair/alpha-zero-general/tree/master/othello).
 
