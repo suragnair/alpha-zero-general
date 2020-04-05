@@ -103,7 +103,11 @@ def display(board):
        }
        print("---------------------")
        image=board.getImage()
+
+       print("  ", " ".join(str(i) for i in range(len(image))))
        for i in range(len(image)-1,-1,-1):
+           print("{:2}".format(i), end=" ")
+
            row=image[i]
            for col in row:
                c = render_chars[str(col)]
