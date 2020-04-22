@@ -20,7 +20,7 @@ class Board():
         self.win_length = win_length or DEFAULT_WIN_LENGTH
 
         if np_pieces is None:
-            self.np_pieces = np.zeros([self.height, self.width])
+            self.np_pieces = np.zeros([self.height, self.width], dtype=np.int)
         else:
             self.np_pieces = np_pieces
             assert self.np_pieces.shape == (self.height, self.width)
