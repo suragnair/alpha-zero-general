@@ -22,15 +22,20 @@ class RandomPlayer():
 
 
 class HumanTicTacToePlayer():
-    def __init__(self, game):
+    def __init__(self, game, n):
         self.game = game
+        self.n = n
 
     def play(self, board):
+        boardvalues = np.arange(self.n*self.n*self.n).reshape(self.n,self.n,self.n)
+        validvalue = np.arange(self.n*self.n*self.n)
         # display(board)
         valid = self.game.getValidMoves(board, 1)
         for i in range(len(valid)):
-            if valid[i]:
-                print(int(i/self.game.n), int(i%self.game.n))
+            if valid[i] == 1:
+                action = validvalue[i]
+                print(np.argwhere(boardvalues == action))
+
         while True: 
             # Python 3.x
             a = input()
@@ -38,7 +43,7 @@ class HumanTicTacToePlayer():
             # a = raw_input()
 
             z,x,y = [int(x) for x in a.split(' ')]
-            boardvalues = np.arange(0,27).reshape(3,3,3)
+            boardvalues = np.arange(self.n*self.n*self.n).reshape(self.n,self.n,self.n)
             a = boardvalues[z][x][y]
             if valid[a]:
                 break
