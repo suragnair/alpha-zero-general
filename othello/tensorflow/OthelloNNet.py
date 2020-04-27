@@ -23,6 +23,7 @@ class OthelloNNet():
         with self.graph.as_default(): 
             self.input_boards = tf.placeholder(tf.float32, shape=[None, self.board_x, self.board_y])    # s: batch_size x board_x x board_y
             self.dropout = tf.placeholder(tf.float32)
+            self.valids = tf.placeholder(tf.float32, shape=[None, self.action_size])
             self.isTraining = tf.placeholder(tf.bool, name="is_training")
 
             x_image = tf.reshape(self.input_boards, [-1, self.board_x, self.board_y, 1])                    # batch_size  x board_x x board_y x 1
@@ -34,6 +35,11 @@ class OthelloNNet():
             s_fc1 = Dropout(Relu(BatchNormalization(Dense(h_conv4_flat, 1024, use_bias=False), axis=1, training=self.isTraining)), rate=self.dropout) # batch_size x 1024
             s_fc2 = Dropout(Relu(BatchNormalization(Dense(s_fc1, 512, use_bias=False), axis=1, training=self.isTraining)), rate=self.dropout)         # batch_size x 512
             self.pi = Dense(s_fc2, self.action_size)                                                        # batch_size x self.action_size
+            
+            # this sets the value of invalid moves to ~ -1000, so that the network is not encouraged to set both
+            #   illegal moves, and low-quality moves to a value of 0, as sigmoid(-1000) approx= 0.
+            # see: https://github.com/suragnair/alpha-zero-general/issues/77
+            self.pi -= (1-self.valids)*1000
             self.prob = tf.nn.softmax(self.pi)
             self.v = Tanh(Dense(s_fc2, 1))                                                               # batch_size x 1
 
@@ -64,6 +70,7 @@ class ResNet():
         with self.graph.as_default(): 
             self.input_boards = tf.placeholder(tf.float32, shape=[None, self.board_x, self.board_y])    # s: batch_size x board_x x board_y
             self.dropout = tf.placeholder(tf.float32)
+            self.valids = tf.placeholder(tf.float32, shape=[None, self.action_size])
             self.isTraining = tf.placeholder(tf.bool, name="is_training")
 
             x_image = tf.reshape(self.input_boards, [-1, self.board_x, self.board_y, 1])                    # batch_size  x board_x x board_y x 1
@@ -96,6 +103,11 @@ class ResNet():
             policy = tf.nn.relu(policy)
             policy = tf.layers.flatten(policy, name='p_flatten')
             self.pi = tf.layers.dense(policy, self.action_size)
+            
+            # this sets the value of invalid moves to ~ -1000, so that the network is not encouraged to set both
+            #   illegal moves, and low-quality moves to a value of 0.
+            # see: https://github.com/suragnair/alpha-zero-general/issues/77
+            self.pi -= (1-self.valids)*1000
             self.prob = tf.nn.softmax(self.pi)
 
             value = tf.layers.conv2d(residual_tower, 1,kernel_size=(1, 1), strides=(1, 1),name='v',padding='same',use_bias=False)

@@ -49,9 +49,16 @@ class Coach():
             temp = int(episodeStep < self.args.tempThreshold)
 
             pi = self.mcts.getActionProb(canonicalBoard, temp=temp)
-            sym = self.game.getSymmetries(canonicalBoard, pi)
-            for b,p in sym:
-                trainExamples.append([b, self.curPlayer, p, None])
+            valids = self.game.getValidMoves(canonicalBoard, 1)
+            
+            # ideally these should be combined so that getSymmetries takes valids as well 
+            bs, ps = zip(*self.game.getSymmetries(canonicalBoard, pi))
+            _, valids_sym = zip(*self.game.getSymmetries(canonicalBoard, valids))
+            sym = zip(bs,ps,valids_sym)
+            
+            for b,p,valid in sym:
+                # previous was: [b, self.curPlayer, p, None], but only 3 values were returned
+                trainExamples.append([b, self.curPlayer, p, valid])
 
             action = np.random.choice(len(pi), p=pi)
             board, self.curPlayer = self.game.getNextState(board, self.curPlayer, action)
@@ -59,7 +66,7 @@ class Coach():
             r = self.game.getGameEnded(board, self.curPlayer)
 
             if r!=0:
-                return [(x[0],x[2],r*((-1)**(x[1]!=self.curPlayer))) for x in trainExamples]
+                return [(x[0],x[2],r*((-1)**(x[1]!=self.curPlayer)),x[3]) for x in trainExamples]
 
     def learn(self):
         """
