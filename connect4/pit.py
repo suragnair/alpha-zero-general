@@ -16,7 +16,8 @@ if __name__ == "__main__":
 
     game = Game()
     net = nn(game)
-    net.load_checkpoint('./pretrained_models/connect4/keras/', 'best.pth.tar')
+    # adapt path
+    net.load_checkpoint('./pretrained_models/connect4/keras/', '')
     args1 = dotdict({'numMCTSSims': 50, 'cpuct': 1.0})
     mcts1 = MCTS(game, net, args1)
     n1p = lambda x: np.argmax(mcts1.getActionProb(x, temp=0))
