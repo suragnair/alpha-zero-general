@@ -1,19 +1,18 @@
 import os
+import sys
 import time
 
 import chainer
 import chainer.functions as F
-from chainer import optimizers, cuda, serializers, training
-
 import numpy as np
-import sys
-
+from chainer import optimizers, cuda, serializers, training
 from chainer.dataset import concat_examples
 from chainer.iterators import SerialIterator
 from chainer.training import extensions
+from tqdm import tqdm
 
 sys.path.append('../../')
-from utils import dotdict
+from utils import *
 from NeuralNet import NeuralNet
 from .OthelloNNet import OthelloNNet as onnet
 
@@ -92,32 +91,24 @@ class NNetWrapper(NeuralNet):
         """
         examples: list of examples, each example is of form (board, pi, v)
         """
-        from pytorch_classification.utils import Bar, AverageMeter
         optimizer = optimizers.Adam(alpha=args.lr)
         optimizer.setup(self.nnet)
 
         for epoch in range(args.epochs):
-            print('EPOCH ::: ' + str(epoch+1))
+            print('EPOCH ::: ' + str(epoch + 1))
             # self.nnet.train()
-            data_time = AverageMeter()
-            batch_time = AverageMeter()
             pi_losses = AverageMeter()
             v_losses = AverageMeter()
-            end = time.time()
+            batch_count = int(len(examples) / args.batch_size)
 
-            bar = Bar('Training Net', max=int(len(examples)/args.batch_size))
-            batch_idx = 0
-
-            while batch_idx < int(len(examples)/args.batch_size):
+            t = tqdm(range(batch_count), desc='Training Net')
+            for _ in t:
                 sample_ids = np.random.randint(len(examples), size=args.batch_size)
                 boards, pis, vs = list(zip(*[examples[i] for i in sample_ids]))
                 xp = self.nnet.xp
                 boards = xp.array(boards, dtype=xp.float32)
                 target_pis = xp.array(pis, dtype=xp.float32)
                 target_vs = xp.array(vs, dtype=xp.float32)
-
-                # measure data loading time
-                data_time.update(time.time() - end)
 
                 # compute output
                 out_pi, out_v = self.nnet(boards)
@@ -130,31 +121,12 @@ class NNetWrapper(NeuralNet):
                 v_loss = l_v.data
                 pi_losses.update(cuda.to_cpu(pi_loss), boards.shape[0])
                 v_losses.update(cuda.to_cpu(v_loss), boards.shape[0])
+                t.set_postfix(Loss_pi=pi_losses, Loss_v=v_losses)
 
                 # compute gradient and do SGD step
                 self.nnet.cleargrads()
                 total_loss.backward()
                 optimizer.update()
-
-                # measure elapsed time
-                batch_time.update(time.time() - end)
-                end = time.time()
-                batch_idx += 1
-
-                # plot progress
-                bar.suffix = '({batch}/{size}) Data: {data:.3f}s | Batch: {bt:.3f}s | Total: {total:} | ETA: {eta:} ' \
-                             '| Loss_pi: {lpi:.4f} | Loss_v: {lv:.3f}'.format(
-                              batch=batch_idx,
-                              size=int(len(examples)/args.batch_size),
-                              data=data_time.avg,
-                              bt=batch_time.avg,
-                              total=bar.elapsed_td,
-                              eta=bar.eta_td,
-                              lpi=pi_losses.avg,
-                              lv=v_losses.avg,
-                              )
-                bar.next()
-            bar.finish()
 
     def predict(self, board):
         """
@@ -191,5 +163,5 @@ class NNetWrapper(NeuralNet):
     def load_checkpoint(self, folder='checkpoint', filename='checkpoint.pth.tar'):
         filepath = os.path.join(folder, filename)
         if not os.path.exists(filepath):
-            raise("No model in path {}".format(filepath))
+            raise ("No model in path {}".format(filepath))
         serializers.load_npz(filepath, self.nnet)
