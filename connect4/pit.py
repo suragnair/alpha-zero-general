@@ -12,12 +12,11 @@ from utils import dotdict
 
 
 if __name__ == "__main__":
-    human_vs_cpu = False
+    human_vs_cpu = True
 
     game = Game()
     net = nn(game)
-    # todo adapt
-    net.load_checkpoint('/home/nmo/Documents/alpha-zero-general/temp/', 'best.pth.tar')
+    net.load_checkpoint('./pretrained_models/connect4/keras/', 'best.pth.tar')
     args1 = dotdict({'numMCTSSims': 50, 'cpuct': 1.0})
     mcts1 = MCTS(game, net, args1)
     n1p = lambda x: np.argmax(mcts1.getActionProb(x, temp=0))
@@ -29,7 +28,7 @@ if __name__ == "__main__":
     else:
         n2 = nn(game)
         #todo adapt
-        n2.load_checkpoint('/home/nmo/Documents/alpha-zero-general/temp/', 'best.pth.tar')
+        n2.load_checkpoint('./pretrained_models/connect4/keras/', 'best.pth.tar')
         args2 = dotdict({'numMCTSSims': 50, 'cpuct': 1.0})
         mcts2 = MCTS(game, n2, args2)
         n2p = lambda x: np.argmax(mcts2.getActionProb(x, temp=0))
