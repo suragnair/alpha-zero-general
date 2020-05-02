@@ -28,6 +28,6 @@ if __name__ == "__main__":
         filename = '8x8_100checkpoints_best.pth.tar'
 
     player1 = create_first_player(g, path, filename, NNet)
-    player2 = create_second_player(g, hp, human_vs_cpu, NNet, path='./pretrained_models/othello/pytorch/',
-                                   filename='8x8_100checkpoints_best.pth.tar')
+    player2 = create_second_player(g, hp, human_vs_cpu, NNet, path=path,
+                                   filename=filename)
     play(g, player1, player2, OthelloGame.display, 2)
