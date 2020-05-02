@@ -27,7 +27,8 @@ if __name__ == "__main__":
     else:
         filename = '8x8_100checkpoints_best.pth.tar'
 
-    player1 = create_first_player(g, path, filename, NNet)
-    player2 = create_second_player(g, hp, human_vs_cpu, NNet, path=path,
+    mcts_args = dotdict({'numMCTSSims': 50, 'cpuct': 1.0})
+    player1 = create_first_player(g, path, filename, NNet, mcts_args)
+    player2 = create_second_player(g, hp, human_vs_cpu, NNet, mcts_args, path=path,
                                    filename=filename)
     play(g, player1, player2, OthelloGame.display, 2)

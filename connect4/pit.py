@@ -16,11 +16,12 @@ if __name__ == "__main__":
     human_vs_cpu = False
 
     game = Game()
+    mcts_args = dotdict({'numMCTSSims': 25, 'cpuct': 1.0})
     # adapt path
-    player1 = create_first_player(game, '', '', NNet)
+    player1 = create_first_player(game, '', '', NNet, mcts_args)
     # adapt path
     player2 = create_second_player(game, HumanConnect4Player(game).play, human_vs_cpu, NNet,
-                                   '', '')
+                                   mcts_args, '', '')
     play(game, player1, player2, Game.display, 2)
 
 
