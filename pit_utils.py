@@ -3,6 +3,10 @@ from MCTS import MCTS
 import numpy as np
 from utils import *
 
+"""
+Helper functions to create players and the game.
+"""
+
 def create_first_player(g, path, filename, nnet):
     n1 = nnet(g)
     n1.load_checkpoint(path, filename)
@@ -25,8 +29,3 @@ def create_second_player(g, hp, human_vs_cpu, nnet, path='', filename=''):
 def play(game, player1, player2, display, nr_games):
     arena = Arena.Arena(player1, player2, game, display=display)
     print(arena.playGames(nr_games, verbose=True))
-
-"""
-use this script to play any two agents against each other, or play manually with
-any agent.
-"""
