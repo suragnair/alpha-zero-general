@@ -7,10 +7,11 @@ class MCTS():
     This class handles the MCTS tree.
     """
 
-    def __init__(self, game, nnet, args):
+    def __init__(self, game, nnet, args, dirichlet_noise=False):
         self.game = game
         self.nnet = nnet
         self.args = args
+        self.dirichlet_noise = dirichlet_noise
         self.Qsa = {}       # stores Q values for s,a (as defined in the paper)
         self.Nsa = {}       # stores #times edge s,a was visited
         self.Ns = {}        # stores #times board s was visited
@@ -77,6 +78,8 @@ class MCTS():
         if s not in self.Ps:
             # leaf node
             self.Ps[s], v = self.nnet.predict(canonicalBoard)
+            if self.dirichlet_noise:
+                self.Ps[s] = (0.75 * self.Ps[s]) + (0.25 * np.random.dirichlet([self.args.dirichletAlpha] * len(self.Ps[s])))
             valids = self.game.getValidMoves(canonicalBoard, 1)
             self.Ps[s] = self.Ps[s]*valids      # masking invalid moves
             sum_Ps_s = np.sum(self.Ps[s])
