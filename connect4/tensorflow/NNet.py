@@ -5,7 +5,6 @@ import time
 import numpy as np
 from tqdm import tqdm
 
-sys.path.append('../../')
 from utils import *
 from NeuralNet import NeuralNet
 
