@@ -44,5 +44,3 @@ While the current code is fairly functional, we could benefit from the following
 * [Jernej Habjan](https://github.com/JernejHabjan) contributed RTS game.
 * [Adam Lawson](https://github.com/goshawk22) contributed rules and a trained model for 3D TicTacToe.
 
-Thanks to [pytorch-classification](https://github.com/bearpaw/pytorch-classification) and [progress](https://github.com/verigak/progress).
-
