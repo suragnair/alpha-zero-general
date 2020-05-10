@@ -30,8 +30,8 @@ class MCTS():
                    proportional to Nsa[(s,a)]**(1./temp)
         """
         for i in range(self.args.numMCTSSims):
-            if i == 0 and self.dirichlet_noise:
-                self.search(canonicalBoard, dirichlet_noise=True)
+            dir_noise = (i == 0 and self.dirichlet_noise)
+            self.search(canonicalBoard, dirichlet_noise=dir_noise)
 
         s = self.game.stringRepresentation(canonicalBoard)
         counts = [self.Nsa[(s,a)] if (s,a) in self.Nsa else 0 for a in range(self.game.getActionSize())]
