@@ -1,6 +1,4 @@
 import sys
-#sys.path = sys.path[1:] # remove current path otherwise "import tensorflow" does not work
-#sys.path.append('..')
 import tensorflow as tf
 from connect4.Connect4Game import Connect4Game as Game
 from connect4.tensorflow.NNet import NNetWrapper as NNet
@@ -9,11 +7,11 @@ import numpy as np
 from MCTS import MCTS
 from Arena import Arena
 from utils import dotdict
-from pit_utils import *
+from ArenaBuilder import *
 
 
-class Connect4PitFactory(PitBuilder):
-    def create(self):
+class Connect4ArenaBuilder(ArenaBuilder):
+    def create(self, human_vs_cpu=True):
         game = Game()
         mcts_args = dotdict({'numMCTSSims': 25, 'cpuct': 1.0})
         # adapt path

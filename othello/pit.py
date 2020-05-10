@@ -4,11 +4,11 @@ from othello.OthelloGame import OthelloGame
 from othello.OthelloPlayers import *
 from othello.pytorch.NNet import NNetWrapper as NNet
 
-from pit_utils import *
+from ArenaBuilder import *
 
 
-class OthelloPitFactory(PitBuilder):
-    def create(self):
+class OthelloArenaBuilder(ArenaBuilder):
+    def create(self, human_vs_cpu=True):
         mini_othello = False  # Play in 6x6 instead of the normal 8x8.
         human_vs_cpu = True
 

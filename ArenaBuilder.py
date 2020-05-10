@@ -4,8 +4,8 @@ import numpy as np
 from utils import *
 
 
-class PitBuilder:
-    def create(self):
+class ArenaBuilder:
+    def create(self, human_vs_cpu=True):
         '''
         Creates an arena object
         :return: Arena

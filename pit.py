@@ -1,6 +1,5 @@
-from othello.pit import OthelloPitFactory
-
+from othello.pit import OthelloArenaBuilder
 if __name__ == "__main__":
-    factory = OthelloPitFactory()
-    arena = factory.create()
+    factory = OthelloArenaBuilder()
+    arena = factory.create(True)
     factory.play(arena, 2)
