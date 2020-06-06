@@ -3,13 +3,13 @@ import logging
 import coloredlogs
 
 from Coach import Coach
-from othello.OthelloGame import OthelloGame as Game
-from othello.pytorch.NNet import NNetWrapper as nn
+from ultimatetictactoe.UltimateTicTacToeGame import UltimateTicTacToeGame as Game
+from ultimatetictactoe.keras.NNet import NNetWrapper as nn
 from utils import *
 
 log = logging.getLogger(__name__)
 
-coloredlogs.install(level='INFO')  # Change this to DEBUG to see more info.
+coloredlogs.install(level='DEBUG')  # Change this to DEBUG to see more info.
 
 args = dotdict({
     'numIters': 1000,
@@ -23,7 +23,7 @@ args = dotdict({
 
     'checkpoint': './temp/',
     'load_model': False,
-    'load_folder_file': ('/dev/models/8x100x50','best.pth.tar'),
+    'load_folder_file': ('./temp/', 'best.pth.tar'),
     'numItersForTrainExamplesHistory': 20,
 
 })
@@ -31,7 +31,7 @@ args = dotdict({
 
 def main():
     log.info('Loading %s...', Game.__name__)
-    g = Game(6)
+    g = Game()
 
     log.info('Loading %s...', nn.__name__)
     nnet = nn(g)
