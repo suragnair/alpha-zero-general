@@ -10,6 +10,8 @@ Board data:
 Squares are stored and manipulated as (x,y) tuples.
 x is the column, y is the row.
 '''
+# wins = None
+
 class Board():
 
     # list of all 8 winning combinations
@@ -25,18 +27,36 @@ class Board():
     ]
 
     def __init__(self):
+        global wins
         "Set up initial board configuration."
         # Create the empty board array.
         self.pieces = [[0]*9 for _ in range(11)]
+        # if wins is None:
+        #     wins = [2] * 3**9
+        #     for i in range(3**9):
+        #         j = i
+        #         b = [0]*9
+        #         for k in range(9):
+        #             b[k] = j % 3
+        #             j = int(j / 3)
+        #             if j == 0:
+        #                 wins[i] = 0
+        #                 break
+        #         for (ax, ay), (bx, by), (cx, cy) in self.__wins:
+        #             for player in (1, 2):
+        #                 if b[3 * ay + ax] == player and b[3 * by + bx] == player and b[3 * cy + cx] == player:
+        #                     wins[i] = player*2 - 3
+
+
 
     # add [][] indexer syntax to the Board
     def __getitem__(self, i):
         (x, y) = i
-        return self.pieces[x][y]
+        return self.pieces[y][x]
 
     def __setitem__(self, i, val):
         (x, y) = i
-        self.pieces[x][y] = val
+        self.pieces[y][x] = val
 
     def wins(self):
         return self.pieces[9]
@@ -67,6 +87,19 @@ class Board():
         return False
 
     def is_win(self):
+        # global wins
+        # i = 0
+        # for j in range(9):
+        #     i *= 3
+        #     i += {0: 0, -1: 1, 1: 2, 2:0}[self.wins()[j]]
+        # w = wins[i]
+        # if w != 0:
+        #     return w
+        # for i in range(9):
+        #     if self.wins()[i] == 0:
+        #         return 0
+        # return 2
+
         for (ax, ay), (bx, by), (cx, cy) in self.__wins:
             for player in (-1, 1):
                 if self.wins()[3*ay + ax] == player and self.wins()[3*by + bx] == player and self.wins()[3*cy + cx] == player:
@@ -84,6 +117,7 @@ class Board():
         self[x, y] = color
         s_x = int(x / 3)
         s_y = int(y / 3)
+
         for (ax, ay), (bx, by), (cx, cy) in self.__wins:
             if self[3*s_x + ax, 3*s_y + ay] == color and \
                     self[3*s_x + bx, 3*s_y + by] == color and \
@@ -98,6 +132,13 @@ class Board():
                     break
             if tied:
                 self.wins()[3*s_y + s_x] = 2
+        # i = 0
+        # for y in range(3):
+        #     for x in range(3):
+        #         i *= 3
+        #         i += {0: 0, -1: 1, 1: 2}[self[3*s_x + x, 3*s_y + y]]
+        # global wins
+        # self.wins()[3*s_y + s_x] = wins[i]
         c_x = x % 3
         c_y = y % 3
         for i in range(9):

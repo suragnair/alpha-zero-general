@@ -87,7 +87,7 @@ class UltimateTicTacToeGame(Game):
         next_board = np.reshape(board[10], (3, 3))
         l = []
 
-        for i in range(1, 4):
+        for i in range(1, 5):
             for j in [True, False]:
                 newB = np.rot90(piece_board, i)
                 newW = np.rot90(wins_board, i)
@@ -98,7 +98,8 @@ class UltimateTicTacToeGame(Game):
                     newW = np.fliplr(newW)
                     newN = np.fliplr(newN)
                     newPi = np.fliplr(newPi)
-                l += [(newB, list(newPi.ravel()) + [pi[-1]])]
+                B = np.append(newB, [newW.ravel(), newN.ravel()], axis=0)
+                l += [(B, list(newPi.ravel()) + [pi[-1]])]
         return l
 
     def stringRepresentation(self, board):
@@ -118,11 +119,26 @@ class UltimateTicTacToeGame(Game):
                 print(3*Y+y, "| ", end="")    # print the row #
                 for X in range(3):
                     for x in range(3):
-                        piece = board[3*Y+y][3*X+x]    # get the piece to print
-                        print(UltimateTicTacToeGame.square_content[piece], end=" ")
+                        piece = board[3*X+x, 3*Y+y]    # get the piece to print
+                        if piece in (-1, 1):
+                            print(UltimateTicTacToeGame.square_content[piece], end=" ")
+                        elif board[10][3*X + Y] == 0:
+                            print(".", end = " ")
+                        else:
+                            print(" ", end = " ")
                     if X < 2:
                         print(end="  ")
-                print("|")
+                print("|", end="")
+                if Y == 1:
+                    for x in range(3):
+                        piece = board[9][3*x + y]
+                        if piece in (-1, 1):
+                            print(UltimateTicTacToeGame.square_content[piece], end=" ")
+                        elif piece == 2:
+                            print("T", end=" ")
+                        else:
+                            print(" ", end=" ")
+                print()
             if Y < 2:
                 print("")
 
