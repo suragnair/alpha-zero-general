@@ -17,14 +17,14 @@ class HumanUltimateTicTacToePlayer():
     def __init__(self, game):
         self.game = game
 
-    def play(self, board, verbose=False):
+    def play(self, board, proc, verbose=False):
         # display(board)
         valid = self.game.getValidMoves(board, 1)
-        for i in range(len(valid)):
-            if valid[i]:
-                print("[", int(i/9), int(i%9), end="] ")
+        # for i in range(len(valid)):
+        #     if valid[i]:
+        #         print("[", int(i/9), int(i%9), end="] ")
         while True:
-            input_move = input()
+            input_move = proc.stdout.readline().decode()
             input_a = input_move.split(" ")
             if len(input_a) == 2:
                 try:

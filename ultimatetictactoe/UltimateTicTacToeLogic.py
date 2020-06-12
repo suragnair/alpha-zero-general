@@ -3,14 +3,15 @@ Author: Taylor P. Santos
 Date: May 28, 2020.
 Board class.
 Board data:
-  1=white, -1=black, 0=playable, 2=empty
+  1=white, -1=black, 0=empty
   first dim is column , 2nd is row:
+     first 9 columns are board state, 10th column is sub-grid wins, 11th column is playable grids
      pieces[1][7] is the square in column 2,
      at the opposite end of the board in row 8.
+
 Squares are stored and manipulated as (x,y) tuples.
 x is the column, y is the row.
 '''
-# wins = None
 
 class Board():
 
@@ -27,25 +28,9 @@ class Board():
     ]
 
     def __init__(self):
-        global wins
         "Set up initial board configuration."
         # Create the empty board array.
         self.pieces = [[0]*9 for _ in range(11)]
-        # if wins is None:
-        #     wins = [2] * 3**9
-        #     for i in range(3**9):
-        #         j = i
-        #         b = [0]*9
-        #         for k in range(9):
-        #             b[k] = j % 3
-        #             j = int(j / 3)
-        #             if j == 0:
-        #                 wins[i] = 0
-        #                 break
-        #         for (ax, ay), (bx, by), (cx, cy) in self.__wins:
-        #             for player in (1, 2):
-        #                 if b[3 * ay + ax] == player and b[3 * by + bx] == player and b[3 * cy + cx] == player:
-        #                     wins[i] = player*2 - 3
 
 
 
