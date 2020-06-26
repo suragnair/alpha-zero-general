@@ -1,7 +1,11 @@
+import sys
+
 import numpy as np
 
 from Game import Game
 from ultimate_tictactoe.UltimateTicTacToeLogic import Board
+
+sys.path.append('..')
 
 
 class UltimateTicTacToeGame(Game):
