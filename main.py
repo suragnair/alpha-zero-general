@@ -10,9 +10,8 @@ from utils import *
 g = UltimateTicTacToeGame()
 
 # all players
-rp = RandomPlayer(g).play
-gp = GreedyOthelloPlayer(g).play
-hp = HumanOthelloPlayer(g).play
+rp = RandomUltimateTictacToePlayer(g).play
+hp = HumanUltimateTicTacToePlayer(g).play
 
 
 # nnet players
