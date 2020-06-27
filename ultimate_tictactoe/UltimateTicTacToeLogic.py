@@ -7,14 +7,9 @@ class Board:
         self.n = n
         self.N = n ** 2
         self.last_move = None
-        self.pieces = [None] * self.N
-        self.win_status = [None] * self.n
+        self.pieces = np.zeros((self.N,self.N)).astype(int)
+        self.win_status = np.zeros((n,n)).astype(int)
 
-        for i in range(self.N):
-            self.pieces[i] = [0] * self.N
-
-        for i in range(self.n):
-            self.win_status[i] = [0] * self.n
 
     def copy(self, other):
         self.n = other.n
@@ -45,6 +40,11 @@ class Board:
                         if x_area != legal_coord[0] or y_area != legal_coord[1]:
                             legal_move = (x, y)
                             moves.add(legal_move)
+                    else:
+                        legal_move = (x, y)
+                        moves.add(legal_move)
+                        
+
 
         return list(moves)
 
@@ -130,7 +130,7 @@ class Board:
         count = 0
         for x, y in \
                 zip(range(area[0] * self.n, (area[0] + 1) * self.n), range(area[1] * self.n, (area[1] + 1) * self.n)):
-            if self.win_status[x][y] == player:
+            if self[x][y] == player:
                 count += 1
         if count == win:
             return True
@@ -138,7 +138,7 @@ class Board:
         count = 0
         for x, y in \
                 zip(range(area[0] * self.n, (area[0] + 1) * self.n), range(area[1] * self.n, (area[1] + 1) * self.n)):
-            if self.win_status[x][self.n - y - 1] == player:
+            if self[x][self.n - y - 1] == player:
                 count += 1
         if count == win:
             return True
@@ -158,8 +158,8 @@ class Board:
             self.win_status[area_x][area_y] = player
 
     def get_canonical_form(self, player):
-        self.pieces *= player
-        self.win_status *= player
+        self.pieces = player * self.pieces
+        self.win_status = player * self.win_status
 
     def rot90(self, i, copy=False):
         if copy:
