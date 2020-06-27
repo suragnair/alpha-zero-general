@@ -88,9 +88,8 @@ class UltimateTicTacToeGame(Game):
 
     def stringRepresentation(self, board):
         return board.tostring()
-    
-    @staticmethod
-    def display(board):
+
+    def display(self, board):
         n = board.n
         board_pieces=board.pieces  
         for row in range(len(board_pieces)):
