@@ -15,8 +15,8 @@ class Board:
         self.n = other.n
         self.N = other.N
         self.last_move = other.last_move
-        self.pieces = other.pieces
-        self.win_status = other.win_status
+        self.pieces = np.copy(other.pieces)
+        self.win_status = np.copy(other.win_status)
 
     def __getitem__(self, index):
         return self.pieces[index]
@@ -38,11 +38,13 @@ class Board:
                     x_area, y_area = self.get_area(x, y)
                     if legal_coord:
                         if x_area != legal_coord[0] or y_area != legal_coord[1]:
+                            if self[x][y] == 0:
+                                legal_move = (x, y)
+                                moves.add(legal_move)
+                    else:
+                        if self[x][y] == 0:
                             legal_move = (x, y)
                             moves.add(legal_move)
-                    else:
-                        legal_move = (x, y)
-                        moves.add(legal_move)
                         
 
 
@@ -55,7 +57,9 @@ class Board:
         return area_x, area_y
 
     def get_legal_area(self):
-        return self.get_area(self.last_move[0], self.last_move[1]) if self.last_move else None
+        if not self.last_move:
+            return None
+        return self.last_move[0] % self.n, self.last_move[1] % self.n
 
     def is_locked(self, x, y):
         return self.win_status[x][y] != 0

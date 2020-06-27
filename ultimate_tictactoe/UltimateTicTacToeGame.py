@@ -48,7 +48,7 @@ class UltimateTicTacToeGame(Game):
             return np.array(valid_move)
 
         for x, y in legal_moves:
-            valid_move[self.n * x + y] = 1
+            valid_move[self.N * x + y] = 1
 
         return np.array(valid_move)
 
@@ -81,7 +81,7 @@ class UltimateTicTacToeGame(Game):
                 new_b = board.rot90(i, copy=True)
                 new_pi = np.rot90(pi_board, i)
                 if j:
-                    new_b = board.fliplr(new_b, copy=True)
+                    new_b = board.fliplr(copy=True)
                     new_pi = np.fliplr(new_pi)
                 symmetry_list += [(new_b, list(new_pi.ravel()) + [pi[-1]])]
         return symmetry_list
