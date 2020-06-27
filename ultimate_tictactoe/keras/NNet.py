@@ -55,10 +55,10 @@ class NNetWrapper(NeuralNet):
         start = time.time()
 
         # preparing input
-        board = board[np.newaxis, :, :]
+        board_pieces = np.array(board.pieces).reshape((1,board.N,board.N))
 
         # run
-        pi, v = self.nnet.model.predict(board)
+        pi, v = self.nnet.model.predict(board_pieces)
 
         #print('PREDICTION TIME TAKEN : {0:03f}'.format(time.time()-start))
         return pi[0], v[0]
