@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class RandomPlayer():
+class RandomUltimateTictacToePlayer():
     def __init__(self, game):
         self.game = game
 
@@ -13,7 +13,7 @@ class RandomPlayer():
         return a
 
 
-class HumanTicTacToePlayer():
+class HumanUltimateTicTacToePlayer():
     def __init__(self, game):
         self.game = game
 

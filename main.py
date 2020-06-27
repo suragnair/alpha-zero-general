@@ -13,9 +13,8 @@ from MCTS import MCTS
 g = UltimateTicTacToeGame()
 
 # all players
-rp = RandomPlayer(g).play
-hp = HumanTicTacToePlayer(g).play
-
+rp = RandomUltimateTictacToePlayer(g).play
+hp = HumanUltimateTicTacToePlayer(g).play
 
 # nnet players
 n1 = nn(g)
