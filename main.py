@@ -1,12 +1,9 @@
-import logging
-import sys
+import os
 
-import coloredlogs
+os.environ["KERAS_BACKEND"] = "plaidml.keras.backend"
 
 from Coach import Coach
-from MCTS import MCTS
 from ultimate_tictactoe.UltimateTicTacToeGame import UltimateTicTacToeGame
-from ultimate_tictactoe.UltimateTicTacToePlayers import *
 from ultimate_tictactoe.keras.NNet import NNetWrapper as nn
 from utils import *
 
@@ -16,27 +13,27 @@ g = UltimateTicTacToeGame()
 
 print('Loading %s...', nn.__name__)
 nnet = nn(g)
-    #
+#
 
-    #  log.info('Loading the Coach...')
+#  log.info('Loading the Coach...')
 
 args = dotdict({
-    'numIters': 10,
+    'numIters': 15,
     'numEps': 100,  # Number of complete self-play games to simulate during a new iteration.
-    'tempThreshold': 15,  #
-    'updateThreshold': 0.6,
-        # During arena playoff, new neural net will be accepted if threshold or more of games are won.
-    'maxlenOfQueue': 200,  # Number of game examples to train the neural networks.
+    'tempThreshold': 15,
+    'updateThreshold': 0.6,  # During arena playoff, new neural net will be accepted if threshold or more of games
+    # are won.
+    'maxlenOfQueue': 2000,  # Number of game examples to train the neural networks.
     'numMCTSSims': 25,  # Number of games moves for MCTS to simulate.
-    'arenaCompare': 5,  # Number of games to play during arena play to determine if new net will be accepted.
+    'arenaCompare': 10,  # Number of games to play during arena play to determine if new net will be accepted.
     'cpuct': 1,
 
-    'checkpoint': './temp/',
+    'checkpoint': './temp_2/',
     'load_model': False,
-    'load_folder_file': ('/dev/models/8x100x50', 'best.h5'),
+    'load_folder_file': ('./temp/', 'checkpoint_5.h5'),
     'numItersForTrainExamplesHistory': 20,
 
-    })
+})
 
 if args.load_model:
     print('Loading checkpoint "%s/%s"...', args.load_folder_file)
@@ -52,4 +49,3 @@ if args.load_model:
 
 print('Starting the learning process 🎉')
 c.learn()
-

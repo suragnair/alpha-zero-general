@@ -89,18 +89,17 @@ class UltimateTicTacToeGame(Game):
     def stringRepresentation(self, board):
         return board.tostring()
 
-    def display(self, board):
-        n = board.n
-        board_pieces=board.pieces  
+    @staticmethod
+    def display(board):
+        value = {-1: "X", 1: 'O', 0: '.'}
+        board_pieces = board.pieces
         for row in range(len(board_pieces)):
             for item in range(len(board_pieces[0])):
-                if item!=len(board_pieces[0])-1:
-                    print(board_pieces[row][item], end=' ')
-                elif item==len(board_pieces[0])-1:
-                    print(board_pieces[row][item])
-                if item in [2,5]:
+                if item != len(board_pieces[0]) - 1:
+                    print(value[board_pieces[row][item]], end=' ')
+                elif item == len(board_pieces[0]) - 1:
+                    print(value[board_pieces[row][item]])
+                if item in [2, 5]:
                     print('|', end=' ')
-            if row in [2,5]:
+            if row in [2, 5]:
                 print('------+-------+------')
-
-        
