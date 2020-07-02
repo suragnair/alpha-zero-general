@@ -7,9 +7,8 @@ class Board:
         self.n = n
         self.N = n ** 2
         self.last_move = None
-        self.pieces = np.zeros((self.N,self.N)).astype(int)
-        self.win_status = np.zeros((n,n)).astype(int)
-
+        self.pieces = np.zeros((self.N, self.N)).astype(int)
+        self.win_status = np.zeros((n, n)).astype(int)
 
     def copy(self, other):
         self.n = other.n
@@ -26,7 +25,8 @@ class Board:
         moves = set()
         legal_coord = self.get_legal_area()
 
-        if legal_coord and not self.is_locked(legal_coord[0], legal_coord[1]):
+        if legal_coord and not (self.is_locked(legal_coord[0], legal_coord[1]) or
+                                self.is_full(legal_coord[0], legal_coord[1])):
             for x in range(legal_coord[0] * self.n, (legal_coord[0] + 1) * self.n):
                 for y in range(legal_coord[1] * self.n, (legal_coord[1] + 1) * self.n):
                     if self[x][y] == 0:
@@ -35,9 +35,9 @@ class Board:
         else:
             for x in range(self.N):
                 for y in range(self.N):
-                    x_area, y_area = self.get_area(x, y)
+                    area_coord = self.get_area(x, y)
                     if legal_coord:
-                        if x_area != legal_coord[0] or y_area != legal_coord[1]:
+                        if area_coord != legal_coord and not self.is_locked(area_coord[0], area_coord[1]):
                             if self[x][y] == 0:
                                 legal_move = (x, y)
                                 moves.add(legal_move)
@@ -45,8 +45,6 @@ class Board:
                         if self[x][y] == 0:
                             legal_move = (x, y)
                             moves.add(legal_move)
-                        
-
 
         return list(moves)
 
@@ -65,11 +63,7 @@ class Board:
         return self.win_status[x][y] != 0
 
     def has_legal_moves(self):
-        for y in range(self.n):
-            for x in range(self.n):
-                if self.win_status[x][y] == 0:
-                    return True
-        return False
+        return len(self.get_legal_moves()) != 0
 
     def is_win(self, player):
         win = self.n
@@ -142,7 +136,7 @@ class Board:
         count = 0
         for x, y in \
                 zip(range(area[0] * self.n, (area[0] + 1) * self.n), range(area[1] * self.n, (area[1] + 1) * self.n)):
-            if self[x][self.n - y - 1] == player:
+            if self[x][area[1] * self.n + (area[1] + 1) * self.n - y - 1] == player:
                 count += 1
         if count == win:
             return True
@@ -157,7 +151,7 @@ class Board:
         self[x][y] = player
         self.last_move = move
 
-        area_x, area_y = self.get_area(x,y)
+        area_x, area_y = self.get_area(x, y)
         if self.is_local_win((area_x, area_y), player):
             self.win_status[area_x][area_y] = player
 
@@ -198,3 +192,10 @@ class Board:
     def tostring(self):
         return np.array(self.pieces).tostring()
 
+    def is_full(self, x0, y0):
+        for y in range(y0 * self.n, (y0 + 1) * self.n):
+            for x in range(x0 * self.n, (x0 + 1) * self.n):
+                if not self[x][y]:
+                    return False
+
+        return True
