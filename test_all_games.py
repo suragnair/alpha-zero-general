@@ -44,7 +44,6 @@ from gobang.keras.NNet import NNetWrapper as GobangKerasNNet
 from gobang.tensorflow.NNet import NNetWrapper as GobangTensorflowNNet
 
 from ultimate_tictactoe.UltimateTicTacToeGame import UltimateTicTacToeGame
-from ultimate_tictactoe.UltimateTicTacToePlayers import *
 from ultimate_tictactoe.keras.NNet import NNetWrapper as UltimateTicTacToeKerasNNet
 
 import numpy as np
