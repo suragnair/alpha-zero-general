@@ -1,3 +1,0 @@
-{
-    "python.pythonPath": "~/anaconda/envs/${env.CONDA_DEFAULT_ENV}/bin/python"
-}
