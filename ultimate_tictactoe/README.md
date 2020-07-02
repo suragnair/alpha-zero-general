@@ -24,3 +24,18 @@ During a game, the board is represented by an object that has three attributes:
 ## Implementation
 
  Game, Logic and Players implementations ared based on TicTacToe implementation by Evgeny Tyurin. UltimateTicTacToeNNet is based on the Keras implementation of OthelloNNet by Shantanu Kumar.
+ 
+## Test Scripts
+
+To train a model for Ultimate Tic Tac Toe:
+````bash
+python ultimate_tic_tac_toe/utt_main.py
+````
+To test a model against a random player or a human player:
+````bash
+python ultimate_tic_tac_toe/utt_pit.py
+````
+
+## Experiments 
+
+We trained a Keras model for Ultimate TicTacToe (15 iterations, 100 episodes, 20 epochs per iteration and 25 MCTS simulations per turn) for about 50 hours on an AMD Radeon Pro 560 4GB with OpenCL and PlaidML.
