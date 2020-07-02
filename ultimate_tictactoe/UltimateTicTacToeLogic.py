@@ -136,7 +136,7 @@ class Board:
         count = 0
         for x, y in \
                 zip(range(area[0] * self.n, (area[0] + 1) * self.n), range(area[1] * self.n, (area[1] + 1) * self.n)):
-            if self[x][self.n - y - 1] == player:
+            if self[x][area[1] * self.n + (area[1] + 1) * self.n - y - 1] == player:
                 count += 1
         if count == win:
             return True
