@@ -99,7 +99,7 @@ class MCTS():
 
             self.Vs[s] = valids
             self.Ns[s] = 0
-            return -v
+            return self.game.getCanonicalForm(canonicalBoard, -1)
 
         valids = self.Vs[s]
         cur_best = -float('inf')
@@ -133,4 +133,4 @@ class MCTS():
             self.Nsa[(s, a)] = 1
 
         self.Ns[s] += 1
-        return -v
+        return self.game.getCanonicalForm(canonicalBoard, -1)
