@@ -28,7 +28,7 @@ def residual_block(x, filters, kernel_size=3):
     y = BatchNormalization()(y)
     out = Add()([x, y])
     out = relu(out)
-    
+
     return out
 
 def value_head(input):
@@ -40,7 +40,9 @@ def value_head(input):
     bn1 = BatchNormalization()(conv1)
     bn1_relu = relu(bn1)
 
-    dense1 = Dense(256)(bn1_relu)
+    flat = Flatten()(bn1_relu)
+
+    dense1 = Dense(256)(flat)
     dn_relu = relu(dense1)
 
     dense2 = Dense(256)(dn_relu)
@@ -54,8 +56,8 @@ def policy_head(input):
                 padding="same")(input)
     bn1 = BatchNormalization()(conv1)
     bn1_relu = relu(bn1)
-    
-    return bn1_relu
+    flat = Flatten()(bn1_relu)
+    return flat
 
 class Connect4NNet():
     def __init__(self, game, args):
@@ -77,8 +79,6 @@ class Connect4NNet():
 
         for i in range(self.args.num_residual_layers):
                 t = residual_block(t, filters=self.args.num_channels)
-
-        t = Flatten()(t)
 
         self.pi = Dense(self.action_size, activation='softmax', name='pi')(policy_head(t))
         self.v = Dense(1, activation='tanh', name='v')(value_head(t))
