@@ -1,5 +1,3 @@
-import sys
-sys.path.append('..')
 from othello.OthelloGame import OthelloGame
 from othello.OthelloPlayers import *
 from othello.pytorch.NNet import NNetWrapper as NNet
