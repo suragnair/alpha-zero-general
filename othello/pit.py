@@ -6,7 +6,8 @@ from ArenaBuilder import *
 
 
 class OthelloArenaBuilder(ArenaBuilder):
-    def create(self, human_vs_cpu=True):
+    def create(self, human_vs_cpu=True, verbose=True):
+        self.verbose = verbose
         mini_othello = False  # Play in 6x6 instead of the normal 8x8.
         human_vs_cpu = True
 

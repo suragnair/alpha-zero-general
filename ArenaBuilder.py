@@ -5,6 +5,10 @@ from utils import *
 
 
 class ArenaBuilder:
+    def __init__(self, verbose=True, nr_games=2):
+        self.verbose = verbose
+        self.nr_games = nr_games
+
     def create(self, human_vs_cpu=True):
         '''
         Creates an arena object
@@ -32,5 +36,5 @@ class ArenaBuilder:
     def set_arena(self, game, player1, player2, display):
         return Arena.Arena(player1, player2, game, display=display)
 
-    def play(self, arena, nr_games):
-        print(arena.playGames(nr_games, verbose=True))
+    def play(self, arena):
+        print(arena.playGames(self.nr_games, verbose=self.verbose))
