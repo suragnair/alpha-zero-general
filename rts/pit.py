@@ -9,7 +9,7 @@ rts/pit.py
 Compares 2 players against each other and outputs num wins p1/ num wins p2/ draws
 """
 
-class Connect4ArenaBuilder(ArenaBuilder):
+class RTSArenaBuilder(ArenaBuilder):
     def create(self, human_vs_cpu=True):
         CONFIG.set_runner('pit')  # set visibility as pit
         g = RTSGame()

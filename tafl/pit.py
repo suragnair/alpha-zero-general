@@ -14,7 +14,7 @@ from utils import *
 use this script to play any two agents against each other, or play manually with
 any agent.
 """
-class Connect4ArenaBuilder(ArenaBuilder):
+class TaflArenaBuilder(ArenaBuilder):
     def create(self, human_vs_cpu=True):
         g = TaflGame("Brandubh")
 
