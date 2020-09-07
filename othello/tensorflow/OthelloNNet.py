@@ -33,8 +33,7 @@ class OthelloNNet():
             h_conv4_flat = tf.reshape(h_conv4, [-1, args.num_channels*(self.board_x-4)*(self.board_y-4)])
             s_fc1 = Dropout(Relu(BatchNormalization(Dense(h_conv4_flat, 1024, use_bias=False), axis=1, training=self.isTraining)), rate=self.dropout) # batch_size x 1024
             s_fc2 = Dropout(Relu(BatchNormalization(Dense(s_fc1, 512, use_bias=False), axis=1, training=self.isTraining)), rate=self.dropout)         # batch_size x 512
-            self.pi = Dense(s_fc2, self.action_size)                                                        # batch_size x self.action_size
-            self.prob = tf.nn.softmax(self.pi)
+            self.pi = tf.nn.softmax(Dense(s_fc2, self.action_size))                                                     # batch_size x self.action_size
             self.v = Tanh(Dense(s_fc2, 1))                                                               # batch_size x 1
 
             self.calculate_loss()
