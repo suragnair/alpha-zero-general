@@ -82,6 +82,18 @@ class Connect4NNet():
 
         self.pi = Dense(self.action_size, activation='softmax', name='pi')(policy_head(t))
         self.v = Dense(1, activation='tanh', name='v')(value_head(t))
+	
+	self.calculate_loss()
 
         self.model = Model(inputs=self.input_boards, outputs=[self.pi, self.v])
-        self.model.compile(loss=['categorical_crossentropy','mean_squared_error'], optimizer=Adam(args.lr))
+        self.model.compile(loss=[self.loss_pi ,self.loss_v], optimizer=Adam(args.lr))
+
+    def calculate_loss(self):
+        self.target_pis = tf.placeholder(tf.float32, shape=[None, self.action_size])
+        self.target_vs = tf.placeholder(tf.float32, shape=[None])
+        self.loss_pi =  tf.losses.softmax_cross_entropy(self.target_pis, self.pi)
+        self.loss_v = tf.losses.mean_squared_error(self.target_vs, tf.reshape(self.v, shape=[-1,]))
+        self.total_loss = self.loss_pi + self.loss_v
+        update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+        with tf.control_dependencies(update_ops):
+            self.train_step = tf.train.AdamOptimizer(self.args.lr).minimize(self.total_loss)
