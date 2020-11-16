@@ -43,6 +43,9 @@ from gobang.GobangPlayers import *
 from gobang.keras.NNet import NNetWrapper as GobangKerasNNet
 from gobang.tensorflow.NNet import NNetWrapper as GobangTensorflowNNet
 
+from ultimate_tictactoe.UltimateTicTacToeGame import UltimateTicTacToeGame
+from ultimate_tictactoe.keras.NNet import NNetWrapper as UltimateTicTacToeKerasNNet
+
 import numpy as np
 from utils import *
 
@@ -79,6 +82,9 @@ class TestAllGames(unittest.TestCase):
 
     def test_gobang_tensorflow(self):
         self.execute_game_test(GobangGame(), GobangTensorflowNNet)
+
+    def test_ultimate_tic_tac_toe_keras(self):
+        self.execute_game_test(UltimateTicTacToeGame(), UltimateTicTacToeKerasNNet)
 
 
 if __name__ == '__main__':

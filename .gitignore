@@ -11,3 +11,5 @@ checkpoints/
 # For PyCharm users
 .idea/
 
+# For Visual Studio Code user
+.vscode/
