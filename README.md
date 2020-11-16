@@ -43,4 +43,5 @@ While the current code is fairly functional, we could benefit from the following
 * [MBoss](https://github.com/1424667164) contributed rules and a model for GoBang.
 * [Jernej Habjan](https://github.com/JernejHabjan) contributed RTS game.
 * [Adam Lawson](https://github.com/goshawk22) contributed rules and a trained model for 3D TicTacToe.
+* [Carlos Aguayo](https://github.com/carlos-aguayo) contributed rules and a trained model for Dots and Boxes along with a [JavaScript implementation](https://github.com/carlos-aguayo/carlos-aguayo.github.io/tree/master/alphazero).
 
