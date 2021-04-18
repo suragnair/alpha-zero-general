@@ -90,9 +90,9 @@ class Arena():
 
         for _ in tqdm(range(num), desc="Arena.playGames (2)"):
             gameResult = self.playGame(verbose=verbose)
-            if gameResult == -1:
+            if gameResult == 1:
                 oneWon += 1
-            elif gameResult == 1:
+            elif gameResult == -1:
                 twoWon += 1
             else:
                 draws += 1

@@ -68,7 +68,7 @@ class Game():
         Returns:
             r: 0 if game has not ended. 1 if player won, -1 if player lost,
                small non-zero value for draw.
-               
+
         """
         pass
 
@@ -111,3 +111,10 @@ class Game():
                          Required by MCTS for hashing.
         """
         pass
+
+    def toArray(self, board):
+        """
+        Returns:
+            a board representation suitable as the input to your neural network
+        """
+        return board
