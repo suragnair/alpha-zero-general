@@ -12,6 +12,7 @@
     - TicTacToe                             [Yes]
     - Connect4                  [Yes]
     - Gobang                    [Yes]       [Yes]
+    - Chess         [Yes]
 
 """
 
@@ -42,6 +43,10 @@ from gobang.GobangGame import GobangGame
 from gobang.GobangPlayers import *
 from gobang.keras.NNet import NNetWrapper as GobangKerasNNet
 from gobang.tensorflow.NNet import NNetWrapper as GobangTensorflowNNet
+
+from _chess.ChessGame import ChessGame
+from _chess.pytorch.NNet import NNetWrapper as ChessPytorchNNet
+
 
 import numpy as np
 from utils import *
@@ -80,6 +85,8 @@ class TestAllGames(unittest.TestCase):
     def test_gobang_tensorflow(self):
         self.execute_game_test(GobangGame(), GobangTensorflowNNet)
 
+    def test_chess_pytorch(self):
+        self.execute_game_test(ChessGame(), ChessPytorchNNet)
 
 if __name__ == '__main__':
     unittest.main()
