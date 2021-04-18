@@ -105,12 +105,11 @@ class NNetWrapper(NeuralNet):
             bar.finish()
 
 
-    def predict(self, boardAndValid):
+    def predict(self, board):
         """
         board: Chess.Board
         """
         # timing
-        board, valid = boardAndValid
         start = time.time()
 
         # preparing input
