@@ -36,7 +36,7 @@ THREEFOLD_REPETITION= 7
 
 class ChessGame(Game):
 
-    def __init__(self):
+    def __init__(self, n=8):
         pass
 
     def getInitBoard(self):
