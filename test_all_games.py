@@ -12,6 +12,7 @@
     - TicTacToe                             [Yes]
     - Connect4                  [Yes]
     - Gobang                    [Yes]       [Yes]
+    - Santorini                 [Yes]
 
 """
 
@@ -30,7 +31,7 @@ from tictactoe_3d.keras.NNet import NNetWrapper as TicTacToe3DKerasNNet
 
 from othello.OthelloGame import OthelloGame
 from othello.OthelloPlayers import *
-from othello.pytorch.NNet import NNetWrapper as OthelloPytorchNNet
+#from othello.pytorch.NNet import NNetWrapper as OthelloPytorchNNet
 from othello.tensorflow.NNet import NNetWrapper as OthelloTensorflowNNet
 from othello.keras.NNet import NNetWrapper as OthelloKerasNNet
 
@@ -43,6 +44,9 @@ from gobang.GobangPlayers import *
 from gobang.keras.NNet import NNetWrapper as GobangKerasNNet
 from gobang.tensorflow.NNet import NNetWrapper as GobangTensorflowNNet
 
+from santorini.SantoriniGame import SantoriniGame
+from santorini.SantoriniPlayers import *
+from santorini.tensorflow.NNet import NNetWrapper as SantoriniTensorflowNNet
 import numpy as np
 from utils import *
 
@@ -80,6 +84,8 @@ class TestAllGames(unittest.TestCase):
     def test_gobang_tensorflow(self):
         self.execute_game_test(GobangGame(), GobangTensorflowNNet)
 
+    def test_santorini_tensorflow(self):
+        self.execute_game_test(SantoriniGame(5), SantoriniTensorflowNNet)
 
 if __name__ == '__main__':
     unittest.main()
