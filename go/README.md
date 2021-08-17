@@ -38,7 +38,7 @@ python pit.py
 All models are in temp folder
 
 ### The temp folder
-We trained severfor 6x6 Go (~80 iterations, 100 episodes per iteration and 25 MCTS simulations per turn). This took about 3 days on an NVIDIA Tesla K80. The pretrained model (PyTorch) can be found in ```pretrained_models/go/pytorch/```. You can play a game against it using ```pit.py```. Below is the performance of the model against a random and a greedy baseline with the number of iterations.
+We trained severfor 5x5 Go (parameters and iterations see report).  There is also one 9x9 Go model at the date of Aug 16. At this point, the 9x9 model cannot win over advanced admature Go player, but it is keep making progress with 4 1080Ti GPU. You can play a game against it using ```pit.py```. 
 
 
 
