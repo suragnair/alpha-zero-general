@@ -5,7 +5,7 @@ the pit.py should be ready to use.
 Code need further cleaning up, and a lot of explaination of optimazation is omissed here. (coming soon)
 ### Contributions -- add-ons
 * Game logic files for Go
-* Pre-trained models for 5*5 Go and 9*9 Go. (9*9 is in process of training)
+* Trained models for 5*5 Go and 9*9 Go. (9*9 is in process of training)
 * An asynchronous version of the code- parallel processes for self-play, neural net training and model comparison. 
 
 ### Modifications
