@@ -16,18 +16,18 @@ Code need further cleaning up, and a lot of explaination of optimazation is omis
 
 3. Monte-Carlo search. 
 
-3.1
-For each moves, instead of limiting the max number of simulations to stop searching, we limit the max depth of the tree. 
+  3.1.
+  For each moves, instead of limiting the max number of simulations to stop searching, we limit the max depth of the tree. 
 
-When the tree is increasing in depth, its impact on the Q value keep decreasing, so its passibility to change the selected move of first level will also decrease. This modifications aim to diminish useless searches and increase amounts of searches for those faltering between two or three moves. When generating game examples, I think it make more sense to stop the search when it hit certain depth than make rigid number of search regardless it will make any difference or not.
+  When the tree is increasing in depth, its impact on the Q value keep decreasing, so its passibility to change the selected move of first level will also decrease. This modifications aim to diminish useless searches and increase amounts of searches for those faltering between two or three moves. When generating game examples, I think it make more sense to stop the search when it hit certain depth than make rigid number of search regardless it will make any difference or not.
 
-3.2
-Tree pruning by limiting the number of children. 
+  3.2
+  Tree pruning by limiting the number of children. 
 
-Original code assigned a nearly zero staring value for each uninitialized moves, and these nearly zero value will be compared with moves which already have Q values. As a result, when Q value approximate to 1, only one of two moves of highest policy value will be considered, as for 
-Q approximate to -1, all valid moves will be considered since 0 is larger than -1. That is, it has great chance to omit correct move when Q is large, it will waste computing power on useless searches when Q is small. 
+  Original code assigned a nearly zero staring value for each uninitialized moves, and these nearly zero value will be compared with moves which already have Q values. As a result, when Q value approximate to 1, only one of two moves of highest policy value will be considered, as for 
+  Q approximate to -1, all valid moves will be considered since 0 is larger than -1. That is, it has great chance to omit correct move when Q is large, it will waste computing power on useless searches when Q is small. 
 
-To prune the tree, we only use moves of top 5 policy, masking out all other moves. All of 5 moves will be initialized. In this way, we diminish Q value’s impact on decision making, provide a way to get more control in MTCL search.
+  To prune the tree, we only use moves of top 5 policy, masking out all other moves. All of 5 moves will be initialized. In this way, we diminish Q value’s impact on decision making, provide a way to get more control in MTCL search.
 
 4. Noise
 In training, noise are generated using a way similar to the kata-go paper: fluctuating the limit maximum depth of each moves.
