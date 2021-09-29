@@ -3,12 +3,12 @@ coloredlogs==14.0
 cython==0.28.3
 flask==1.0
 gitpython==2.1.11
-matplotlib==2.1.1
+matplotlib
 numpy==1.14.5
 pandas==0.23.1
-scipy==1.1.0
-scikit-learn==0.19.1
-scikit-image==0.14.0
+scipy
+scikit-learn
+scikit-image
 torchfile==0.1.0
 torchvision==0.2.1
 tqdm==4.19.5
