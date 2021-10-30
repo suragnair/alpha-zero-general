@@ -82,8 +82,8 @@ class Connect4NNet():
 
         self.pi = Dense(self.action_size, activation='softmax', name='pi')(policy_head(t))
         self.v = Dense(1, activation='tanh', name='v')(value_head(t))
-	
-	self.calculate_loss()
+
+        self.calculate_loss()
 
         self.model = Model(inputs=self.input_boards, outputs=[self.pi, self.v])
         self.model.compile(loss=[self.loss_pi ,self.loss_v], optimizer=Adam(args.lr))
