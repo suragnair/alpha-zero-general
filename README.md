@@ -27,6 +27,19 @@ We trained a PyTorch model for 6x6 Othello (~80 iterations, 100 episodes per ite
 
 A concise description of our algorithm can be found [here](https://github.com/suragnair/alpha-zero-general/raw/master/pretrained_models/writeup.pdf).
 
+### Citing
+
+If you found this work useful, feel free to cite it as
+
+```
+@misc{thakoor2016learning,
+  title={Learning to play othello without human knowledge},
+  author={Thakoor, Shantanu and Nair, Surag and Jhunjhunwala, Megha},
+  year={2016},
+  publisher={Stanford University, Final Project Report}
+}
+```
+
 ### Contributing
 While the current code is fairly functional, we could benefit from the following contributions:
 * Game logic files for more games that follow the specifications in ```Game.py```, along with their neural networks
