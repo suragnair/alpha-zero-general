@@ -69,10 +69,13 @@ class NNetWrapper(NeuralNet):
         board = board[np.newaxis, :, :]
 
         # run
-        pi, v = self.nnet.model.predict(board)
+        pi, v = self.nnet.model.predict(board, verbose=False)
         return pi[0], v[0]
 
     def save_checkpoint(self, folder='checkpoint', filename='checkpoint.pth.tar'):
+        # change extension
+        filename = filename.split(".")[0] + ".h5"
+        
         filepath = os.path.join(folder, filename)
         if not os.path.exists(folder):
             print("Checkpoint Directory does not exist! Making directory {}".format(folder))
@@ -82,5 +85,8 @@ class NNetWrapper(NeuralNet):
         self.nnet.model.save_weights(filepath)
 
     def load_checkpoint(self, folder='checkpoint', filename='checkpoint.pth.tar'):
+        # change extension
+        filename = filename.split(".")[0] + ".h5"
+        
         filepath = os.path.join(folder, filename)
         self.nnet.model.load_weights(filepath)
