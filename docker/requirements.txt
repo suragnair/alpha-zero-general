@@ -4,7 +4,7 @@ cython==0.28.3
 flask==1.0
 gitpython==2.1.11
 matplotlib
-numpy==1.14.5
+numpy==1.21.0
 pandas==0.23.1
 scipy
 scikit-learn
