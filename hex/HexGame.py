@@ -56,6 +56,7 @@ class HexGame(Game):
     def getCanonicalForm(self, positions, player):
         board = HexBoard(self.size)
         board.positions = np.copy(positions)
+        return board.positions
         return player * board.positions
 
     def getSymmetries(self, board, pi):
@@ -63,7 +64,7 @@ class HexGame(Game):
         return [(board, pi)]
 
     def stringRepresentation(self, positions):
-        return positions.tostring()
+        return hash(positions.tostring())
 
     def getScore(self, positions, player):
         return self.getGameEnded(positions, player)
