@@ -7,13 +7,23 @@ class HexBoard():
     def __getitem__(self, index): 
         return self.positions[index]
     
-    def getValidMoves(self):
+    def getValidMoves(self, recodeBlackAsWhite=False):
         moves = []
         for x in range(self.size):
             for y in range(self.size):
                 if self.positions[x][y] == 0:
                     moves.append((x, y))
         return moves
+        # if recodeBlackAsWhite:
+        #     return [self.recodeCoordinates(move) for move in moves]
+        # else:
+        #     return moves
+
+    def recodeCoordinates (self, coordinates):
+        """
+        Transforms a coordinate tuple (with respect to the board) analogously to the method recodeBlackAsWhite.
+        """
+        return (self.size-1-coordinates[1], self.size-1-coordinates[0])
 
     def hasValidMoves(self):
         remainingMoves = self.getValidMoves()

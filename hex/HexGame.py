@@ -32,7 +32,7 @@ class HexGame(Game):
         board.positions = np.copy(positions)
 
         valids = [0] * self.getActionSize()
-        validMoves = board.getValidMoves()
+        validMoves = board.getValidMoves(recodeBlackAsWhite=(player == -1))
         # if len(validMoves) == 0:
         #     valids[-1] = 1
         #     return np.array(valids)
@@ -57,11 +57,39 @@ class HexGame(Game):
         board = HexBoard(self.size)
         board.positions = np.copy(positions)
         return board.positions
-        return player * board.positions
+        # if player == 1:
+        #     return board.positions
+
+        # if player == -1:
+        #     """
+        #     Returns a board where black is recoded as white and wants to connect horizontally. This corresponds to flipping the board along the south-west to north-east diagonal and swapping colors.
+        #     """
+        #     flipped_board = self.getInitBoard()
+        #     #flipping and color change
+        #     for i in range(self.size):
+        #         for j in range(self.size):
+        #             if board[self.size-1-j][self.size-1-i] == 1:
+        #                 flipped_board[i][j] = -1
+        #             if board[self.size-1-j][self.size-1-i] == -1:
+        #                 flipped_board[i][j] = 1
+        #     return flipped_board
+
+        # return player * board.positions
 
     def getSymmetries(self, board, pi):
-        # mirror, rotational
         return [(board, pi)]
+        # mirror, rotational
+        # pi_board = np.reshape(pi[:], (self.size, self.size))
+        # l = []
+        # for i in range(1, 5):
+        #     for j in [True, False]:
+        #         newB = np.rot90(board, i)
+        #         newPi = np.rot90(pi_board, i)
+        #         if j:
+        #             newB = np.fliplr(newB)
+        #             newPi = np.fliplr(newPi)
+        #         l += [(newB, list(newPi.ravel()))]
+        # return l
 
     def stringRepresentation(self, positions):
         return hash(positions.tostring())
