@@ -48,6 +48,8 @@ While the current code is fairly functional, we could benefit from the following
 * An asynchronous version of the code- parallel processes for self-play, neural net training and model comparison. 
 * Asynchronous MCTS as described in the paper
 
+Some extensions have been implented [here](https://github.com/kevaday/alphazero-general).
+
 ### Contributors and Credits
 * [Shantanu Thakoor](https://github.com/ShantanuThakoor) and [Megha Jhunjhunwala](https://github.com/jjw-megha) helped with core design and implementation.
 * [Shantanu Kumar](https://github.com/SourKream) contributed TensorFlow and Keras models for Othello.
