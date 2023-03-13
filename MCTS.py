@@ -11,7 +11,7 @@ log = logging.getLogger(__name__)
 
 default_args = dotdict(
     {
-        "numMCTSSims": 25,  # Number of games moves for MCTS to simulate.
+        "numMCTSSims": 25,  # Number of moves for MCTS to simulate.
         "cpuct": 1.0,       # PUCT exploration constant
     }
 )
