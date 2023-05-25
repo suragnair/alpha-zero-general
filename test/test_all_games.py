@@ -29,8 +29,8 @@ from MCTS import MCTS
 # from connect4.keras.NNet import NNetWrapper as Connect4KerasNNet
 # from dotsandboxes.DotsAndBoxesGame import DotsAndBoxesGame
 # from dotsandboxes.keras.NNet import NNetWrapper as DotsAndBoxesKerasNNet
-# from gobang.GobangGame import GobangGame
-# from gobang.keras.NNet import NNetWrapper as GobangKerasNNet
+from gobang.GobangGame import GobangGame
+from gobang.keras.NNet import NNetWrapper as GobangKerasNNet
 from othello.OthelloGame import OthelloGame
 from othello.OthelloPlayers import RandomPlayer
 from othello.keras.NNet import NNetWrapper as OthelloKerasNNet
@@ -69,9 +69,9 @@ class TestAllGames:
     def test_tictactoe3d_keras(self):
         execute_game_test(TicTacToe3DGame(3), TicTacToe3DKerasNNet)
 
-    # def test_gobang_keras(self):
-    #     execute_game_test(GobangGame(), GobangKerasNNet)
-    #
+    def test_gobang_keras(self):
+        execute_game_test(GobangGame(), GobangKerasNNet)
+
     # def test_tafl_keras(self):
     #     execute_game_test(TaflGame(5), TaflKerasNNet)
     #

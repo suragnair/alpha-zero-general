@@ -1,13 +1,10 @@
-import sys
-sys.path.append('..')
-from utils import *
+from keras.layers import BatchNormalization
+from tensorflow.python.keras.layers import Dense, Activation, Conv2D, Dropout, Reshape, Flatten
+from tensorflow.python.keras.models import Input, Model
+from tensorflow.python.keras.optimizer_v2.adam import Adam
 
-import argparse
-from tensorflow.keras.models import *
-from tensorflow.keras.layers import *
-from tensorflow.keras.optimizers import *
 
-class GobangNNet():
+class GobangNNet:
     def __init__(self, game, args):
         # game params
         self.board_x, self.board_y = game.getBoardSize()
@@ -22,7 +19,7 @@ class GobangNNet():
         h_conv2 = Activation('relu')(BatchNormalization(axis=3)(Conv2D(args.num_channels, 3, padding='same')(h_conv1)))         # batch_size  x board_x x board_y x num_channels
         h_conv3 = Activation('relu')(BatchNormalization(axis=3)(Conv2D(args.num_channels, 3, padding='valid')(h_conv2)))        # batch_size  x (board_x-2) x (board_y-2) x num_channels
         h_conv4 = Activation('relu')(BatchNormalization(axis=3)(Conv2D(args.num_channels, 3, padding='valid')(h_conv3)))        # batch_size  x (board_x-4) x (board_y-4) x num_channels
-        h_conv4_flat = Flatten()(h_conv4)       
+        h_conv4_flat = Flatten()(h_conv4)
         s_fc1 = Dropout(args.dropout)(Activation('relu')(BatchNormalization(axis=1)(Dense(1024)(h_conv4_flat))))  # batch_size x 1024
         s_fc2 = Dropout(args.dropout)(Activation('relu')(BatchNormalization(axis=1)(Dense(512)(s_fc1))))          # batch_size x 1024
         self.pi = Dense(self.action_size, activation='softmax', name='pi')(s_fc2)   # batch_size x self.action_size
