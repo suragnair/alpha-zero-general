@@ -5,7 +5,7 @@ import numpy as np
 
 from NeuralNet import NeuralNet
 from othello.keras.OthelloNNet import OthelloNNet
-from utils import *
+from utils import dotdict
 
 args = dotdict({
     'lr': 0.001,

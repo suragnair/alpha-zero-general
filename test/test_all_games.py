@@ -21,7 +21,7 @@
     - DotsAndBoxes               [Yes]
 """
 
-import unittest
+import pytest
 
 import numpy as np
 
@@ -47,43 +47,41 @@ from tictactoe_3d.keras.NNet import NNetWrapper as TicTacToe3DKerasNNet
 from utils import dotdict
 
 
-class TestAllGames(unittest.TestCase):
+def execute_game_test(game, neural_net):
+    rp = RandomPlayer(game).play
 
-    @staticmethod
-    def execute_game_test(game, neural_net):
-        rp = RandomPlayer(game).play
+    args = dotdict({'numMCTSSims': 25, 'cpuct': 1.0})
+    mcts = MCTS(game, neural_net(game), args)
 
-        args = dotdict({'numMCTSSims': 25, 'cpuct': 1.0})
-        mcts = MCTS(game, neural_net(game), args)
-        n1p = lambda x: np.argmax(mcts.getActionProb(x, temp=0))
+    def n1p(x):
+        return np.argmax(mcts.getActionProb(x, temp=0))
 
-        arena = Arena.Arena(n1p, rp, game)
-        print(arena.playGames(2, verbose=False))
+    arena = Arena.Arena(n1p, rp, game)
+    print(arena.playGames(2, verbose=False))
+
+
+class TestAllGames:
 
     def test_othello_keras(self):
-        self.execute_game_test(OthelloGame(6), OthelloKerasNNet)
+        execute_game_test(OthelloGame(6), OthelloKerasNNet)
 
     def test_tictactoe_keras(self):
-        self.execute_game_test(TicTacToeGame(), TicTacToeKerasNNet)
+        execute_game_test(TicTacToeGame(), TicTacToeKerasNNet)
 
     def test_tictactoe3d_keras(self):
-        self.execute_game_test(TicTacToe3DGame(3), TicTacToe3DKerasNNet)
+        execute_game_test(TicTacToe3DGame(3), TicTacToe3DKerasNNet)
 
     def test_gobang_keras(self):
-        self.execute_game_test(GobangGame(), GobangKerasNNet)
+        execute_game_test(GobangGame(), GobangKerasNNet)
 
     def test_tafl_keras(self):
-        self.execute_game_test(TaflGame(5), TaflKerasNNet)
+        execute_game_test(TaflGame(5), TaflKerasNNet)
 
     def test_connect4_keras(self):
-        self.execute_game_test(Connect4Game(5), Connect4KerasNNet)
+        execute_game_test(Connect4Game(5), Connect4KerasNNet)
 
     def test_rts_keras(self):
-        self.execute_game_test(RTSGame(), RTSKerasNNet)
+        execute_game_test(RTSGame(), RTSKerasNNet)
 
     def test_dotsandboxes_keras(self):
-        self.execute_game_test(DotsAndBoxesGame(3), DotsAndBoxesKerasNNet)
-
-
-if __name__ == '__main__':
-    unittest.main()
+        execute_game_test(DotsAndBoxesGame(3), DotsAndBoxesKerasNNet)

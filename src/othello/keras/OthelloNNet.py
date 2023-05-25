@@ -1,11 +1,8 @@
-import sys
-sys.path.append('..')
-from utils import *
+from keras.layers import BatchNormalization
+from tensorflow.python.keras import Input, Model
+from tensorflow.python.keras.layers import Reshape, Activation, Conv2D, Dense, Flatten, Dropout
+from tensorflow.python.keras.optimizer_v2.adam import Adam
 
-import argparse
-from tensorflow.keras.models import *
-from tensorflow.keras.layers import *
-from tensorflow.keras.optimizers import *
 
 class OthelloNNet():
     def __init__(self, game, args):
