@@ -1,6 +1,6 @@
 from Coach import Coach
 from tafl.TaflGame import TaflGame as Game
-from tafl.pytorch.NNet import NNetWrapper as nn
+from tafl.keras.NNet import NNetWrapper as nn
 from utils import *
 
 args = dotdict({
@@ -15,12 +15,12 @@ args = dotdict({
 
     'checkpoint': './temp/',
     'load_model': False,
-    'load_folder_file': ('~/dev/models/8x100x50','best.pth.tar'),
+    'load_folder_file': ('~/dev/models/8x100x50', 'best.pth.tar'),
     'numItersForTrainExamplesHistory': 20,
 
 })
 
-if __name__=="__main__":
+if __name__ == "__main__":
     g = Game(6)
     nnet = nn(g)
 

@@ -36,8 +36,8 @@ from othello.OthelloPlayers import RandomPlayer
 from othello.keras.NNet import NNetWrapper as OthelloKerasNNet
 # from rts.RTSGame import RTSGame
 # from rts.keras.NNet import NNetWrapper as RTSKerasNNet
-# from tafl.TaflGame import TaflGame
-# from tafl.keras.NNet import NNetWrapper as TaflKerasNNet
+from tafl.TaflGame import TaflGame
+from tafl.keras.NNet import NNetWrapper as TaflKerasNNet
 from tictactoe.TicTacToeGame import TicTacToeGame
 from tictactoe.keras.NNet import NNetWrapper as TicTacToeKerasNNet
 from tictactoe_3d.TicTacToeGame import TicTacToeGame as TicTacToe3DGame
@@ -72,9 +72,9 @@ class TestAllGames:
     def test_gobang_keras(self):
         execute_game_test(GobangGame(), GobangKerasNNet)
 
-    # def test_tafl_keras(self):
-    #     execute_game_test(TaflGame(5), TaflKerasNNet)
-    #
+    def test_tafl_keras(self):
+        execute_game_test(TaflGame(5), TaflKerasNNet)
+
     # def test_connect4_keras(self):
     #     execute_game_test(Connect4Game(5), Connect4KerasNNet)
     #
