@@ -23,38 +23,28 @@
 
 import unittest
 
+import numpy as np
+
 import Arena
 from MCTS import MCTS
-
-from othello.OthelloGame import OthelloGame
-from othello.OthelloPlayers import RandomPlayer
-from othello.pytorch.NNet import NNetWrapper as OthelloPytorchNNet
-from othello.keras.NNet import NNetWrapper as OthelloKerasNNet
-
-from tictactoe.TicTacToeGame import TicTacToeGame
-from tictactoe.keras.NNet import NNetWrapper as TicTacToeKerasNNet
-
-from tictactoe_3d.TicTacToeGame import TicTacToeGame as TicTacToe3DGame
-from tictactoe_3d.keras.NNet import NNetWrapper as TicTacToe3DKerasNNet
-
 from connect4.Connect4Game import Connect4Game
 from connect4.keras.NNet import NNetWrapper as Connect4KerasNNet
-
-from gobang.GobangGame import GobangGame
-from gobang.keras.NNet import NNetWrapper as GobangKerasNNet
-
-from tafl.TaflGame import TaflGame
-from tafl.pytorch.NNet import NNetWrapper as TaflPytorchNNet
-from tafl.keras.NNet import NNetWrapper as TaflKerasNNet
-
-from rts.RTSGame import RTSGame
-from rts.keras.NNet import NNetWrapper as RTSKerasNNet
-
 from dotsandboxes.DotsAndBoxesGame import DotsAndBoxesGame
 from dotsandboxes.keras.NNet import NNetWrapper as DotsAndBoxesKerasNNet
-
-import numpy as np
-from utils import *
+from gobang.GobangGame import GobangGame
+from gobang.keras.NNet import NNetWrapper as GobangKerasNNet
+from othello.OthelloGame import OthelloGame
+from othello.OthelloPlayers import RandomPlayer
+from othello.keras.NNet import NNetWrapper as OthelloKerasNNet
+from rts.RTSGame import RTSGame
+from rts.keras.NNet import NNetWrapper as RTSKerasNNet
+from tafl.TaflGame import TaflGame
+from tafl.keras.NNet import NNetWrapper as TaflKerasNNet
+from tictactoe.TicTacToeGame import TicTacToeGame
+from tictactoe.keras.NNet import NNetWrapper as TicTacToeKerasNNet
+from tictactoe_3d.TicTacToeGame import TicTacToeGame as TicTacToe3DGame
+from tictactoe_3d.keras.NNet import NNetWrapper as TicTacToe3DKerasNNet
+from utils import dotdict
 
 
 class TestAllGames(unittest.TestCase):
@@ -70,9 +60,6 @@ class TestAllGames(unittest.TestCase):
         arena = Arena.Arena(n1p, rp, game)
         print(arena.playGames(2, verbose=False))
 
-    def test_othello_pytorch(self):
-        self.execute_game_test(OthelloGame(6), OthelloPytorchNNet)
-
     def test_othello_keras(self):
         self.execute_game_test(OthelloGame(6), OthelloKerasNNet)
 
@@ -84,9 +71,6 @@ class TestAllGames(unittest.TestCase):
 
     def test_gobang_keras(self):
         self.execute_game_test(GobangGame(), GobangKerasNNet)
-
-    def test_tafl_pytorch(self):
-        self.execute_game_test(TaflGame(5), TaflPytorchNNet)
 
     def test_tafl_keras(self):
         self.execute_game_test(TaflGame(5), TaflKerasNNet)
