@@ -40,8 +40,8 @@ from othello.keras.NNet import NNetWrapper as OthelloKerasNNet
 # from tafl.keras.NNet import NNetWrapper as TaflKerasNNet
 from tictactoe.TicTacToeGame import TicTacToeGame
 from tictactoe.keras.NNet import NNetWrapper as TicTacToeKerasNNet
-# from tictactoe_3d.TicTacToeGame import TicTacToeGame as TicTacToe3DGame
-# from tictactoe_3d.keras.NNet import NNetWrapper as TicTacToe3DKerasNNet
+from tictactoe_3d.TicTacToeGame import TicTacToeGame as TicTacToe3DGame
+from tictactoe_3d.keras.NNet import NNetWrapper as TicTacToe3DKerasNNet
 from utils import dotdict
 
 
@@ -66,9 +66,9 @@ class TestAllGames:
     def test_tictactoe_keras(self):
         execute_game_test(TicTacToeGame(), TicTacToeKerasNNet)
 
-    # def test_tictactoe3d_keras(self):
-    #     execute_game_test(TicTacToe3DGame(3), TicTacToe3DKerasNNet)
-    #
+    def test_tictactoe3d_keras(self):
+        execute_game_test(TicTacToe3DGame(3), TicTacToe3DKerasNNet)
+
     # def test_gobang_keras(self):
     #     execute_game_test(GobangGame(), GobangKerasNNet)
     #
