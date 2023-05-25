@@ -1,10 +1,8 @@
 import os
-import sys
 from typing import List, Tuple
 
 import numpy as np
 
-sys.path.append('../../..')
 from rts.src.encoders import OneHotEncoder, NumericEncoder
 from utils import dotdict
 
@@ -75,10 +73,16 @@ d_type_rev = dotdict({
 # Dictionary for actions and which actor can execute them
 d_acts = dotdict({
     1: [],  # Gold
-    2: ['up', 'down', 'left', 'right', 'mine_resources', 'return_resources', 'barracks_up', 'barracks_down', 'barracks_right', 'barracks_left', 'town_hall_up', 'town_hall_down', 'town_hall_right', 'town_hall_left', 'idle', 'heal_up', 'heal_down', 'heal_right', 'heal_left'],  # Work
-    3: ['rifle_infantry_up', 'rifle_infantry_down', 'rifle_infantry_right', 'rifle_infantry_left', 'idle', 'heal_up', 'heal_down', 'heal_right', 'heal_left'],  # Barr
-    4: ['up', 'down', 'left', 'right', 'attack_up', 'attack_down', 'attack_right', 'attack_left', 'idle', 'heal_up', 'heal_down', 'heal_right', 'heal_left'],  # Rifl
-    5: ['npc_up', 'npc_down', 'npc_right', 'npc_left', 'idle', 'heal_up', 'heal_down', 'heal_right', 'heal_left'],  # Hall
+    2: ['up', 'down', 'left', 'right', 'mine_resources', 'return_resources', 'barracks_up',
+        'barracks_down', 'barracks_right', 'barracks_left', 'town_hall_up', 'town_hall_down',
+        'town_hall_right', 'town_hall_left', 'idle', 'heal_up', 'heal_down', 'heal_right',
+        'heal_left'],  # Work
+    3: ['rifle_infantry_up', 'rifle_infantry_down', 'rifle_infantry_right', 'rifle_infantry_left',
+        'idle', 'heal_up', 'heal_down', 'heal_right', 'heal_left'],  # Barr
+    4: ['up', 'down', 'left', 'right', 'attack_up', 'attack_down', 'attack_right', 'attack_left',
+        'idle', 'heal_up', 'heal_down', 'heal_right', 'heal_left'],  # Rifl
+    5: ['npc_up', 'npc_down', 'npc_right', 'npc_left', 'idle', 'heal_up', 'heal_down', 'heal_right',
+        'heal_left'],  # Hall
 })
 
 # Reverse dictionary for actions
@@ -330,14 +334,16 @@ class Configuration:
             # how much initial gold do players get at game begining
             self.INITIAL_GOLD = initial_gold
 
-            # Maximum gold that players can have - It is limited to 8 bits for one-hot onehot_encoder
+            # Maximum gold that players can have - It is limited to 8 bits for one-hot
+            # onehot_encoder
             self.MAX_GOLD = maximum_gold
 
             # ##################################
             # ############# HEAL ###############
             # ##################################
 
-            # Game mechanic where actors can damage themselves to heal friendly unit. This is only used when player doesn't have any money to pay for heal action
+            # Game mechanic where actors can damage themselves to heal friendly unit. This is
+            # only used when player doesn't have any money to pay for heal action
             self.SACRIFICIAL_HEAL = sacrificial_heal
 
             # How much friendly unit is healed when executing heal action
@@ -353,7 +359,9 @@ class Configuration:
             # this gets used by kill function that determines the end point
             self.MAX_TIME = max_time
 
-            # If timeout should be used. This causes game to finish after TIMEOUT number of actions. If timeout isnt used, Kill function is used, which is reducing number of hitpoints of units
+            # If timeout should be used. This causes game to finish after TIMEOUT number of
+            # actions. If timeout isnt used, Kill function is used, which is reducing number of
+            # hitpoints of units
             self.USE_TIMEOUT = use_timeout
 
             # Check if timeout is being used. Alternatively Kill function is used
@@ -361,7 +369,8 @@ class Configuration:
                 # how many turns until game end - this gets reduced when each turn is executed
                 self.TIMEOUT = timeout
             else:
-                # sets initial tick to 0 and then in getGameEnded it gets incremented unitl number 8191
+                # sets initial tick to 0 and then in getGameEnded it gets incremented unitl
+                # number 8191
                 self.TIMEOUT = 0
             # ##################################
             # ########## ATTACKING #############
@@ -369,7 +378,8 @@ class Configuration:
 
             # how much damage is dealt to attacked actor
             self.DAMAGE = damage
-            # when attacking, all enemy units are destroyed, resulting in victory for the attacking player
+            # when attacking, all enemy units are destroyed, resulting in victory for the
+            # attacking player
             if destroy_all:
                 self.DAMAGE = 10000
 
@@ -433,7 +443,13 @@ class Configuration:
         def create_players(self,
                            game):
 
-            return self._create_player(game, self.player1_type, self.player1_config, self.player1_onehot_encoder, self.player1_model_file), self._create_player(game, self.player1_type, self.player1_config, self.player2_onehot_encoder, self.player2_model_file)
+            return self._create_player(game, self.player1_type, self.player1_config,
+                                       self.player1_onehot_encoder,
+                                       self.player1_model_file), self._create_player(game,
+                                                                                     self.player1_type,
+                                                                                     self.player1_config,
+                                                                                     self.player2_onehot_encoder,
+                                                                                     self.player2_model_file)
 
         def _create_player(self,
                            game,
@@ -447,7 +463,8 @@ class Configuration:
                 if player_config is None:
                     print("Invalid pit configuration. Returning")
                     exit(1)
-                return self._PitNNetPlayer(game, player_config, onehot_encoder, player_model_file).play
+                return self._PitNNetPlayer(game, player_config, onehot_encoder,
+                                           player_model_file).play
             if player_type == 'random':
                 return RandomPlayer(game).play
             if player_type == 'greedy':
@@ -492,19 +509,27 @@ class Configuration:
                      num_iters_for_train_examples_history,
                      save_train_examples,
                      load_train_examples):
-            self.numIters = num_iters  # total number of games played from start to finish is numIters * numEps
+            self.numIters = num_iters  # total number of games played from start to finish is
+            # numIters * numEps
             self.numEps = num_eps  # How may game is played in this episode
             self.tempThreshold = temp_threshold
-            self.updateThreshold = update_threshold  # Percentage that new model has to surpass by win rate to replace old model
+            self.updateThreshold = update_threshold  # Percentage that new model has to surpass
+            # by win rate to replace old model
             self.maxlenOfQueue = maxlen_of_queue
-            self.numMCTSSims = num_mcts_sims  # How many MCTS tree searches are performing (mind that this MCTS doesnt use simulations)
-            self.arenaCompare = arena_compare  # How many comparisons are made between old and new model
+            self.numMCTSSims = num_mcts_sims  # How many MCTS tree searches are performing (mind
+            # that this MCTS doesnt use simulations)
+            self.arenaCompare = arena_compare  # How many comparisons are made between old and
+            # new model
             self.cpuct = cpuct  # search parameter for MCTS
 
             self.checkpoint = checkpoint
-            self.load_model = load_model  # Load training examples from file - WARNING - this is disabled in RTSPlayers.py because of memory errors received when loading data from file
+            self.load_model = load_model  # Load training examples from file - WARNING - this is
+            # disabled in RTSPlayers.py because of memory errors received when loading data from
+            # file
             self.load_folder_file = load_folder_file
-            self.numItersForTrainExamplesHistory = num_iters_for_train_examples_history  # maximum number of 'iterations' that game episodes are kept in queue. After that last is popped and new one is added.
+            self.numItersForTrainExamplesHistory = num_iters_for_train_examples_history  #
+            # maximum number of 'iterations' that game episodes are kept in queue. After that
+            # last is popped and new one is added.
 
             self.save_train_examples = save_train_examples
             self.load_train_examples = load_train_examples
@@ -593,21 +618,30 @@ class Configuration:
                  initial_board_config: List[BoardTile] = None):
         """
         :param grid_size: Grid size of game for example 8,6...
-        :param learn_visibility: How much console should output while running learn. If visibility.verbose > 3, Pygame is shown
-        :param pit_visibility: How much console should output while running pit. If visibility.verbose > 3, Pygame is shown
+        :param learn_visibility: How much console should output while running learn. If
+        visibility.verbose > 3, Pygame is shown
+        :param pit_visibility: How much console should output while running pit. If
+        visibility.verbose > 3, Pygame is shown
 
         :param onehot_encoder_player1: Which encoder should this player use while pitting
-        :param money_increment_player1: How much money player should gain when worker returns gold coins
+        :param money_increment_player1: How much money player should gain when worker returns
+        gold coins
         :param initial_gold_player1: How much initial gold should player have
         :param maximum_gold_player1: Maximum gold for player (max allowed value is 255)
-        :param sacrificial_heal_player1: If actors can sacrifice their health to heal other actors if player doesn't have enough gold
+        :param sacrificial_heal_player1: If actors can sacrifice their health to heal other
+        actors if player doesn't have enough gold
         :param heal_amount_player1: how much should action 'heal' heal other actor
-        :param heal_cost_player1: how much should action 'heal' cost gold coins. If sacrificial_heal is enabled, this is the amount that actors health will be reduced if player doesn't have enough gold
-        :param use_timeout_player1: If timeout function should be used. If false, 'kill function' will be used
+        :param heal_cost_player1: how much should action 'heal' cost gold coins. If
+        sacrificial_heal is enabled, this is the amount that actors health will be reduced if
+        player doesn't have enough gold
+        :param use_timeout_player1: If timeout function should be used. If false, 'kill function'
+        will be used
         :param max_time_player1: Maximum amount of time after which game ends and score is evaluated
         :param damage_player1: How much damage is inflicted upon action 'attack' on other actor
-        :param destroy_all_player1: If by executing action 'attack', all opponents actors are destroyed
-        :param a_max_health_player1: dictionary of maximum amount of healths for each actor. See its default values to override
+        :param destroy_all_player1: If by executing action 'attack', all opponents actors are
+        destroyed
+        :param a_max_health_player1: dictionary of maximum amount of healths for each actor. See
+        its default values to override
             ``
             Example: {
                 1: 10,  # Gold
@@ -617,7 +651,8 @@ class Configuration:
                 5: 30,  # Hall
             }
             ``
-        :param a_cost_player1: dictionary of costs for each actor. See its default values to override
+        :param a_cost_player1: dictionary of costs for each actor. See its default values to
+        override
             ``
             Example: {
                 1: 0,  # Gold
@@ -627,7 +662,8 @@ class Configuration:
                 5: 7,  # Hall
             }
             ``
-        :param acts_enabled_player1: dictionary of which actions are enabled for player. See its default values to override.
+        :param acts_enabled_player1: dictionary of which actions are enabled for player. See its
+        default values to override.
             ``
             Example: {
                 "idle": False,
@@ -650,17 +686,24 @@ class Configuration:
         :param player1_model_file: Filename in temp folder that player 1 nnet player uses
 
         :param onehot_encoder_player2: Which encoder should this player use while pitting
-        :param money_increment_player2: How much money player should gain when worker returns gold coins
+        :param money_increment_player2: How much money player should gain when worker returns
+        gold coins
         :param initial_gold_player2: How much initial gold should player have
         :param maximum_gold_player2: Maximum gold for player (max allowed value is 255)
-        :param sacrificial_heal_player2: If actors can sacrifice their health to heal other actors if player doesn't have enough gold
+        :param sacrificial_heal_player2: If actors can sacrifice their health to heal other
+        actors if player doesn't have enough gold
         :param heal_amount_player2: how much should action 'heal' heal other actor
-        :param heal_cost_player2: how much should action 'heal' cost gold coins. If sacrificial_heal is enabled, this is the amount that actors health will be reduced if player doesn't have enough gold
-        :param use_timeout_player2: If timeout function should be used. If false, 'kill function' will be used
+        :param heal_cost_player2: how much should action 'heal' cost gold coins. If
+        sacrificial_heal is enabled, this is the amount that actors health will be reduced if
+        player doesn't have enough gold
+        :param use_timeout_player2: If timeout function should be used. If false, 'kill function'
+        will be used
         :param max_time_player2: Maximum amount of time after which game ends and score is evaluated
         :param damage_player2: How much damage is inflicted upon action 'attack' on other actor
-        :param destroy_all_player2: If by executing action 'attack', all opponents actors are destroyed
-        :param a_max_health_player2: dictionary of maximum amout of healths for each actor. See its default values to override
+        :param destroy_all_player2: If by executing action 'attack', all opponents actors are
+        destroyed
+        :param a_max_health_player2: dictionary of maximum amout of healths for each actor. See
+        its default values to override
             ``
             Example: {
                 1: 10,  # Gold
@@ -670,7 +713,8 @@ class Configuration:
                 5: 30,  # Hall
             }
             ``
-        :param a_cost_player2: dictionary of costs for each actor. See its default values to override
+        :param a_cost_player2: dictionary of costs for each actor. See its default values to
+        override
             ``
             Example: {
                 1: 0,  # Gold
@@ -680,7 +724,8 @@ class Configuration:
                 5: 7,  # Hall
             }
             ``
-        :param acts_enabled_player2: dictionary of which actions are enabled for player. See its default values to override
+        :param acts_enabled_player2: dictionary of which actions are enabled for player. See its
+        default values to override
             ``
             Example: {
                 "idle": False,
@@ -705,34 +750,45 @@ class Configuration:
 
         :param num_iters: How many iterations of games it should be played
         :param num_eps: How many episodes in each game iteration it should be played
-        :param temp_threshold: Used by coach. "It uses a temp=1 if episodeStep < tempThreshold, and thereafter uses temp=0."
+        :param temp_threshold: Used by coach. "It uses a temp=1 if episodeStep < tempThreshold,
+        and thereafter uses temp=0."
         :param update_threshold: Percentage of how much wins should newer model have to be accepted
         :param maxlen_of_queue: How many train examples can be stored in each iteration
         :param num_mcts_sims: How many MCTS sims are executed in each game episode while learning
-        :param arena_compare: How many comparations of newer and older model should be made before evaluating which is better
+        :param arena_compare: How many comparations of newer and older model should be made
+        before evaluating which is better
         :param cpuct: Exploration parameter for MCTS
         :param checkpoint: folder where checkpoints should be saved while learning
         :param load_model: If model is loaded from checkpoint on learning start
         :param load_folder_file: tuple(folder, file) where model is loaded from
-        :param num_iters_for_train_examples_history: How many iterations of train examples should be kept for learning. If this number is exceeded, oldest iteration of train exaples is removed from queue
-        :param save_train_examples: If train examples should be saved to file (Caution if choosing this, because of memory error)
-        :param load_train_examples: If train examples should be loaded from file (Caution if choosing this, because of memory error)
+        :param num_iters_for_train_examples_history: How many iterations of train examples should
+        be kept for learning. If this number is exceeded, oldest iteration of train exaples is
+        removed from queue
+        :param save_train_examples: If train examples should be saved to file (Caution if
+        choosing this, because of memory error)
+        :param load_train_examples: If train examples should be loaded from file (Caution if
+        choosing this, because of memory error)
 
         :param player1_type: What type should player 1 be ("nnet", "random", "greedy", "human")
         :param player2_type: What type should player 2 be ("nnet", "random", "greedy", "human")
-        :param player1_config: If "nnet" player is chosen, config can be provided {'numMCTSSims': 2, 'cpuct': 1.0}
-        :param player2_config: If "nnet" player is chosen, config can be provided {'numMCTSSims': 2, 'cpuct': 1.0}
+        :param player1_config: If "nnet" player is chosen, config can be provided {'numMCTSSims':
+        2, 'cpuct': 1.0}
+        :param player2_config: If "nnet" player is chosen, config can be provided {'numMCTSSims':
+        2, 'cpuct': 1.0}
         :param num_games: How many games should be played for pit config
 
-        :param use_one_hot_encoder: If oneHot encoder should be used for both players while learning. (While pitting see configs encoder_player1, onehot_encoder_player2)
+        :param use_one_hot_encoder: If oneHot encoder should be used for both players while
+        learning. (While pitting see configs encoder_player1, onehot_encoder_player2)
         :param lr: Learning rate of model
         :param dropout: Dropout in NNet Model config
         :param epochs: How many epochs should learning take
         :param batch_size: How big batches of learning examples there should be while learning
-        :param cuda: Whether to use cuda if tensorflow gpu is installed and GPU supports cuda operations
+        :param cuda: Whether to use cuda if tensorflow gpu is installed and GPU supports cuda
+        operations
         :param num_channels: Number of channels in NNet Model config
 
-        :param initial_board_config: Configuration of initial non-empty tiles for actors. See its default values to override.
+        :param initial_board_config: Configuration of initial non-empty tiles for actors. See its
+        default values to override.
             ``Example: initial_board_config=[
                 Configuration.BoardTile(1,4,4,'Gold'),
                 Configuration.BoardTile(-1,4,5,'Gold'),
@@ -741,7 +797,8 @@ class Configuration:
             ``
         """
 
-        # output for game stats during playing games (game_episode, game iteration, player name, action executed, action_name, action_direction, player_score...
+        # output for game stats during playing games (game_episode, game iteration, player name,
+        # action executed, action_name, action_direction, player_score...
         self.config_file_pit = ".\\..\\temp\\config_pit.csv"
         self.config_file_learn = ".\\..\\temp\\config_learn.csv"
 
@@ -832,10 +889,14 @@ class Configuration:
                     'y': board_tile.y,
                     'player': board_tile.player,
                     'a_type': d_a_type[board_tile.a_type],
-                    'health': self.player1_config.a_max_health[d_a_type[board_tile.a_type]] if board_tile.player == 1 else self.player2_config.a_max_health[d_a_type[board_tile.a_type]],
+                    'health': self.player1_config.a_max_health[
+                        d_a_type[board_tile.a_type]] if board_tile.player == 1 else
+                    self.player2_config.a_max_health[d_a_type[board_tile.a_type]],
                     'carry': 0,
-                    'gold': self.player1_config.INITIAL_GOLD if board_tile.player == 1 else self.player2_config.INITIAL_GOLD,
-                    'timeout': self.player1_config.TIMEOUT if board_tile.player == 1 else self.player2_config.TIMEOUT
+                    'gold': self.player1_config.INITIAL_GOLD if board_tile.player == 1 else
+                    self.player2_config.INITIAL_GOLD,
+                    'timeout': self.player1_config.TIMEOUT if board_tile.player == 1 else
+                    self.player2_config.TIMEOUT
                 }))
         else:
             self.initial_board_config = initial_board_config or [

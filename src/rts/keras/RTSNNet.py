@@ -1,11 +1,15 @@
+"""
+RTSNNet
+
+Defined NNet model used for game TD2020
+"""
 import os
-import sys
 
-from tensorflow.keras import Input, Model
-from tensorflow.keras.layers import Conv2D, BatchNormalization, Activation, Dense, Dropout, Flatten, Reshape
-from tensorflow.keras.optimizers import Adam
+from keras.layers import BatchNormalization
+from tensorflow.python.keras import Input, Model
+from tensorflow.python.keras.layers import Conv2D, Activation, Dense, Dropout, Flatten, Reshape
+from tensorflow.python.keras.optimizer_v2.adam import Adam
 
-sys.path.append('../../..')
 from rts.src.config import USE_TF_CPU, SHOW_TENSORFLOW_GPU
 
 if USE_TF_CPU:
@@ -13,12 +17,6 @@ if USE_TF_CPU:
     os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 if not SHOW_TENSORFLOW_GPU:
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-
-"""
-RTSNNet
-
-Defined NNet model used for game TD2020
-"""
 
 
 class RTSNNet:

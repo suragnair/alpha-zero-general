@@ -1,12 +1,3 @@
-import os
-import sys
-
-import numpy as np
-
-sys.path.append('../../..')
-from NeuralNet import NeuralNet
-from rts.keras.RTSNNet import RTSNNet
-from rts.src.config import VERBOSE_MODEL_FIT
 
 """
 NNet.py
@@ -15,9 +6,16 @@ NNet wrapper uses defined nnet model to train and predict
 
 funny error message from tf :) - tensorflow.python.framework.errors_impl.NotFoundError: No algorithm worked!
 """
+import os
+
+import numpy as np
+
+from NeuralNet import NeuralNet
+from rts.keras.RTSNNet import RTSNNet
+from rts.src.config import VERBOSE_MODEL_FIT
+from rts.src.config_class import CONFIG
 
 
-# noinspection PyMissingConstructor
 class NNetWrapper(NeuralNet):
     def __init__(self, game, encoder=None):
         """
@@ -25,8 +23,7 @@ class NNetWrapper(NeuralNet):
         :param game: game configuration
         :param encoder: encoded that will be used for training and later predictions
         """
-        from rts.src.config_class import CONFIG
-
+        super().__init__(game)
         # default
         encoder = encoder or CONFIG.nnet_args.encoder
 

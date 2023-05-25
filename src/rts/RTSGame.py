@@ -1,25 +1,18 @@
-import sys
+"""
+RTSGame.pyefined rules for RTS game TD2020
+Includes:
+- init - contains board configuration
+- getGameEnded - contains end game checking
+"""
 from typing import Tuple
 
 import numpy as np
 
-from rts.src.config_class import CONFIG
-
-sys.path.append('../..')
 from rts.src.Board import Board
 from rts.src.config import NUM_ENCODERS, NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, TIME_IDX, FPS
-
-""" USE_TIMEOUT, MAX_TIME, d_a_type, a_max_health, INITIAL_GOLD, TIMEOUT, visibility"""
-
-"""
-RTSGame.pyefined rules for RTS game TD2020
-Includes: 
-- init - contains board configuration
-- getGameEnded - contains end game checking
-"""
+from rts.src.config_class import CONFIG
 
 
-# noinspection PyPep8Naming,PyMethodMayBeStatic
 class RTSGame:
 
     def __init__(self) -> None:
@@ -29,14 +22,17 @@ class RTSGame:
 
     def setInitBoard(self, board_config) -> None:
         """
-        Sets initial_board_config. This function can be used dynamically to change board configuration. It is currently being used by rts_ue4.py, to set board configuration from ue4 game state
+        Sets initial_board_config. This function can be used dynamically to change board
+        configuration. It is currently being used by rts_ue4.py, to set board configuration from
+        ue4 game state
         :param board_config: new initial board configuration
         """
         self.initial_board_config = board_config
 
     def getInitBoard(self) -> np.ndarray:
         """
-        :return: Returns new board from initial_board_config. That config can be dynamically changed as game progresses.
+        :return: Returns new board from initial_board_config. That config can be dynamically
+        changed as game progresses.
         """
         b = Board(self.n)
         remaining_time = None  # when setting initial board, remaining time might be different
@@ -56,7 +52,8 @@ class RTSGame:
 
     def getNextState(self, board: np.ndarray, player: int, action: int) -> Tuple[np.ndarray, int]:
         """
-        Gets next state for board. It also updates tick for board as game tick iterations are transfered within board as 6. parameter
+        Gets next state for board. It also updates tick for board as game tick iterations are
+        transfered within board as 6. parameter
         :param board: current board
         :param player: player executing action
         :param action: action to apply to new board
@@ -99,7 +96,8 @@ class RTSGame:
 
         for y in range(self.n):
             for x in range(self.n):
-                if b[x][y][P_NAME_IDX] == player and b[x][y][A_TYPE_IDX] != 1:  # for this player and not Gold
+                if b[x][y][P_NAME_IDX] == player and b[x][y][
+                    A_TYPE_IDX] != 1:  # for this player and not Gold
                     valids.extend(b.get_moves_for_square(x, y, config=config))
                 else:
                     valids.extend([0] * NUM_ACTS)
@@ -111,12 +109,20 @@ class RTSGame:
     def getGameEnded(self, board: np.ndarray, player) -> float:
         """
         Ok, this function is where it gets complicated...
-        See, its  hard to decide when to finish rts game, as players might not have enough time to execute wanted actions, but in the other hand, if players are left to play for too long, games become very long, or even 'infinitely' long
-        Few different approaches have been used - one is with killer_function that is starting to gradually reduce health of players as the game progresses, so players that produce more units could live longer or players that attack enemy actors, could pull themselves in winning position, as enemy now has less health
-        And the other is using timeout. Timeout just cuts game and evaluates winner using one of 3 elo functions. We've found this one to be more useful, as it can be applied in 3d rts games easier and more sensibly.
+        See, its  hard to decide when to finish rts game, as players might not have enough time
+        to execute wanted actions, but in the other hand, if players are left to play for too
+        long, games become very long, or even 'infinitely' long
+        Few different approaches have been used - one is with killer_function that is starting to
+        gradually reduce health of players as the game progresses, so players that produce more
+        units could live longer or players that attack enemy actors, could pull themselves in
+        winning position, as enemy now has less health
+        And the other is using timeout. Timeout just cuts game and evaluates winner using one of
+        3 elo functions. We've found this one to be more useful, as it can be applied in 3d rts
+        games easier and more sensibly.
         :param board: current game state
         :param player: current player
-        :return: real number on interval [-1,1] - return 0 if not ended, 1 if player 1 won, -1 if player 1 lost, 0.001 if tie
+        :return: real number on interval [-1,1] - return 0 if not ended, 1 if player 1 won,
+        -1 if player 1 lost, 0.001 if tie
         """
 
         n = board.shape[0]
@@ -161,7 +167,8 @@ class RTSGame:
         if sum_p2 < 2:  # SUM IS 1 WHEN PLAYER ONLY HAS MINERALS LEFT
             return +1
 
-        # detect no valid actions - possible tie by overpopulating on non-attacking units and buildings - all fields are full or one player is surrounded:
+        # detect no valid actions - possible tie by overpopulating on non-attacking units and
+        # buildings - all fields are full or one player is surrounded:
         if sum(self.getValidMoves(board, 1)) == 0:
             return -1
 

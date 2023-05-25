@@ -1,15 +1,15 @@
-from typing import List
-
-import numpy as np
-
 """
 encoders.py
 
 Defines 'numeric' and one-hot encoder
 
 Numeric encoder uses integers to encode game state (also negative numbers for player names)
-One-hot encoder uses binary representation of integer numbers, with exception of player name, which is processed separately
+One-hot encoder uses binary representation of integer numbers, with exception of player name,
+which is processed separately
 """
+from typing import List
+
+import numpy as np
 
 
 class Encoder:
@@ -57,8 +57,10 @@ class OneHotEncoder(Encoder):
 
     def _build_indexes(self):
         """
-        Defines encoding indexes - you may change them as you would like, but do not reduce them below their actual encoders.
-        For example - if health is represented using 5 bits, don't set max_health_amount of actor to >2^5 - 1
+        Defines encoding indexes - you may change them as you would like, but do not reduce them
+        below their actual encoders.
+        For example - if health is represented using 5 bits, don't set max_health_amount of actor
+        to >2^5 - 1
         """
         self.P_NAME_IDX_INC_OH = 2  # playerName 2 bit - 00(neutral), 01(1) or 10(-1),
         self.A_TYPE_IDX_INC_OH = 3  # actor type -> 3 bit,
@@ -67,7 +69,9 @@ class OneHotEncoder(Encoder):
         self.MONEY_IDX_INC_OH = 8  # money-> 8 bits (255) [every unit has the same for player]
         self.REMAIN_IDX_INC_OH = 11  # 2^11 2048(za total annihilation)
 
-        # builds indexes for character encoding - if not using one hot encoding, max indexes are incremented by 1 from previous index, but for one hot encoding, its incremented by num bits
+        # builds indexes for character encoding - if not using one hot encoding, max indexes are
+        # incremented by 1 from previous index, but for one hot encoding, its incremented by num
+        # bits
         self.P_NAME_IDX_OH = 0
         self.P_NAME_IDX_MAX_OH = self.P_NAME_IDX_INC_OH
 
@@ -131,7 +135,8 @@ class OneHotEncoder(Encoder):
         :param board: normal board
         :return: new encoded board
         """
-        from rts.src.config import P_NAME_IDX, A_TYPE_IDX, HEALTH_IDX, CARRY_IDX, MONEY_IDX, TIME_IDX
+        from rts.src.config import P_NAME_IDX, A_TYPE_IDX, HEALTH_IDX, CARRY_IDX, MONEY_IDX, \
+            TIME_IDX
 
         n = board.shape[0]
 
@@ -145,10 +150,16 @@ class OneHotEncoder(Encoder):
                 elif board[x, y, P_NAME_IDX] == -1:
                     player = 2
 
-                b[x, y][self.P_NAME_IDX_OH:self.P_NAME_IDX_MAX_OH] = self.itb(player, self.P_NAME_IDX_INC_OH)
-                b[x, y][self.A_TYPE_IDX_OH:self.A_TYPE_IDX_MAX_OH] = self.itb(board[x, y, A_TYPE_IDX], self.A_TYPE_IDX_INC_OH)
-                b[x, y][self.HEALTH_IDX_OH:self.HEALTH_IDX_MAX_OH] = self.itb(board[x, y, HEALTH_IDX], self.HEALTH_IDX_INC_OH)
-                b[x, y][self.CARRY_IDX_OH:self.CARRY_IDX_MAX_OH] = self.itb(board[x, y, CARRY_IDX], self.CARRY_IDX_INC_OH)
-                b[x, y][self.MONEY_IDX_OH:self.MONEY_IDX_MAX_OH] = self.itb(board[x, y, MONEY_IDX], self.MONEY_IDX_INC_OH)
-                b[x, y][self.REMAIN_IDX_OH:self.REMAIN_IDX_MAX_OH] = self.itb(board[x, y, TIME_IDX], self.REMAIN_IDX_INC_OH)
+                b[x, y][self.P_NAME_IDX_OH:self.P_NAME_IDX_MAX_OH] = self.itb(player,
+                                                                              self.P_NAME_IDX_INC_OH)
+                b[x, y][self.A_TYPE_IDX_OH:self.A_TYPE_IDX_MAX_OH] = self.itb(
+                    board[x, y, A_TYPE_IDX], self.A_TYPE_IDX_INC_OH)
+                b[x, y][self.HEALTH_IDX_OH:self.HEALTH_IDX_MAX_OH] = self.itb(
+                    board[x, y, HEALTH_IDX], self.HEALTH_IDX_INC_OH)
+                b[x, y][self.CARRY_IDX_OH:self.CARRY_IDX_MAX_OH] = self.itb(board[x, y, CARRY_IDX],
+                                                                            self.CARRY_IDX_INC_OH)
+                b[x, y][self.MONEY_IDX_OH:self.MONEY_IDX_MAX_OH] = self.itb(board[x, y, MONEY_IDX],
+                                                                            self.MONEY_IDX_INC_OH)
+                b[x, y][self.REMAIN_IDX_OH:self.REMAIN_IDX_MAX_OH] = self.itb(board[x, y, TIME_IDX],
+                                                                              self.REMAIN_IDX_INC_OH)
         return b
