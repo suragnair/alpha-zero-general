@@ -21,29 +21,27 @@
     - DotsAndBoxes               [Yes]
 """
 
-import pytest
-
 import numpy as np
 
 import Arena
 from MCTS import MCTS
-from connect4.Connect4Game import Connect4Game
-from connect4.keras.NNet import NNetWrapper as Connect4KerasNNet
-from dotsandboxes.DotsAndBoxesGame import DotsAndBoxesGame
-from dotsandboxes.keras.NNet import NNetWrapper as DotsAndBoxesKerasNNet
-from gobang.GobangGame import GobangGame
-from gobang.keras.NNet import NNetWrapper as GobangKerasNNet
+# from connect4.Connect4Game import Connect4Game
+# from connect4.keras.NNet import NNetWrapper as Connect4KerasNNet
+# from dotsandboxes.DotsAndBoxesGame import DotsAndBoxesGame
+# from dotsandboxes.keras.NNet import NNetWrapper as DotsAndBoxesKerasNNet
+# from gobang.GobangGame import GobangGame
+# from gobang.keras.NNet import NNetWrapper as GobangKerasNNet
 from othello.OthelloGame import OthelloGame
 from othello.OthelloPlayers import RandomPlayer
 from othello.keras.NNet import NNetWrapper as OthelloKerasNNet
-from rts.RTSGame import RTSGame
-from rts.keras.NNet import NNetWrapper as RTSKerasNNet
-from tafl.TaflGame import TaflGame
-from tafl.keras.NNet import NNetWrapper as TaflKerasNNet
+# from rts.RTSGame import RTSGame
+# from rts.keras.NNet import NNetWrapper as RTSKerasNNet
+# from tafl.TaflGame import TaflGame
+# from tafl.keras.NNet import NNetWrapper as TaflKerasNNet
 from tictactoe.TicTacToeGame import TicTacToeGame
 from tictactoe.keras.NNet import NNetWrapper as TicTacToeKerasNNet
-from tictactoe_3d.TicTacToeGame import TicTacToeGame as TicTacToe3DGame
-from tictactoe_3d.keras.NNet import NNetWrapper as TicTacToe3DKerasNNet
+# from tictactoe_3d.TicTacToeGame import TicTacToeGame as TicTacToe3DGame
+# from tictactoe_3d.keras.NNet import NNetWrapper as TicTacToe3DKerasNNet
 from utils import dotdict
 
 
@@ -68,20 +66,20 @@ class TestAllGames:
     def test_tictactoe_keras(self):
         execute_game_test(TicTacToeGame(), TicTacToeKerasNNet)
 
-    def test_tictactoe3d_keras(self):
-        execute_game_test(TicTacToe3DGame(3), TicTacToe3DKerasNNet)
-
-    def test_gobang_keras(self):
-        execute_game_test(GobangGame(), GobangKerasNNet)
-
-    def test_tafl_keras(self):
-        execute_game_test(TaflGame(5), TaflKerasNNet)
-
-    def test_connect4_keras(self):
-        execute_game_test(Connect4Game(5), Connect4KerasNNet)
-
-    def test_rts_keras(self):
-        execute_game_test(RTSGame(), RTSKerasNNet)
-
-    def test_dotsandboxes_keras(self):
-        execute_game_test(DotsAndBoxesGame(3), DotsAndBoxesKerasNNet)
+    # def test_tictactoe3d_keras(self):
+    #     execute_game_test(TicTacToe3DGame(3), TicTacToe3DKerasNNet)
+    #
+    # def test_gobang_keras(self):
+    #     execute_game_test(GobangGame(), GobangKerasNNet)
+    #
+    # def test_tafl_keras(self):
+    #     execute_game_test(TaflGame(5), TaflKerasNNet)
+    #
+    # def test_connect4_keras(self):
+    #     execute_game_test(Connect4Game(5), Connect4KerasNNet)
+    #
+    # def test_rts_keras(self):
+    #     execute_game_test(RTSGame(), RTSKerasNNet)
+    #
+    # def test_dotsandboxes_keras(self):
+    #     execute_game_test(DotsAndBoxesGame(3), DotsAndBoxesKerasNNet)

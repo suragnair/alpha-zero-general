@@ -1,12 +1,3 @@
-import sys
-sys.path.append('..')
-from utils import *
-
-import argparse
-from tensorflow.keras.models import *
-from tensorflow.keras.layers import *
-from tensorflow.keras.optimizers import *
-
 """
 NeuralNet for the game of TicTacToe.
 
@@ -15,7 +6,13 @@ Date: Jan 5, 2018.
 
 Based on the OthelloNNet by SourKream and Surag Nair.
 """
-class TicTacToeNNet():
+from keras.layers import BatchNormalization
+from tensorflow.python.keras import Input, Model
+from tensorflow.python.keras.layers import Reshape, Activation, Flatten, Dropout, Dense, Conv2D
+from tensorflow.python.keras.optimizer_v2.adam import Adam
+
+
+class TicTacToeNNet:
     def __init__(self, game, args):
         # game params
         self.board_x, self.board_y = game.getBoardSize()
