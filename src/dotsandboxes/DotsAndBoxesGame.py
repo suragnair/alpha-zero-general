@@ -1,13 +1,12 @@
-import sys
 import numpy as np
 
-sys.path.append('../..')
 from Game import Game
-from .DotsAndBoxesLogic import Board
+from dotsandboxes.DotsAndBoxesLogic import Board
 
 
 class DotsAndBoxesGame(Game):
     def __init__(self, n=3):
+        super().__init__()
         self.n = n
 
     def getInitBoard(self):

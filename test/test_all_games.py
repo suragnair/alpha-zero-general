@@ -27,8 +27,8 @@ import Arena
 from MCTS import MCTS
 # from connect4.Connect4Game import Connect4Game
 # from connect4.keras.NNet import NNetWrapper as Connect4KerasNNet
-# from dotsandboxes.DotsAndBoxesGame import DotsAndBoxesGame
-# from dotsandboxes.keras.NNet import NNetWrapper as DotsAndBoxesKerasNNet
+from dotsandboxes.DotsAndBoxesGame import DotsAndBoxesGame
+from dotsandboxes.keras.NNet import NNetWrapper as DotsAndBoxesKerasNNet
 from gobang.GobangGame import GobangGame
 from gobang.keras.NNet import NNetWrapper as GobangKerasNNet
 from othello.OthelloGame import OthelloGame
@@ -80,6 +80,6 @@ class TestAllGames:
     #
     # def test_rts_keras(self):
     #     execute_game_test(RTSGame(), RTSKerasNNet)
-    #
-    # def test_dotsandboxes_keras(self):
-    #     execute_game_test(DotsAndBoxesGame(3), DotsAndBoxesKerasNNet)
+
+    def test_dotsandboxes_keras(self):
+        execute_game_test(DotsAndBoxesGame(3), DotsAndBoxesKerasNNet)

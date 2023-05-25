@@ -1,11 +1,10 @@
-import numpy as np
-import sys
 import os
-sys.path.append('..')
-from utils import dotdict
-from NeuralNet import NeuralNet
 
-from .DotsAndBoxesNNet import DotsAndBoxesNNet as onnet
+import numpy as np
+
+from NeuralNet import NeuralNet
+from dotsandboxes.keras.DotsAndBoxesNNet import DotsAndBoxesNNet as onnet
+from utils import dotdict
 
 args = dotdict({
     'lr': 0.001,
@@ -22,13 +21,14 @@ def normalize_score(board):
     p2_score = board[:, 1, -1]
     score = p1_score - p2_score
 
-    n = board.shape[-1]-1
+    n = board.shape[-1] - 1
 
     max_score = n ** 2
     min_score = -max_score
 
     min_normalized, max_normalized = 0, 1
-    normalized_score = ((score - max_score) / (min_score - max_score)) * (min_normalized - max_normalized) + max_normalized
+    normalized_score = ((score - max_score) / (min_score - max_score)) * (
+                min_normalized - max_normalized) + max_normalized
 
     board[:, 0, -1] = normalized_score
     board[:, 1, -1] = 0
@@ -36,6 +36,7 @@ def normalize_score(board):
 
 class NNetWrapper(NeuralNet):
     def __init__(self, game):
+        super().__init__(game)
         self.nnet = onnet(game, args)
         self.board_x, self.board_y = game.getBoardSize()
         self.action_size = game.getActionSize()
@@ -51,7 +52,8 @@ class NNetWrapper(NeuralNet):
 
         target_pis = np.asarray(target_pis)
         target_vs = np.asarray(target_vs)
-        self.nnet.model.fit(x=input_boards, y=[target_pis, target_vs], batch_size=args.batch_size, epochs=args.epochs)
+        self.nnet.model.fit(x=input_boards, y=[target_pis, target_vs], batch_size=args.batch_size,
+                            epochs=args.epochs)
 
     def predict(self, board):
         """
@@ -69,7 +71,7 @@ class NNetWrapper(NeuralNet):
     def save_checkpoint(self, folder='checkpoint', filename='checkpoint.pth.tar'):
         # change extension
         filename = filename.split(".")[0] + ".h5"
-        
+
         filepath = os.path.join(folder, filename)
         if not os.path.exists(folder):
             print("Checkpoint Directory does not exist! Making directory {}".format(folder))
@@ -81,6 +83,6 @@ class NNetWrapper(NeuralNet):
     def load_checkpoint(self, folder='checkpoint', filename='checkpoint.pth.tar'):
         # change extension
         filename = filename.split(".")[0] + ".h5"
-        
+
         filepath = os.path.join(folder, filename)
         self.nnet.model.load_weights(filepath)
