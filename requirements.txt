@@ -1,7 +1,7 @@
 absl-py==1.1.0
 astunparse==1.6.3
 cachetools==5.2.0
-certifi==2022.5.18.1
+certifi==2022.12.7
 charset-normalizer==2.0.12
 coloredlogs==15.0.1
 flatbuffers==1.12
