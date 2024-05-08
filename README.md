@@ -59,5 +59,6 @@ Some extensions have been implented [here](https://github.com/kevaday/alphazero-
 * [Adam Lawson](https://github.com/goshawk22) contributed rules and a trained model for 3D TicTacToe.
 * [Carlos Aguayo](https://github.com/carlos-aguayo) contributed rules and a trained model for Dots and Boxes along with a [JavaScript implementation](https://github.com/carlos-aguayo/carlos-aguayo.github.io/tree/master/alphazero).
 * [Robert Ronan](https://github.com/rlronan) contributed rules for Santorini.
+* [Plamen Totev](https://github.con/plamentotev) contributed Go Text Protocol player for Othello.
 
 Note: Chainer and TensorFlow v1 versions have been removed but can be found prior to commit [2ad461c](https://github.com/suragnair/alpha-zero-general/tree/2ad461c393ecf446e76f6694b613e394b8eb652f).
