@@ -1,0 +1,58 @@
+# the first couple of lines is directly copied from official pytorch Dockerfile.
+# Note that I removed the third party package installation to keep this image smaller.
+# It is different to the docker image that is pulled from pytorch/pytorch, I cannot use the base image from official dockerhub because it somehow is missing cuda.h in /usr/local/nvidia, which makes it impossible to install some gpu libraries.
+
+FROM nvidia/cuda:9.0-cudnn7-devel-ubuntu16.04
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+         build-essential \
+         cmake \
+         git \
+         curl \
+         vim \
+         ssh \
+         tzdata \
+         ca-certificates \
+         libjpeg-dev \
+         libsm6 \
+         libxext6 \
+         libxrender-dev \
+         libpng-dev &&\
+     rm -rf /var/lib/apt/lists/*
+
+# Install miniconda, pytorch and other useful python libraries
+RUN curl -o ~/miniconda.sh -O  https://repo.anaconda.com/miniconda/Miniconda3-py37_4.10.3-Linux-x86_64.sh  && \
+chmod +x ~/miniconda.sh && \
+~/miniconda.sh -b -p /opt/conda && \
+rm ~/miniconda.sh && \
+/opt/conda/bin/conda install numpy pyyaml scipy cython jupyter ipython mkl mkl-include && \
+/opt/conda/bin/conda install -c soumith magma-cuda90 && \
+/opt/conda/bin/conda install pytorch=0.4.1 -c pytorch && \
+/opt/conda/bin/conda clean -ya
+
+ENV PATH /opt/conda/bin:$PATH
+
+# This must be done before pip so that requirements.txt is available.
+WORKDIR /opt/pytorch
+# pip install custom module listed in requirements.txt
+COPY ./docker/requirements.txt .
+RUN pip install -U pip && pip install -r requirements.txt
+
+WORKDIR /workspace
+RUN chmod -R a+w /workspace
+
+# notebook port
+EXPOSE 8888
+# visdom port
+EXPOSE 8097
+
+# Set up our notebook config.
+COPY ./docker/jupyter_notebook_config.py /root/.jupyter/
+
+# Jupyter has issues with being run directly:
+#   https://github.com/ipython/ipython/issues/7062
+# We just add a little wrapper script.
+COPY ./docker/run_jupyter.sh /
+RUN chmod +x /run_jupyter.sh
+
+CMD ["/run_jupyter.sh", "--allow-root"]
