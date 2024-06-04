@@ -1,7 +1,7 @@
 import sys
 sys.path.append('..')
 from Game import Game
-from .YoxiiLogic import Board
+from .YoxiiLogic import Board, Isometry
 import numpy as np
 
 class YoxiiGame(Game):
@@ -47,8 +47,7 @@ class YoxiiGame(Game):
             nextBoard: board after applying action
             nextPlayer: player who plays in the next turn (should be -player)
         """
-        b = Board()
-        b.fields = np.copy(board)
+        b = Board(board)
         b.conduct_action(action,player)
         return (b.fields, -player)
 
@@ -64,8 +63,7 @@ class YoxiiGame(Game):
                         0 for invalid moves
         """
         valids = [0]*self.getActionSize()
-        b = Board()
-        b.fields = np.copy(board)
+        b = Board(board)
         legalMoves =  b.get_possible_actions(player)
         if DEBUG:
             print("Legal moves: ",sorted(legalMoves))
@@ -91,8 +89,7 @@ class YoxiiGame(Game):
         Keep in mind that the game ends when the current player has no valid moves.
 
         """
-        b = Board()
-        b.fields = np.copy(board)
+        b = Board(board)
         if len(b.get_totem_moves(player))>0: # if the totem can still be moved by the current player
             return 0
         # else: game ended
@@ -110,23 +107,16 @@ class YoxiiGame(Game):
             player: current player (1 or -1)
 
         Returns:
-            canonicalBoard: returns canonical form of board. The canonical form
-                            should be independent of player. For e.g. in chess,
-                            the canonical form can be chosen to be from the pov
-                            of white. When the player is white, we can return
-                            board as is. When the player is black, we can invert
-                            the colors and return the board.
-                            Multiply the board by the player: This step ensures 
-                            that the player's pieces are represented by positive 
-                            values and the opponent's pieces are represented by 
-                            negative values. This makes it easier to compare the 
-                            board from the perspective of either player.
+            canonicalBoard: if player == 1, return the board as is
+                            if player == -1, toggle the perspective of the board 
+                            as if player -1 would be player 1. 
         
-        We need to swap the position of the information about how many coins per players are still valid.
+        We cannot just use -board since the places where is stored how many coins who has must swap, too. 
         """
-        b = Board()
-        b.fields = board
-        return b.getCanonicalVersion(player,DEBUG=DEBUG)
+        if player == 1:
+            return board
+        #else player == -1 -> we need to toggle the board
+        return Board(board).toggle_perspective()
 
     def getSymmetries(self, board, pi):
         """
@@ -139,9 +129,15 @@ class YoxiiGame(Game):
                         form of the board and the corresponding pi vector. This
                         is used when training the neural network from examples.
         """
-        # TODO Should be included at some point. 
-        # I have XXX idea how to rotate the pi vector effectively.
-        return []
+        all_sym = []
+
+        for iso in Isometry.get_isometry_list():
+            b = Board(board)
+            b.board_isometries(iso)
+            pi_new = b.action_vector_isometries(pi,iso)
+            all_sym += [(b.fields,pi_new)]
+
+        return all_sym
 
     def stringRepresentation(self, board):
         """

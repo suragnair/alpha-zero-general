@@ -21,7 +21,7 @@ args = dotdict({
     'tempThreshold': 15,        # Number of simulations with temp = 1 (MCTS focuses on exploration) then temp = 0 (MCTS focuses on exploitation)
     'updateThreshold': 0.6,     # During arena playoff, new neural net will be accepted if threshold or more of games are won.
     'maxlenOfQueue': 200000,    # Number of game examples to train the neural networks.
-    'numMCTSSims': 100,   # originally 25       # Number of games moves for MCTS to simulate.
+    'numMCTSSims': 50,   # originally 25       # Number of games moves for MCTS to simulate.
     'arenaCompare': 40,   # originally 40      # Number of games to play during arena play to determine if new net will be accepted.
     'cpuct': 1,
 
@@ -71,9 +71,12 @@ def main():
 
 # Ensures that the main function is only executed when the script is run directly, not when imported as a module:
 if __name__ == "__main__":
+    main()
+    """
     try:
         main()
     except Exception as e: 
         for i in range(5):
             winsound.Beep(frequency=2400, duration=300)
         print("An error occurred:", str(e))
+    """

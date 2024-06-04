@@ -115,11 +115,65 @@ def _fill_ACTION_TO_COMBOS():
                 _COMBOS_TO_ACTION[combostr] = tot*37*4 + c*4 + typ
 _fill_ACTION_TO_COMBOS()
 
+class Isometry:
+    "Class for everything related to isometries"
+    "Also needed for baking the _POSITIONMAP and _ACTIONMAP"
+
+    @staticmethod
+    def get_isometry_list():
+        return ["rot90","rot180","rot270","flipX","flipY","flipXY","flipYX"]
+
+    @staticmethod
+    def rotate_grid(grid=np.copy(_INIT_BOARD),iso_type="rot90"):
+        match iso_type:
+            case "rot90":
+                grid = np.rot90(grid)
+            case "rot180":
+                grid = np.rot90(grid,k=2)
+            case "rot270":
+                grid = np.rot90(grid,k=3)
+            case "flipX":
+                grid = np.flip(grid,axis=0)
+            case "flipY":
+                grid = np.flip(grid,axis=1)
+            case "flipXY":
+                grid = np.rot90(np.fliplr(grid))
+            case "flipYX":
+                grid = np.rot90(np.flipud(grid))
+        
+        return grid
+    
+    @staticmethod
+    def bake_POSITIONMAP():
+        global _ALL_SQUARES
+
+        map = dict()
+        for iso in Isometry.get_isometry_list():
+            submap = dict()
+            for (x,y) in _ALL_SQUARES:
+                arr = np.zeros((7,7),dtype=int)
+                arr[x,y] = 1
+                arr = Isometry.rotate_grid(arr,iso)
+                p,q = np.where(arr==1)
+                submap[(x,y)] = (p[0], q[0])
+            map[iso] = submap
+        
+        return map
+
+# dict: isometry --> (dict: pos(x,y) --> pos(p,q)) mapping the new places for x,y under isometry i to p,q
+_POSITIONMAP = Isometry.bake_POSITIONMAP() 
+
+# dict: isometry --> (dict: action --> action') mapping action x to y under isometry i
+_ACTIONMAP = dict() # Will be generated using Board() methods, see below that class
+
+
+
+
 class Board:
 
-    def __init__(self,testing=False):
-        global _INIT_BOARD, _ALL_SQUARES
-        self.fields = np.copy(_INIT_BOARD)
+    def __init__(self,board=_INIT_BOARD,testing=False):
+        global _ALL_SQUARES
+        self.fields = np.copy(board)
 
         if testing: # To try out visuals without playing, set up a board with pieces laying around already. 
             self.fields[2][2], self.fields[2][3], self.fields[3][4], self.fields[3][5] = 1 , -2 , 4 , 3
@@ -188,7 +242,7 @@ class Board:
         all_possible_combos = self.get_possible_move_combos(player)
         return [self.map_combo_to_action(tpos,cpos,coin) for (tpos,cpos,coin) in all_possible_combos]
 
-    def conduct_action(self,action,player):
+    def conduct_action(self,action:int,player:int):
         #print("Local:",sum(self.get_possible_actions(player)))
         #print("Local belongs to state\n",str(self.fields))
         #self.print_board()
@@ -207,13 +261,15 @@ class Board:
         self.setTotem(totem_pos)
         self.place_coin(coin_pos,player,coin_type)
     
-    def map_combo_to_action(self,tot:tuple,c:tuple,typ:int) -> int:
+    @staticmethod
+    def map_combo_to_action(tot:tuple,c:tuple,typ:int) -> int:
         global _COMBOS_TO_ACTION
         typ -= 1 # Since coins 1,2,3,4 are mathematically stored as 0,1,2,3
         strfy = lambda tpl: str(tpl[0]) + str(tpl[1])
         return _COMBOS_TO_ACTION[strfy(tot) + strfy(c) + str(typ)]
 
-    def map_action_to_combo(self,action) -> tuple[tuple[int,int],tuple[int,int],int]:
+    @staticmethod
+    def map_action_to_combo(action) -> tuple[tuple[int,int],tuple[int,int],int]:
         global _ACTION_TO_COMBOS
         c = _ACTION_TO_COMBOS[action]
         c = [int(x) for x in c]
@@ -269,16 +325,12 @@ class Board:
     def evaluate_position(self,player):
         return sum([self.fields[x][y] for (x,y) in self.get_totem_moves(player,free_only=False)]) * player
 
-
-    
     def place_coin(self,pos: tuple, player: int, typ: int): # Typ is 1,2,3,4 and always positive. Player is +-1
         if self.get_remaining_coins(player,typ) > 0:   # Check first, if this coin is still available
             self.fields[pos[0]][pos[1]] = player*typ
             self.set_remaining_coins(player,typ,self.get_remaining_coins(player,typ)-1) # Remove one coin since it has been used. 
         else:
             raise IndexError
-
-
 
     # Method for adding multiple n-tuple vectors together. (1,2,4) + (-2,3,-1) = (-1,5,3)
     @staticmethod
@@ -313,66 +365,40 @@ class Board:
         # Save corner information that is rotation sensitive
         coins = {(player,typ):self.get_remaining_coins(player,typ) for player in [1,-1] for typ in range(1,5)}
         totem = self.getTotem()
-        self.fields[totem[0]][totem[1]] = 100 # So that this can be also rotated
         
+        # Rotate fields
+        self.fields = Isometry.rotate_grid(self.fields,isometry_type)
 
-        # Which manipulation shall be done
-
-        match isometry_type:
-            case "rotate":
-                self.fields = np.rot90(self.fields)
-            case "flipX":
-                self.fields = np.flip(self.fields,axis=0)
-            case "flipY":
-                self.fields = np.flip(self.fields,axis=1)
-            case "flipXY":
-                self.fields = np.rot90(np.fliplr(self.fields))
-            case "flipYX":
-                self.fields = np.rot90(np.flipud(self.fields))
-
-
-        # Restore
-        # Find 100 as totem representation
-        global _ALL_SQUARES
-        for x in range(7):
-            for y in range(7):
-                if (x,y) in _ALL_SQUARES and self.fields[x][y] == 100:
-                    self.fields[x][y] = 0
-                    self.setTotem((x,y))
-                    break
+        # Restore corner information
+        global _POSITIONMAP
+        self.setTotem(_POSITIONMAP[isometry_type][totem])
         for key in coins.keys():
             self.set_remaining_coins(*key,coins[key])
         self.fields[5][0], self.fields[5][6] = 0,0 
 
-    def getCanonicalVersion(self,player,DEBUG=False):
-        """Returns the version of the board where player=1 is forced.
-        Consequently, if the game is align to present for the other player,
-        coin save positions and turn around all values   """
-
-        totem_sum = self.fields[1][0] + self.fields[1][6]  # !=0 since totem is not allowed on (0,0)
-        current_perspective = int(totem_sum/abs(totem_sum)) # 1 or -1
-        #print(totem_sum)
-        if DEBUG:
-            print("Current Perspective: ",current_perspective)
-            print("Requested perspective: ",player)
-            print("Original Version:")
-            self.print_board()
-            print("Canonical Version:")
-
-        if player == current_perspective: 
-            if DEBUG: self.print_board()
-            return self.fields
-        #print("Needs swapping.")
-        #else swap
-        for typ in range(1,5):
-            left = self.get_remaining_coins(1,typ)
-            right = self.get_remaining_coins(-1,typ)
-            self.set_remaining_coins(1,typ,right,mod=(-1 if player == 1 else 1))
-            self.set_remaining_coins(-1,typ,left,mod=(-1 if player == 1 else 1))
-
+    def toggle_perspective(self):
+        "Inverts all on-field values and switches the corner positions; absolutes corner values"
         self.fields = -self.fields
-        if DEBUG: self.print_board()
+        self.fields[0,0], self.fields[0,1] = abs(self.fields[0,1]), abs(self.fields[0,0])
+        self.fields[0,5], self.fields[0,6] = abs(self.fields[0,6]), abs(self.fields[0,5])
+        self.fields[6,0], self.fields[6,1] = abs(self.fields[6,1]), abs(self.fields[6,0])
+        self.fields[6,5], self.fields[6,6] = abs(self.fields[6,6]), abs(self.fields[6,5])
+        self.setTotem(self.getTotem()) # absolutes these values too
+
         return self.fields
+    
+    def action_vector_isometries(self,vec,isometry_type="rotate"):
+        """
+        Probability vector (0,0,0,0.2,0.3,0,0,...,0.1,0.1,0,...) 
+        where each entry represents the probability with which to choose action i at that position i
+        Returns updated probability vector.
+        """
+        global _ACTIONMAP
+        vec_new = [0]*len(vec)
+        for i in range(len(vec)):
+            vec_new[_ACTIONMAP[isometry_type][i]] = vec[i]
+        
+        return vec_new
 
     # For quickly printing a visual representation of the self.fields variable
     def print_board(self):
@@ -411,13 +437,37 @@ class Board:
         print()
         #print("\tL"+7*"--"+"J")
 
+"Generate global _ACTIONMAP dictionary using Board class"
+def bake_ACTIONMAP() -> dict:
+    map = dict()
+    for iso in Isometry.get_isometry_list():
+        submap = dict()
+        for a in range(37*37*4):
+            tot, coin, typ = Board.map_action_to_combo(a)
+            tot_new = _POSITIONMAP[iso][tot]
+            coin_new = _POSITIONMAP[iso][coin]
+            a_new = Board.map_combo_to_action(tot_new,coin_new,typ)
+            submap[a] = a_new
+        map[iso] = submap
+    return map
+_ACTIONMAP = bake_ACTIONMAP()
+
+
+
+
+
+
+
+
+
+
+
 
 """
 Test this class:
 
-"""
 print("--TESTS--\n")
-board = Board()
+board = Board(testing=True)
 print(board.fields)
 
 print(board.map_action_to_combo(2331))
@@ -425,21 +475,56 @@ print(board.map_combo_to_action((0,2),(0,3),2))
 print(board.get_possible_actions(1))
 board.place_coin((1,2),1,1)
 board.place_coin((1,3),-1,2)
+board.place_coin((2,4),1,3)
+board.place_coin((2,5),1,3)
+board.place_coin((4,0),-1,1)
+board.place_coin((5,5),-1,1)
+board.place_coin((6,4),-1,1)
 board.conduct_action(2555,1)
+"""
+
+"""
+checkpoint = board.fields
 board.print_board()
+
+for iso in Isometry.get_isometry_list():
+    print(iso,": ")
+    for ((x,y),(a,b),t) in [((3,3),(3,2),3), ((0,2),(0,3),4), ((4,1),(5,2),1)]:
+        B = Board(checkpoint)
+        print("Original:")
+        B.print_board()
+        print("Action applied:")
+        B.conduct_action(Board.map_combo_to_action((x,y),(a,b),t),1)
+        B.print_board()
+        print("Original Iso applied:")
+        C = Board(checkpoint)
+        C.board_isometries(iso)
+        C.print_board()
+        print("Iso and Action applied:")
+        C.conduct_action(_ACTIONMAP[iso][Board.map_combo_to_action((x,y),(a,b),t)],1)
+        C.print_board()
+        print("="*10)
+        print()
+"""
+
+
+"""
 print(board.fields,end="\n\n")
-board.fields = board.getCanonicalVersion(1)
+print(Board(np.zeros((7,7),dtype=int),testing=True).fields)
+
+board.fields = board.toggle_perspective()
 board.print_board()
-board.fields = board.getCanonicalVersion(-1)
+print(board.fields)
+board.fields = board.toggle_perspective()
 board.print_board()
-board.fields = board.getCanonicalVersion(-1)
-board.print_board()
-board.fields = board.getCanonicalVersion(1)
-board.print_board()
+print(board.fields)
+
 for action in [740, 780, 788, 1248]:
     print(board.map_action_to_combo(action))
 
-"""
+
+
+
     ((1, 3), (0, 2), 1)
 ((1, 3), (2, 2), 1)
 ((1, 3), (2, 4), 1)

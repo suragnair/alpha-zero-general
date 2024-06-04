@@ -1,4 +1,6 @@
 import numpy as np
+import sys
+sys.path.append('..')
 from .YoxiiLogic import Board
 
 class RandomPlayer():
@@ -20,8 +22,7 @@ class HumanPlayer():
     def play(self, board):
         print("Chose a position for your totem: x,y")
         # display(board)
-        b = Board()
-        b.fields = np.copy(board)
+        b = Board(board)
         posActions = self.game.getValidMovesAsActions(board, 1)
         totem_moves = set()
         totem_to_action = {}
@@ -48,7 +49,7 @@ class HumanPlayer():
             except:
                 print("Not a valid position.")
 
-        b.move_totem(chosen_move)
+        b.setTotem(chosen_move)
         b.print_board()
 
         print("Chose a position and coin type: x,y,t")
