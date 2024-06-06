@@ -1,6 +1,7 @@
 '''
 Author: Conrad Schweiker
 Date: 23.05.2024
+Try Yoxii in browser (yoxii.olaf.run) or run the pitForYoxii.py file to test a specific net.
 Board class.
 Board data:
     self.fields[x][y] yields the item on that position
