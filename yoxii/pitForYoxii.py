@@ -41,9 +41,9 @@ mcts2 = MCTS(g, n2, args2)
 n2p = lambda x: np.argmax(mcts2.getActionProb(x, temp=0)) # exchange with rp if you dont want to lose
 
 
-player2 = rp # Exchange with rp (random player), hp (human player)
+player2 = hp # Exchange with rp (random player), hp (human player)
 
 arena = Arena.Arena(n1p, player2, g, display=YoxiiGame.display)
 
-#print(arena.playGames(2 if player2 == hp else 10, verbose=player2 == hp))
-print(arena.playGames(2, verbose=True))
+print(arena.playGames(2 if player2 == hp else 10, verbose=player2 == hp))
+#print(arena.playGames(2, verbose=True))
