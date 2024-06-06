@@ -1,6 +1,6 @@
 import logging
 import coloredlogs
-import winsound
+#import winsound
 import sys
 sys.path.append('..')
 from Coach import Coach  # Main class for training the ai
@@ -27,8 +27,8 @@ args = dotdict({
 
     'checkpoint': current_directory+'/models/checkpoints/',
     'load_model': True,        # Loading a pretrained model? 
-    'load_folder_file': (current_directory+'/models/checkpoints/','checkpoint_72.pth.tar'), 
-    'numItersForTrainExamplesHistory': 20,     # Model is not only trained on the new data but also on the past games of the previous iterations. 
+    'load_folder_file': (current_directory+'/models/checkpoints/','checkpoint_76.pth.tar'), 
+    'numItersForTrainExamplesHistory': 30,     # Model is not only trained on the new data but also on the past games of the previous iterations. 
 
 })
 
