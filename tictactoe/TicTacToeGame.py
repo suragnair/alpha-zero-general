@@ -2,7 +2,7 @@ from __future__ import print_function
 import sys
 sys.path.append('..')
 from Game import Game
-from .TicTacToeLogic import Board
+from tictactoe.TicTacToeLogic import Board
 import numpy as np
 
 """

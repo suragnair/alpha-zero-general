@@ -1,8 +1,9 @@
 import Arena
 from MCTS import MCTS
-from othello.OthelloGame import OthelloGame
-from othello.OthelloPlayers import *
-from othello.pytorch.NNet import NNetWrapper as NNet
+from tictactoe.TicTacToeGame import TicTacToeGame
+from tictactoe.keras.NNet import NNetWrapper as NNet
+from utils import *
+from tictactoe.TicTacToePlayers import *
 
 
 import numpy as np
@@ -17,14 +18,14 @@ mini_othello = False  # Play in 6x6 instead of the normal 8x8.
 human_vs_cpu = True
 
 if mini_othello:
-    g = OthelloGame(6)
+    g = TicTacToeGame(6)
 else:
-    g = OthelloGame(8)
+    g = TicTacToeGame(8)
 
 # all players
 rp = RandomPlayer(g).play
-gp = GreedyOthelloPlayer(g).play
-hp = HumanOthelloPlayer(g).play
+#gp = GreedyOthelloPlayer(g).play
+hp = HumanTicTacToePlayer(g).play
 
 
 
@@ -49,6 +50,6 @@ else:
 
     player2 = n2p  # Player 2 is neural network if it's cpu vs cpu.
 
-arena = Arena.Arena(n1p, player2, g, display=OthelloGame.display)
+arena = Arena.Arena(n1p, player2, g, display=TicTacToeGame.display)
 
 print(arena.playGames(2, verbose=True))
