@@ -11,3 +11,9 @@ checkpoints/
 # For PyCharm users
 .idea/
 
+
+/venv/
+venv/
+/venv
+```
+

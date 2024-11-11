@@ -1,4 +1,10 @@
 import sys
+
+from keras import Model, Input
+from keras.src.layers import Reshape, Activation, Conv2D
+from torch.nn import Flatten
+from torch.optim import Adam
+
 sys.path.append('..')
 from utils import *
 
@@ -15,6 +21,10 @@ Date: Jan 5, 2018.
 
 Based on the OthelloNNet by SourKream and Surag Nair.
 """
+
+
+# I need to add a new head that outputs the predicted nedxt board state.
+# Also a new reward head that predicts the immediate reward for moving to the next state.
 class TicTacToeNNet():
     def __init__(self, game, args):
         # game params
@@ -34,7 +44,18 @@ class TicTacToeNNet():
         s_fc1 = Dropout(args.dropout)(Activation('relu')(BatchNormalization(axis=1)(Dense(1024)(h_conv4_flat))))  # batch_size x 1024
         s_fc2 = Dropout(args.dropout)(Activation('relu')(BatchNormalization(axis=1)(Dense(512)(s_fc1))))          # batch_size x 1024
         self.pi = Dense(self.action_size, activation='softmax', name='pi')(s_fc2)   # batch_size x self.action_size
-        self.v = Dense(1, activation='tanh', name='v')(s_fc2)                    # batch_size x 1
+        self.v = Dense(1, activation='tanh', name='v')(s_fc2)
 
+
+        #From preliminary research, seems this would do the trick, but need more time to confirm
+
+
+        #self.next_state = Dense(self.board_x * self.board_y, activation='relu', name='next_state')(s_fc2)  # batch_size x (board_x * board_y)
+        #self.next_state = Reshape((self.board_x, self.board_y))(self.next_state)  # Reshape to match the board shape
+        # self.reward = Dense(1, activation='linear', name='reward')(s_fc2
+
+        #This model needs to be adjusted to take 4 outputs, the policy, value, next_state, and reward
         self.model = Model(inputs=self.input_boards, outputs=[self.pi, self.v])
+
+        #This line needs to be adjusted to include the next_state and reward in the loss function
         self.model.compile(loss=['categorical_crossentropy','mean_squared_error'], optimizer=Adam(args.lr))

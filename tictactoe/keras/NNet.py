@@ -37,6 +37,10 @@ class NNetWrapper(NeuralNet):
         self.board_x, self.board_y = game.getBoardSize()
         self.action_size = game.getActionSize()
 
+
+
+    #I need to modify this method to include the next_state, which is the predicted board state after the current move,
+    # as well as reward, which is the immediate reward received after transitioning to the predicted next state.
     def train(self, examples):
         """
         examples: list of examples, each example is of form (board, pi, v)
@@ -47,6 +51,9 @@ class NNetWrapper(NeuralNet):
         target_vs = np.asarray(target_vs)
         self.nnet.model.fit(x = input_boards, y = [target_pis, target_vs], batch_size = args.batch_size, epochs = args.epochs)
 
+
+    ## I need to modify this method to include the next_state, which is the predicted board state after the current move, and reward,
+    # in addition to the policy and value that is already here.
     def predict(self, board):
         """
         board: np array with board
@@ -63,6 +70,8 @@ class NNetWrapper(NeuralNet):
         #print('PREDICTION TIME TAKEN : {0:03f}'.format(time.time()-start))
         return pi[0], v[0]
 
+
+#Nothing to modify for these two methods.
     def save_checkpoint(self, folder='checkpoint', filename='checkpoint.pth.tar'):
         # change extension
         filename = filename.split(".")[0] + ".h5"
