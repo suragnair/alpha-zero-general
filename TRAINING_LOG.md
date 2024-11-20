@@ -1,4 +1,4 @@
-6*6_numeps_100_num_mcts_sims_25_2_input_channel 
+### 6*6_numeps_100_num_mcts_sims_25_2_input_channel - A
 - trained for 2 days. around 40 iterations
 - self-competation, the latest 9 iterations, always draw. (40 games in total, 38+ draws)
 
@@ -29,3 +29,17 @@ performs nearly the same.
 
 Analysis:
 
+
+
+### 6*6_numeps_100_num_mcts_sims_100_2_input_channel - B
+- trained for one night. 13 iterations
+- around 30 / 40 draw rate. Not saturated yet.
+
+When comparing B with A in 10 games, A's win / loss / draw rate is 1 / 4 / 15
+
+Analysis:
+ - We did not see a significant improvement in B even after increasing the simulation depths in MCTS. 
+
+Next steps
+ - Check if there is any bugs in the code.
+ - continue to train B until it saturates (40 draws in each iteration)
