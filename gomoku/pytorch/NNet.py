@@ -1,8 +1,10 @@
 import os
 import sys
 import time
+import copy
 
 import numpy as np
+import logging
 from tqdm import tqdm
 
 sys.path.append('../../')
@@ -11,9 +13,11 @@ from NeuralNet import NeuralNet
 
 import torch
 import torch.optim as optim
-
-from .OthelloNNet import OthelloNNet as onnet
 import torch.utils.benchmark as benchmark
+
+from .GomokuNNet import GomokuNNet as gonet
+
+log = logging.getLogger(__name__)
 
 args = dotdict({
     'lr': 0.001,
@@ -23,31 +27,33 @@ args = dotdict({
     'cuda': torch.cuda.is_available(),
     'mps': torch.backends.mps.is_available(),
     'num_channels': 512,
+    'input_channels': 2,
 })
 
 
 class NNetWrapper(NeuralNet):
-    def __init__(self, game):
-        self.nnet = onnet(game, args)
+    def __init__(self, game, input_channels = 2):
+        self.args = copy.copy(args)
+        self.args.input_channels = input_channels
+        print(f"input_channels: {self.args.input_channels}")
+        self.nnet = gonet(game, self.args)
         self.board_x, self.board_y = game.getBoardSize()
         self.action_size = game.getActionSize()
-
         if args.cuda:
             self.nnet.cuda()
         elif args.mps:
             self.nnet = self.nnet.to('mps')
 
-    def train(self, examples):
+    def train(self, examples, preload_data_for_gpu = True):
         """
         examples: list of examples, each example is of form (board, pi, v)
+        preload_data_for_gpu: preload examples on GPU memory. It can speed up training but might blow the GPU memory. 
+            Disable it if you encounter any 
         """
         optimizer = optim.Adam(self.nnet.parameters())
-
-        examples = [(
-            torch.FloatTensor(np.array(board).astype(np.float64)).to('mps'), 
-            torch.FloatTensor(np.array(pi)).to('mps'), 
-            torch.FloatTensor(np.array(vs).astype(np.float64)).to('mps')
-            ) for board, pi, vs in examples]
+        # if args.mps and preload_data_for_gpu:
+        #     # move input to MPS
+        #     examples = []
 
         for epoch in range(args.epochs):
             print('EPOCH ::: ' + str(epoch + 1))
@@ -55,32 +61,25 @@ class NNetWrapper(NeuralNet):
             pi_losses = AverageMeter()
             v_losses = AverageMeter()
 
-            batch_count = int(len(examples) / args.batch_size)
-
+            batch_count = len(examples) // args.batch_size
             t = tqdm(range(batch_count), desc='Training Net')
             for _ in t:
                 sample_ids = np.random.randint(len(examples), size=args.batch_size)
-                boards, target_pis, target_vs = list(zip(*[examples[i] for i in sample_ids]))
-                
-                # boards, pis, vs = list(zip(*[examples[i] for i in sample_ids]))
-                # boards = torch.FloatTensor(np.array(boards).astype(np.float64))
-                # target_pis = torch.FloatTensor(np.array(pis))
-                # target_vs = torch.FloatTensor(np.array(vs).astype(np.float64))
+                boards, pis, vs = list(zip(*[examples[i] for i in sample_ids]))
+
+                boards = np.array(boards)
+                black_stones = (boards == 1).astype(np.float32)
+                white_stones = (boards == -1).astype(np.float32)
+                boards = np.stack([black_stones, white_stones], axis=1)  # Shape: (batch_size, 2, board_x, board_y)
+                boards = torch.FloatTensor(boards)
+                target_pis = torch.FloatTensor(np.array(pis))
+                target_vs = torch.FloatTensor(np.array(vs).astype(np.float32))
 
                 # predict
                 if args.cuda:
                     boards, target_pis, target_vs = boards.contiguous().cuda(), target_pis.contiguous().cuda(), target_vs.contiguous().cuda()
-                # elif args.mps:
-                    # boards, target_pis, target_vs = (
-                    #     boards.contiguous().to('mps'),
-                    #     target_pis.contiguous().to('mps'),
-                    #     target_vs.contiguous().to('mps')
-                    # )
-                # Stack the individual examples into batch tensors
-                boards = torch.stack(boards)        # Shape: (batch_size, 1, board_x, board_y)
-                target_pis = torch.stack(target_pis) # Shape: (batch_size, action_size)
-                target_vs = torch.stack(target_vs)   # Shape: (batch_size, 1)
-                
+                elif args.mps:
+                    boards, target_pis, target_vs = boards.contiguous().to('mps'), target_pis.contiguous().to('mps'), target_vs.contiguous().to('mps')
                 # compute output
                 out_pi, out_v = self.nnet(boards)
                 l_pi = self.loss_pi(target_pis, out_pi)
@@ -105,10 +104,17 @@ class NNetWrapper(NeuralNet):
         start = time.time()
 
         # preparing input
-        board = torch.FloatTensor(board.astype(np.float64))
+        # Preprocess the board into two channels
+        # TODO: optimize it. move it to MPS first? then convert.
+        if self.args.input_channels == 2:
+            black_stones = (board == 1).astype(np.float32)
+            white_stones = (board == -1).astype(np.float32)
+            board = np.stack([black_stones, white_stones], axis=0)  # Shape: (2, board_x, board_y)
+        
+        board = torch.FloatTensor(board.astype(np.float32))
         if args.cuda: board = board.contiguous().cuda()
         elif args.mps: board = board.contiguous().to('mps') 
-        board = board.view(1, self.board_x, self.board_y)
+        board = board.view(self.args.input_channels, self.board_x, self.board_y)
         self.nnet.eval()
         with torch.no_grad():
             pi, v = self.nnet(board)

@@ -11,3 +11,12 @@ checkpoints/
 # For PyCharm users
 .idea/
 
+# environment
+myenv/
+
+# handy tests
+test.py
+
+*.ipynb
+activate.sh
+.ipynb_checkpoints/

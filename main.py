@@ -3,8 +3,8 @@ import logging
 import coloredlogs
 
 from Coach import Coach
-from othello.OthelloGame import OthelloGame as Game
-from othello.pytorch.NNet import NNetWrapper as nn
+from gomoku.GomokuGame import GomokuGame as Game
+from gomoku.pytorch.NNet import NNetWrapper as nn
 from utils import *
 
 log = logging.getLogger(__name__)
@@ -21,9 +21,9 @@ args = dotdict({
     'arenaCompare': 40,         # Number of games to play during arena play to determine if new net will be accepted.
     'cpuct': 1,
 
-    'checkpoint': './temp/',
-    'load_model': False,
-    'load_folder_file': ('/dev/models/8x100x50','best.pth.tar'),
+    'checkpoint': './checkpoints/gomoku/6*6_numeps_100_num_mcts_sims_25_2_input_channels',
+    'load_model': True,
+    'load_folder_file': ('checkpoints/gomoku/6*6_numeps_100_num_mcts_sims_25_2_input_channels','best.pth.tar'),
     'numItersForTrainExamplesHistory': 20,
 
 })
