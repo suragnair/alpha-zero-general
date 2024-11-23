@@ -13,6 +13,7 @@ checkpoints/
 
 # environment
 myenv/
+env/
 
 # handy tests
 test.py

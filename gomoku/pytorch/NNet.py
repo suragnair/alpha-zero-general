@@ -20,10 +20,11 @@ from .GomokuNNet import GomokuNNet as gonet
 log = logging.getLogger(__name__)
 
 args = dotdict({
-    'lr': 0.001,
-    'dropout': 0.3,
+    'lr': 0.0003, # dropped from 0.001 to 0.0003
+    'dropout': 0.5, # Nov. 23. changed from 0.3 to 0.5
     'epochs': 10,
-    'batch_size': 64,
+    'batch_size': 128, # training batch size
+    'eval_batch_size': 256, # eval batch size, make it larger for faster eval
     'cuda': torch.cuda.is_available(),
     'mps': torch.backends.mps.is_available(),
     'num_channels': 128,
@@ -34,7 +35,7 @@ args = dotdict({
 
 class NNetWrapper(NeuralNet):
     def __init__(self, game, input_channels = 2, num_channels = 512):
-        self.args = copy.copy(args)
+        self.args = dotdict(args)
         self.args.input_channels = input_channels
         self.args.num_channels = num_channels
         self.game = game
@@ -64,10 +65,16 @@ class NNetWrapper(NeuralNet):
         test_examples = [examples[i] for i in test_sample_ids]
         
         # early stoping to avoid overfitting
-        best_test_loss = float('inf')
         best_epoch = 0
         no_improve_epochs = 0
         best_nnet = gonet(self.game, self.args)
+        
+        pi_losses, v_losses = self.evaluate_test_set(test_examples)
+        log.info(f"Test Losses - Policy Loss: {pi_losses:.4f}, Value Loss: {v_losses:.4f}")
+
+        best_test_loss = pi_losses + v_losses
+        # save the current best model
+        best_nnet.load_state_dict(copy.deepcopy(self.nnet.state_dict()))
 
         for epoch in range(args.epochs):
             print('EPOCH ::: ' + str(epoch + 1))
@@ -114,7 +121,6 @@ class NNetWrapper(NeuralNet):
                 optimizer.step()
             
             pi_losses, v_losses = self.evaluate_test_set(test_examples)
-            log.info(f"Test Losses - Policy Loss: {pi_losses:.4f}, Value Loss: {v_losses:.4f}")
             if pi_losses + v_losses < best_test_loss:
                 best_test_loss = pi_losses + v_losses
                 no_improve_epochs = 0
@@ -124,10 +130,11 @@ class NNetWrapper(NeuralNet):
             else:
                 no_improve_epochs += 1
                 if no_improve_epochs > self.args.early_stoping_patience:
-                    log.info(f"early stop at epoch {epoch + 1}; saving network trained at epoch {best_epoch + 1}")
+                    log.info(f"early stop at epoch {epoch + 1}")
                     # early stop
                     break
 
+        log.info(f"saving network trained at epoch {best_epoch + 1}")
         self.nnet.load_state_dict(copy.deepcopy(best_nnet.state_dict()))
         self.cpu_nnet.load_state_dict(copy.deepcopy(self.nnet.state_dict()))
         self.cpu_nnet.to('cpu')
@@ -141,26 +148,38 @@ class NNetWrapper(NeuralNet):
             pi_losses = AverageMeter()
             v_losses = AverageMeter()
 
+            batch_count = len(test_examples) // self.args.eval_batch_size
+            t = tqdm(range(batch_count), desc='Evaluating Net')
+
             with torch.no_grad():  # No gradient computation for evaluation
-                for board, pi, v in test_examples:
-                    board = np.array(board, dtype=np.float32)
-                    black_stones = (board == 1).astype(np.float32)
-                    white_stones = (board == -1).astype(np.float32)
-                    board = np.stack([black_stones, white_stones], axis=0)  # Shape: (2, board_x, board_y)
+                for i, _ in enumerate(t):
+                    batch = test_examples[i * self.args.eval_batch_size: (i + 1) * self.args.eval_batch_size]
+
+                    boards, pis, vs = zip(*batch)
+
+                    boards = np.array(boards, dtype=np.float32)
+                    pis = np.array(pis, dtype=np.float32)
+                    vs = np.array(vs, dtype=np.float32)
+                    
+                    black_stones = (boards == 1).astype(np.float32)
+                    white_stones = (boards == -1).astype(np.float32)
+                    boards = np.stack([black_stones, white_stones], axis=1)  # Shape: (batch_size, 2, board_x, board_y)
 
                     # Move data to the appropriate device
-                    board = torch.tensor(board, device=self.device).unsqueeze(0)  # Add batch dimension
-                    target_pi = torch.tensor(pi, device=self.device).unsqueeze(0)  # Add batch dimension
-                    target_v = torch.tensor(v, device=self.device).unsqueeze(0)  # Add batch dimension
+                    boards = torch.tensor(boards, device=self.device)
+                    target_pis = torch.tensor(pis, device=self.device)
+                    target_vs = torch.tensor(vs, device=self.device)
 
-                    # Compute output
-                    out_pi, out_v = self.nnet(board)
-                    l_pi = self.loss_pi(target_pi, out_pi)
-                    l_v = self.loss_v(target_v, out_v)
+                    # compute output
+                    out_pi, out_v = self.nnet(boards)
+                    l_pi = self.loss_pi(target_pis, out_pi)
+                    l_v = self.loss_v(target_vs, out_v)
+                    total_loss = l_pi + l_v
 
-                    # Record loss
-                    pi_losses.update(l_pi.item(), board.size(0))
-                    v_losses.update(l_v.item(), board.size(0))
+                    # record loss
+                    pi_losses.update(l_pi.item(), boards.size(0))
+                    v_losses.update(l_v.item(), boards.size(0))
+                    t.set_postfix(Eval_loss_pi=pi_losses, Eval_loss_v=v_losses)
 
             return pi_losses.avg, v_losses.avg
             
