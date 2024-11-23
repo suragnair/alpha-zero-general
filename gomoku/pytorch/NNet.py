@@ -20,7 +20,7 @@ from .GomokuNNet import GomokuNNet as gonet
 log = logging.getLogger(__name__)
 
 args = dotdict({
-    'lr': 0.0006,
+    'lr': 0.001,
     'dropout': 0.3,
     'epochs': 10,
     'batch_size': 64,
