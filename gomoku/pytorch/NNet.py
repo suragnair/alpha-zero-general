@@ -124,7 +124,7 @@ class NNetWrapper(NeuralNet):
             else:
                 no_improve_epochs += 1
                 if no_improve_epochs > self.args.early_stoping_patience:
-                    log.info(f"early stop at epoch {epoch}; saving network trained at epoch {best_epoch}")
+                    log.info(f"early stop at epoch {epoch + 1}; saving network trained at epoch {best_epoch + 1}")
                     # early stop
                     break
 
