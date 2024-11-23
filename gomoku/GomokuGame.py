@@ -107,7 +107,7 @@ class GomokuGame(Game):
         for y in range(n):
             print(y, "|", end="")    # print the row #
             for x in range(n):
-                piece = board[y][x]    # get the piece to print
+                piece = board[x][y]    # get the piece to print
                 print(GomokuGame.square_content[piece], end=" ")
             print("|")
 

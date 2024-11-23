@@ -7,6 +7,9 @@ This repo is forked from the [Alpha Zero General](https://github.com/suragnair/a
 - Added gomoku implementation.
 
 
+Run unit test
+
+
 TODO
 
 - Use Numba to optimize the speed on CPU.

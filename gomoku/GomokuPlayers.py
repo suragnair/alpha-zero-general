@@ -30,7 +30,7 @@ class HumanGomokuPlayer():
                 try:
                     x,y = [int(i) for i in input_a]
                     if ((0 <= x) and (x < self.game.n) and (0 <= y) and (y < self.game.n)):
-                        a = self.game.n * y + x
+                        a = self.game.n * x + y
                         if valid[a]:
                             break
                 except ValueError:

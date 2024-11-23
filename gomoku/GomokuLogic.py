@@ -5,13 +5,15 @@ Board class.
 Board data:
   1=white, -1=black, 0=empty
   first dim is column , 2nd is row:
-     pieces[1][7] is the square in column 2,
-     at the opposite end of the board in row 8.
-Squares are stored and manipulated as (x,y) tuples.
+     pieces[1][7] is the stone in column 1 row 7,
+Stones are stored and manipulated as (x,y) tuples.
 x is the column, y is the row.
+(0, 0) is the top-left corner.
 '''
 import logging
 import numpy as np
+
+log = logging.getLogger(__name__)
 
 class Board():
 
@@ -54,8 +56,7 @@ class Board():
             for x in range(self.n):
                 if self[x][y]!=color:
                     continue
-                # we only need to count 4 directions
-                if len(self._get_n_in_a_row(x, y, 5)):
+                if len(self._get_n_in_a_row(x, y, 5)) > 0:
                     return True
         return False
 
@@ -79,7 +80,6 @@ class Board():
             if count == n:
                 directions.append(direction)
         return directions
-
 
     def is_within_board(self, x, y):
         return x >= 0 and x < self.n and y >= 0 and y < self.n

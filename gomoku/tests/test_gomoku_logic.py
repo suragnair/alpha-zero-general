@@ -134,6 +134,27 @@ class TestBoard(unittest.TestCase):
 
         self.assertEqual(set(legal_moves), set([(0, 0)]))
 
+    def test_get_legal_moves_with_a_complicated_pattern(self):
+        # Place some stones and test legal move generation
+        self.board.execute_move((4, 0), 1)
+        self.board.execute_move((4, 5), 1)
+        self.board.execute_move((1, 2), 1)
+        self.board.execute_move((1, 3), 1)
+        self.board.execute_move((2, 2), 1)
+        self.board.execute_move((2, 4), 1)
+        self.board.execute_move((3, 2), 1)
+        self.board.execute_move((3, 1), -1)
+        self.board.execute_move((4, 1), -1)
+        self.board.execute_move((4, 2), -1)
+        self.board.execute_move((4, 3), -1)
+        self.board.execute_move((1, 4), -1)
+        self.board.execute_move((2, 3), -1)
+        self.board.execute_move((3, 3), -1)
+
+        legal_moves = self.board.get_legal_moves(-1)
+
+        self.assertEqual(set(legal_moves), set([(0, 0)]))
+
     def test_is_within_board(self):
         # Test the is_within_board function
         self.assertTrue(self.board.is_within_board(0, 0))
