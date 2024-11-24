@@ -40,8 +40,6 @@ class NNetWrapper(NeuralNet):
         self.args.num_channels = num_channels
         self.game = game
         self.nnet = gonet(game, self.args)
-        # cpu_nnet is a copy stored on CPU to do prediction.
-        self.cpu_nnet = gonet(game, self.args)
         self.board_x, self.board_y = game.getBoardSize()
         self.action_size = game.getActionSize()
         device = 'cuda' if args.cuda else 'mps' if args.mps else 'cpu'
@@ -70,7 +68,6 @@ class NNetWrapper(NeuralNet):
         best_nnet = gonet(self.game, self.args)
         
         pi_losses, v_losses = self.evaluate_test_set(test_examples)
-        log.info(f"Test Losses - Policy Loss: {pi_losses:.4f}, Value Loss: {v_losses:.4f}")
 
         best_test_loss = pi_losses + v_losses
         # save the current best model
@@ -136,9 +133,7 @@ class NNetWrapper(NeuralNet):
 
         log.info(f"saving network trained at epoch {best_epoch + 1}")
         self.nnet.load_state_dict(copy.deepcopy(best_nnet.state_dict()))
-        self.cpu_nnet.load_state_dict(copy.deepcopy(self.nnet.state_dict()))
-        self.cpu_nnet.to('cpu')
-
+        
     def evaluate_test_set(self, test_examples):
             """
             Evaluate the model on the test examples and calculate average losses.
@@ -188,27 +183,24 @@ class NNetWrapper(NeuralNet):
         board: np array with board
         """
         # timing
-        start = time.time()
+        # start = time.time()
 
         # preparing input
         # Preprocess the board into two channels
-        # TODO: optimize it. move it to MPS first? then convert.
         if self.args.input_channels == 2:
             black_stones = (board == 1).astype(np.float32)
             white_stones = (board == -1).astype(np.float32)
             board = np.stack([black_stones, white_stones], axis=0)  # Shape: (2, board_x, board_y)
         
-        # board = torch.tensor(board, dtype=torch.float32, device=self.device)
-        board = torch.tensor(board, dtype=torch.float32)
-        board = board.view(self.args.input_channels, self.board_x, self.board_y)
-        self.cpu_nnet.eval()
+        board = torch.tensor(board, dtype=torch.float32, device=self.device)
+        
+        self.nnet.eval()
         with torch.no_grad():
-            pi, v = self.cpu_nnet(board)
+            pi, v = self.nnet(board)
 
+        return torch.exp(pi).data.cpu().numpy()[0], v.data.cpu().numpy()[0][0]
         # print('PREDICTION TIME TAKEN : {0:03f}'.format(time.time()-start))
-        # return torch.exp(pi).data.cpu().numpy()[0], v.data.cpu().numpy()[0][0]
-        return torch.exp(pi).data.numpy()[0], v.data.numpy()[0][0]
-
+        
     def loss_pi(self, targets, outputs):
         return -torch.sum(targets * outputs) / targets.size()[0]
 

@@ -25,7 +25,7 @@ any agent.
 def main():
     human_vs_cpu = True
 
-    g = GomokuGame(6)
+    g = GomokuGame(15)
 
     # all players
     rp = RandomPlayer(g).play
@@ -34,7 +34,7 @@ def main():
 
     # nnet players
     n1 = NNet(g, input_channels = 2, num_channels = 128)
-    n1.load_checkpoint('./checkpoints/gomoku/6*6_numeps_100_num_mcts_sims_100_2_input_channels_128_channels','best.pth.tar')
+    n1.load_checkpoint('./checkpoints/gomoku/15*15_numeps_100_num_mcts_sims_25_temp_15_input_channels_2_channels_128','best.pth.tar')
 
     args1 = dotdict({'numMCTSSims': 100, 'cpuct':1.0, 'verbose': 1})
     mcts1 = MCTS(g, n1, args1)
@@ -57,7 +57,7 @@ def main():
 
 
 def two_model_compete():
-    g = GomokuGame(6)
+    g = GomokuGame(15)
     n1 = NNet(g, input_channels = 2)
     n1.load_checkpoint('./checkpoints/gomoku/6*6_numeps_100_num_mcts_sims_100_2_input_channels','best.pth.tar')
 

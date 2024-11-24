@@ -2,6 +2,7 @@ import logging
 import math
 import sys
 
+
 import numpy as np
 
 EPS = 1e-8
@@ -25,19 +26,20 @@ class MCTS():
 
         self.Es = {}  # stores game.getGameEnded ended for board s
         self.Vs = {}  # stores game.getValidMoves for board s
-
+        
     def getActionProb(self, canonicalBoard, temp=1):
         """
-        This function performs numMCTSSims simulations of MCTS starting from
-        canonicalBoard.
+        Performs MCTS simulations starting from canonicalBoard, for numMCTSSims times
 
         Returns:
             probs: a policy vector where the probability of the ith action is
                    proportional to Nsa[(s,a)]**(1./temp)
         """
-        for i in range(self.args.numMCTSSims):
+
+        for _ in range(self.args.numMCTSSims):
             self.search(canonicalBoard)
 
+        # Comput action probabilities
         s = self.game.stringRepresentation(canonicalBoard)
 
         counts = np.array(
@@ -87,8 +89,10 @@ class MCTS():
 
         s = self.game.stringRepresentation(canonicalBoard)
 
+        # Check terminal state
         if s not in self.Es:
             self.Es[s] = self.game.getGameEnded(canonicalBoard, 1)
+
         if self.Es[s] != 0:
             # terminal node
             if self.Es[s] == 2:
@@ -96,9 +100,11 @@ class MCTS():
                 return 0
             return -self.Es[s]
 
+        # Expand the leaf node
         if s not in self.Ps:
-            # leaf node
+
             self.Ps[s], v = self.nnet.predict(canonicalBoard)
+            
             valids = self.game.getValidMoves(canonicalBoard, 1)
             self.Ps[s] *=  valids  # masking invalid moves
             sum_Ps_s = np.sum(self.Ps[s])

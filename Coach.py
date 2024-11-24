@@ -4,7 +4,8 @@ import sys
 from collections import deque
 from pickle import Pickler, Unpickler
 from random import shuffle
-
+from concurrent.futures import ThreadPoolExecutor
+import concurrent
 import numpy as np
 from tqdm import tqdm
 
@@ -47,30 +48,31 @@ class Coach():
         """
         trainExamples = []
         board = self.game.getInitBoard()
-        self.curPlayer = 1
+        curPlayer = 1
         episodeStep = 0
-
+        mcts = MCTS(self.game, self.nnet, self.args)  # reset search tree TODO: do we really need to reset?
+ 
         while True:
             episodeStep += 1
-            canonicalBoard = self.game.getCanonicalForm(board, self.curPlayer)
+            canonicalBoard = self.game.getCanonicalForm(board, curPlayer)
             temp = int(episodeStep < self.args.tempThreshold)
 
-            pi = self.mcts.getActionProb(canonicalBoard, temp=temp)
+            pi = mcts.getActionProb(canonicalBoard, temp=temp)
             sym = self.game.getSymmetries(canonicalBoard, pi)
             for b, p in sym:
-                trainExamples.append([b, self.curPlayer, p, None])
+                trainExamples.append([b, curPlayer, p, None])
 
             action = np.random.choice(len(pi), p=pi)
-            board, self.curPlayer = self.game.getNextState(board, self.curPlayer, action)
+            board, curPlayer = self.game.getNextState(board, curPlayer, action)
 
-            r = self.game.getGameEnded(board, self.curPlayer)
+            r = self.game.getGameEnded(board, curPlayer)
 
             if r != 0:
                 if r == 2:
                     # game draw. We did not collect any rewards.
                     # shall we drop these training examples?
                     r = 0
-                return [(x[0], x[2], r * ((-1) ** (x[1] != self.curPlayer))) for x in trainExamples]
+                return [(x[0], x[2], r * ((-1) ** (x[1] != curPlayer))) for x in trainExamples]
 
     def learn(self):
         """
@@ -88,10 +90,15 @@ class Coach():
             if not self.skipFirstSelfPlay or i > 1:
                 iterationTrainExamples = deque([], maxlen=self.args.maxlenOfQueue)
 
-                for _ in tqdm(range(self.args.numEps), desc="Self Play"):
-                    self.mcts = MCTS(self.game, self.nnet, self.args)  # reset search tree
-                    iterationTrainExamples += self.executeEpisode()
+                with ThreadPoolExecutor(max_workers=self.args.num_workers) as executor:
+                    # Launch async simulations
+                    futures = [executor.submit(self.executeEpisode) for _ in range(self.args.numEps)]
 
+                    with tqdm(total=self.args.numEps, desc=f"Self Play with {self.args.num_workers} workers") as pbar:
+                        for future in concurrent.futures.as_completed(futures):
+                            iterationTrainExamples += future.result()
+                            pbar.update(1)
+    
                 # save the iteration examples to the history 
                 self.trainExamplesHistory.append(iterationTrainExamples)
 

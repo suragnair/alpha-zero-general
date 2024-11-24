@@ -28,6 +28,8 @@ args = dotdict({
     'num_channels': 128,
     'input_channels': 2,
     'verbose': 0,
+    # parallism params
+    'num_workers': 4,
 })
 
 
