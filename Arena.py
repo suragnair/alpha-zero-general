@@ -37,6 +37,8 @@ class Arena():
             or
                 draw result returned from the game that is neither 1, -1, nor 0.
         """
+        if verbose:
+            assert self.display
         players = [self.player2, None, self.player1]
         curPlayer = 1
         board = self.game.getInitBoard()
@@ -49,16 +51,19 @@ class Arena():
         while self.game.getGameEnded(board, curPlayer) == 0:
             it += 1
             if verbose:
-                assert self.display
-                print("Turn ", str(it), "Player ", str(curPlayer))
+                print(f"Turn {it}, Player {curPlayer}")
                 self.display(board)
-            action = players[curPlayer + 1](self.game.getCanonicalForm(board, curPlayer))
+            action = players[curPlayer + 1](
+                self.game.getCanonicalForm(board, curPlayer)
+            )
 
-            valids = self.game.getValidMoves(self.game.getCanonicalForm(board, curPlayer), 1)
+            valids = self.game.getValidMoves(
+                self.game.getCanonicalForm(board, curPlayer), curPlayer
+            )
 
             if valids[action] == 0:
-                log.error(f'Action {action} is not valid!')
-                log.debug(f'valids = {valids}')
+                log.error(f"Action {action} is not valid!")
+                log.debug(f"valids = {valids}")
                 assert valids[action] > 0
 
             # Notifying the opponent for the move
@@ -73,8 +78,10 @@ class Arena():
                 player.endGame()
 
         if verbose:
-            assert self.display
-            print("Game over: Turn ", str(it), "Result ", str(self.game.getGameEnded(board, 1)))
+            print(
+                f"Game over: Turn {it}, "
+                f"Player 1 Result {self.game.getGameEnded(board, 1)}"
+            )
             self.display(board)
         return curPlayer * self.game.getGameEnded(board, curPlayer)
 
@@ -88,7 +95,7 @@ class Arena():
             twoWon: games won by player2
             draws:  games won by nobody
         """
-
+        assert num % 2 == 0, "Please enter an even number of games."
         num = int(num / 2)
         oneWon = 0
         twoWon = 0
