@@ -12,20 +12,24 @@ log = logging.getLogger(__name__)
 coloredlogs.install(level='INFO')  # Change this to DEBUG to see more info.
 
 args = dotdict({
-    'numIters': 1000,
-    'numEps': 100,              # Number of complete self-play games to simulate during a new iteration.
-    'tempThreshold': 15,        #
-    'updateThreshold': 0.6,     # During arena playoff, new neural net will be accepted if threshold or more of games are won.
-    'maxlenOfQueue': 200000,    # Number of game examples to train the neural networks.
-    'numMCTSSims': 25,          # Number of games moves for MCTS to simulate.
-    'arenaCompare': 40,         # Number of games to play during arena play to determine if new net will be accepted.
-    'cpuct': 1,
+    'numIters': 1000,           # Number of training iterations
+    'numEps': 100,              # Number of self-play games per training iteration
+    'tempThreshold': 15,        # Number of iterations to pass before increasing MCTS temp by 1
+    'updateThreshold': 0.6,     # Threshold win percentage of arena games to accept a new neural network
+    'maxlenOfQueue': 200_000,   # Number of game examples to train the neural networks.
+    'numMCTSSims': 25,          # Number of moves for MCTS to simulate.
+    'arenaCompare': 40,         # Number of arena games to assess neural network for acceptance
+    'cpuct': 1,                 # PUCT exploration constant
 
-    'checkpoint': './temp/',
+    'checkpoint': './temp/',    # Folder name to save checkpoints
+    # Set True to load in the model weights from checkpoint and training
+    # examples from the load_folder_file
     'load_model': False,
-    'load_folder_file': ('/dev/models/8x100x50','best.pth.tar'),
+    # Two-tuple of folder and filename where training examples are housed
+    'load_folder_file': ('/dev/models/8x100x50', 'best.pth.tar'),
+    # Max amount of training examples to keep in the history, dropping the
+    # oldest example beyond that before adding a new one (like a FIFO queue)
     'numItersForTrainExamplesHistory': 20,
-
 })
 
 
