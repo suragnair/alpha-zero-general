@@ -3,8 +3,8 @@ import logging
 import coloredlogs
 
 from Coach import Coach
-from othello.OthelloGame import OthelloGame as Game
-from othello.pytorch.NNet import NNetWrapper as nn
+from tictactoe.TicTacToeGame import TicTacToeGame as Game
+from tictactoe.keras.TicTacToeNNet import TicTacToeNNet as nn
 from utils import *
 
 log = logging.getLogger(__name__)
@@ -20,21 +20,25 @@ args = dotdict({
     'numMCTSSims': 25,          # Number of games moves for MCTS to simulate.
     'arenaCompare': 40,         # Number of games to play during arena play to determine if new net will be accepted.
     'cpuct': 1,
+    'num_channels': 512,        # Number of channels in convolutional layers
+    'dropout': 0.3,             # Dropout rate for regularization
+    'lr': 0.001,                # Learning rate for the optimizer
+    'batch_size': 64,           # Batch size for training
+    'epochs': 10,               # Number of training epochs
 
     'checkpoint': './temp/',
     'load_model': False,
-    'load_folder_file': ('/dev/models/8x100x50','best.pth.tar'),
+    'load_folder_file': ('tictactoe/pretrained','best.weights.h5'),
     'numItersForTrainExamplesHistory': 20,
-
 })
 
 
 def main():
     log.info('Loading %s...', Game.__name__)
-    g = Game(6)
+    g = Game()
 
     log.info('Loading %s...', nn.__name__)
-    nnet = nn(g)
+    nnet = nn(g, args)
 
     if args.load_model:
         log.info('Loading checkpoint "%s/%s"...', args.load_folder_file[0], args.load_folder_file[1])
