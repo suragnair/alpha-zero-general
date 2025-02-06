@@ -14,23 +14,24 @@ Date: Jan 5, 2018.
 Based on the board for the game of Othello by Eric P. Nichols.
 
 '''
+
+
 # from bkcharts.attributes import color
 class Board():
-
     # list of all 8 directions on the board, as (x,y) offsets
-    __directions = [(1,1),(1,0),(1,-1),(0,-1),(-1,-1),(-1,0),(-1,1),(0,1)]
+    __directions = [(1, 1), (1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1), (0, 1)]
 
     def __init__(self, n=3):
         "Set up initial board configuration."
 
         self.n = n
         # Create the empty board array.
-        self.pieces = [None]*self.n
+        self.pieces = [None] * self.n
         for i in range(self.n):
-            self.pieces[i] = [0]*self.n
+            self.pieces[i] = [0] * self.n
 
     # add [][] indexer syntax to the Board
-    def __getitem__(self, index): 
+    def __getitem__(self, index):
         return self.pieces[index]
 
     def get_legal_moves(self, color):
@@ -43,18 +44,18 @@ class Board():
         # Get all the empty squares (color==0)
         for y in range(self.n):
             for x in range(self.n):
-                if self[x][y]==0:
-                    newmove = (x,y)
+                if self[x][y] == 0:
+                    newmove = (x, y)
                     moves.add(newmove)
         return list(moves)
 
     def has_legal_moves(self):
         for y in range(self.n):
             for x in range(self.n):
-                if self[x][y]==0:
+                if self[x][y] == 0:
                     return True
         return False
-    
+
     def is_win(self, color):
         """Check whether the given player has collected a triplet in any direction; 
         @param color (1=white,-1=black)
@@ -64,32 +65,32 @@ class Board():
         for y in range(self.n):
             count = 0
             for x in range(self.n):
-                if self[x][y]==color:
+                if self[x][y] == color:
                     count += 1
-            if count==win:
+            if count == win:
                 return True
         # check x-strips
         for x in range(self.n):
             count = 0
             for y in range(self.n):
-                if self[x][y]==color:
+                if self[x][y] == color:
                     count += 1
-            if count==win:
+            if count == win:
                 return True
         # check two diagonal strips
         count = 0
         for d in range(self.n):
-            if self[d][d]==color:
+            if self[d][d] == color:
                 count += 1
-        if count==win:
+        if count == win:
             return True
         count = 0
         for d in range(self.n):
-            if self[d][self.n-d-1]==color:
+            if self[d][self.n - d - 1] == color:
                 count += 1
-        if count==win:
+        if count == win:
             return True
-        
+
         return False
 
     def execute_move(self, move, color):
@@ -97,9 +98,8 @@ class Board():
         color gives the color pf the piece to play (1=white,-1=black)
         """
 
-        (x,y) = move
+        (x, y) = move
 
         # Add the piece to the empty square.
         assert self[x][y] == 0
         self[x][y] = color
-
