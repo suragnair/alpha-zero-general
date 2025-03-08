@@ -1,7 +1,32 @@
+# Enhanced Alpha Zero General framework
+
+This repo is forked from the [Alpha Zero General](https://github.com/suragnair/alpha-zero-general) repo with following enhancements.
+
+- Mac Mini GPU support
+- Split the board into two planes, one for black stones and one for white, to align with the AlphaGo Zero paper.
+- Added gomoku implementation.
+
+
+Run unit test
+
+`python -m unittest`
+
+TODO
+
+- Use Numba to optimize the speed on CPU.
+- Implement asynchronized MCTS.
+- Fine tune the Gomoku training algorithm. Some exploration directions: 
+   - Increase the simulation steps
+   - Build a deeper CNN
+
+
+
+Folling content is from the original README file
+
 # Alpha Zero General (any game, any framework!)
 A simplified, highly flexible, commented and (hopefully) easy to understand implementation of self-play based reinforcement learning based on the AlphaGo Zero paper (Silver et al). It is designed to be easy to adopt for any two-player turn-based adversarial game and any deep learning framework of your choice. A sample implementation has been provided for the game of Othello in PyTorch and Keras. An accompanying tutorial can be found [here](https://suragnair.github.io/posts/alphazero.html). We also have implementations for many other games like GoBang and TicTacToe.
 
-To use a game of your choice, subclass the classes in ```Game.py``` and ```NeuralNet.py``` and implement their functions. Example implementations for Othello can be found in ```othello/OthelloGame.py``` and ```othello/{pytorch,keras}/NNet.py```. 
+To use a game of your choice, subclass the classes in ```Game.py``` and ```NeuralNet.py``` and impleme their functions. Example implementations for Othello can be found in ```othello/OthelloGame.py``` and ```othello/{pytorch,keras}/NNet.py```. 
 
 ```Coach.py``` contains the core training loop and ```MCTS.py``` performs the Monte Carlo Tree Search. The parameters for the self-play can be specified in ```main.py```. Additional neural network parameters are in ```othello/{pytorch,keras}/NNet.py``` (cuda flag, batch size, epochs, learning rate etc.). 
 
@@ -38,6 +63,12 @@ If you found this work useful, feel free to cite it as
   year={2016},
   publisher={Stanford University, Final Project Report}
 }
+```
+
+### Testing
+
+```
+pytest
 ```
 
 ### Contributing

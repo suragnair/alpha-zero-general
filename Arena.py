@@ -1,6 +1,8 @@
 import logging
 
 from tqdm import tqdm
+from concurrent.futures import ThreadPoolExecutor
+import concurrent
 
 log = logging.getLogger(__name__)
 
@@ -10,6 +12,7 @@ class Arena():
     An Arena class where any 2 agents can be pit against each other.
     """
 
+    NUM_WORKERS = 16
     def __init__(self, player1, player2, game, display=None):
         """
         Input:
@@ -76,6 +79,7 @@ class Arena():
             assert self.display
             print("Game over: Turn ", str(it), "Result ", str(self.game.getGameEnded(board, 1)))
             self.display(board)
+            
         return curPlayer * self.game.getGameEnded(board, curPlayer)
 
     def playGames(self, num, verbose=False):
@@ -93,24 +97,57 @@ class Arena():
         oneWon = 0
         twoWon = 0
         draws = 0
-        for _ in tqdm(range(num), desc="Arena.playGames (1)"):
-            gameResult = self.playGame(verbose=verbose)
-            if gameResult == 1:
-                oneWon += 1
-            elif gameResult == -1:
-                twoWon += 1
-            else:
-                draws += 1
+        with ThreadPoolExecutor(max_workers=Arena.NUM_WORKERS) as executor:
+            futures = [executor.submit(self.playGame, verbose=verbose) for _ in range(num)]
+            gameResult = []
+            with tqdm(total=num, desc=f"Arena.playGames (1) with {Arena.NUM_WORKERS} workers") as pbar:
+                for future in concurrent.futures.as_completed(futures):
+                    try:
+                        gameResult.append(future.result())
+                    except Exception as e:
+                        log.error(f"Exception in a worker: {e}") 
+                    finally:                               
+                        pbar.update(1)
+            oneWon = gameResult.count(1) 
+            twoWon = gameResult.count(-1)
+            draws = num - oneWon - twoWon
+ 
+        # for _ in tqdm(range(num), desc="Arena.playGames (1)"):
+        #     gameResult = self.playGame(verbose=verbose)
+        #     if gameResult == 1:
+        #         oneWon += 1
+        #     elif gameResult == -1:
+        #         twoWon += 1
+        #     else:
+        #         draws += 1
 
-        self.player1, self.player2 = self.player2, self.player1
+            # switch players (white and black)
+            self.player1, self.player2 = self.player2, self.player1
+            gameResult = []
+            futures = [executor.submit(self.playGame, verbose=verbose) for _ in range(num)]
 
-        for _ in tqdm(range(num), desc="Arena.playGames (2)"):
-            gameResult = self.playGame(verbose=verbose)
-            if gameResult == -1:
-                oneWon += 1
-            elif gameResult == 1:
-                twoWon += 1
-            else:
-                draws += 1
+            with tqdm(total=num, desc=f"Arena.playGames (2) with {Arena.NUM_WORKERS} workers") as pbar:
+                for future in concurrent.futures.as_completed(futures):
+                    try:
+                        gameResult.append(future.result())
+                    except Exception as e:
+                        log.error(f"Exception in a worker: {e}") 
+                    finally:                               
+                        pbar.update(1)
+
+            oneWon += gameResult.count(-1) 
+            twoWon += gameResult.count(1)
+            draws = num * 2 - oneWon - twoWon
+
+        # for _ in tqdm(range(num), desc="Arena.playGames (2)"):
+        #     gameResult = self.playGame(verbose=verbose)
+        #     if gameResult == -1:
+        #         oneWon += 1
+        #     elif gameResult == 1:
+        #         twoWon += 1
+        #     else:
+        #         draws += 1
 
         return oneWon, twoWon, draws
+
+        
