@@ -1,0 +1,55 @@
+[project]
+name = "alpha-zero-general"
+version = "1.0.0"
+description = "A simplified, highly flexible implementation of AlphaZero"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24.0",
+    "torch>=2.0.0",
+    "pydantic>=2.0.0",
+    "tqdm>=4.64.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "ruff>=0.1.0",
+]
+keras = [
+    "tensorflow>=2.9.0",
+    "keras>=2.9.0",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "mypy>=1.19.1",
+    "pytest>=7.0.0",
+    "ruff>=0.1.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = ["E501"]
+
+[tool.hatch.build.targets.wheel]
+packages = [
+    "minishogi",
+    "othello",
+    "tictactoe",
+    "tictactoe_3d",
+    "connect4",
+    "gobang",
+    "tafl",
+    "rts",
+    "dotsandboxes",
+    "santorini",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
