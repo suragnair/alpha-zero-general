@@ -11,6 +11,7 @@
     - Othello        [Yes]       [Yes]
     - TicTacToe                  [Yes]
     - TicTacToe3D                [Yes]
+    - TicTacToe4D    [Yes]
     - Connect4                   [Yes]
     - Gobang                     [Yes]
     - Tafl           [Yes]       [Yes]
@@ -33,6 +34,9 @@ from tictactoe.keras.NNet import NNetWrapper as TicTacToeKerasNNet
 
 from tictactoe_3d.TicTacToeGame import TicTacToeGame as TicTacToe3DGame
 from tictactoe_3d.keras.NNet import NNetWrapper as TicTacToe3DKerasNNet
+
+from tictactoe_4d.TicTacToe4DGame import TicTacToe4DGame
+from tictactoe_4d.pytorch.NNet import NNetWrapper as TicTacToe4DPytorchNNet
 
 from connect4.Connect4Game import Connect4Game
 from connect4.keras.NNet import NNetWrapper as Connect4KerasNNet
@@ -77,6 +81,9 @@ class TestAllGames(unittest.TestCase):
     
     def test_tictactoe3d_keras(self):
         self.execute_game_test(TicTacToe3DGame(3), TicTacToe3DKerasNNet)
+
+    def test_tictactoe4d_pytorch(self):
+        self.execute_game_test(TicTacToe4DGame(4), TicTacToe4DPytorchNNet)
   
     def test_gobang_keras(self):
         self.execute_game_test(GobangGame(), GobangKerasNNet)

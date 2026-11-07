@@ -57,6 +57,7 @@ Some extensions have been implented [here](https://github.com/kevaday/alphazero-
 * [MBoss](https://github.com/1424667164) contributed rules and a model for GoBang.
 * [Jernej Habjan](https://github.com/JernejHabjan) contributed RTS game.
 * [Adam Lawson](https://github.com/goshawk22) contributed rules and a trained model for 3D TicTacToe.
+* [Ilya Kisselyov](https://github.com/ilyakz) contributed rules and a trained model for 4D TicTacToe, along with a [browser version](https://ilyakz.github.io/qubic-zero/) ([source](https://github.com/ilyakz/qubic-zero)).
 * [Carlos Aguayo](https://github.com/carlos-aguayo) contributed rules and a trained model for Dots and Boxes along with a [JavaScript implementation](https://github.com/carlos-aguayo/carlos-aguayo.github.io/tree/master/alphazero).
 * [Robert Ronan](https://github.com/rlronan) contributed rules for Santorini.
 * [Plamen Totev](https://github.com/plamentotev) contributed Go Text Protocol player for Othello.
