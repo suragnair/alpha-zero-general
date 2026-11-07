@@ -55,7 +55,7 @@ A board in a terminal is hard to read in four dimensions. The [browser version](
 
 `pretrained_models/tictactoe_4d/pytorch/4x4x4x4_best.pth.tar` has 32 channels, 4 residual blocks and 690,722 parameters, 2.8 MB in all.
 
-It was not trained with `Coach.py`. It comes from [qubic-zero](https://github.com/ilyakz/qubic-zero), a separate engine with a parallel self-play core, where half of the training games were played against a threat-search bot. That engine plays forced moves outside the network and looks for winning threat sequences during the search, so the network was never taught those moves. This is why `predict` plays them here.
+It was not trained with `Coach.py`. It comes from [qubic-zero](https://github.com/ilyakz/qubic-zero), a separate engine with a parallel self-play core. Its training mixed self-play with games against a threat-search bot and against an earlier version of the network, using the root search of Gumbel AlphaZero. That engine plays forced moves outside the network and looks for winning threat sequences during the search, so the network was never taught those moves. This is why `predict` plays them here.
 
 ## Strength
 
@@ -65,7 +65,7 @@ Measured with this repository's `Arena` and `MCTS`, `cpuct` 1.5, a new search tr
 |---|---|---|---|
 | `RandomPlayer` | 25 | 40 | 100% |
 | `OneStepPlayer` | 100 | 40 | 100% |
-| Threat-search bot from qubic-zero | 25 | 100 | 21% |
-| Threat-search bot from qubic-zero | 100 | 100 | 19% |
+| Threat-search bot from qubic-zero | 25 | 100 | 20% |
+| Threat-search bot from qubic-zero | 100 | 60 | 30% |
 
-The last two rows show the limit of this setup. The bot plays long sequences of forcing moves, and plain MCTS with so few simulations does not see them coming: moving first the network won 16 games of 50, moving second 3 of 50. In qubic-zero's own engine, which adds threat-sequence search and a safety check at the root, the same weights score 69% against this bot over 200 games at 100 simulations.
+The last two rows show the limit of this setup. The bot plays long sequences of forcing moves, and plain MCTS with so few simulations does not see them coming: at 100 simulations the network won 14 games of 30 moving first and 4 of 30 moving second. In qubic-zero's own engine, which adds threat-sequence search and a safety check at the root, the same weights score 97% against this bot over 400 games at 100 simulations.
